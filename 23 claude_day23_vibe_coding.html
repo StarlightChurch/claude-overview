@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>23일차: 바이브 코딩(Vibe Coding) | Claude 활용 가이드</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;500;600&family=Bebas+Neue&display=swap');
+
+  :root {
+    --ink:    #0a0514;
+    --paper:  #f7f5fc;
+    --v1:     #8b5cf6;   /* violet main */
+    --v1l:    #ede9fe;
+    --v2:     #ec4899;   /* pink accent */
+    --v2l:    #fce7f3;
+    --v3:     #06b6d4;   /* cyan */
+    --v3l:    #cffafe;
+    --green:  #10b981;
+    --gold:   #f59e0b;
+    --soft:   #f0eefa;
+    --mid:    #6b7280;
+    --border: #e2d9f3;
+    --dark:   #1a0f2e;
+    --code:   #0f0a1e;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{font-family:'Noto Sans KR',sans-serif;background:var(--paper);color:var(--ink);line-height:1.8;font-size:16px;}
+
+  /* ─── HERO ─── */
+  .hero{
+    background:linear-gradient(135deg,#0a0514 0%,#1a0f2e 40%,#0d1a2e 100%);
+    padding:64px 40px 56px;position:relative;overflow:hidden;color:white;
+  }
+  .hero::before{
+    content:'VIBE';font-family:'Bebas Neue',sans-serif;font-size:260px;
+    position:absolute;right:-30px;top:50%;transform:translateY(-50%);
+    background:linear-gradient(135deg,rgba(139,92,246,.08),rgba(236,72,153,.05));
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    pointer-events:none;letter-spacing:-6px;line-height:1;
+  }
+  .hero::after{
+    content:'';position:absolute;inset:0;
+    background:radial-gradient(ellipse at 20% 50%,rgba(139,92,246,.15) 0%,transparent 55%),
+               radial-gradient(ellipse at 80% 30%,rgba(236,72,153,.10) 0%,transparent 45%);
+    pointer-events:none;
+  }
+  .hi{max-width:900px;margin:0 auto;position:relative;z-index:1;}
+  .h-week{font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;
+    background:linear-gradient(90deg,#a78bfa,#f472b6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+  .h-week::before{content:'';display:inline-block;width:28px;height:2px;
+    background:linear-gradient(90deg,#a78bfa,#f472b6);}
+  .hero h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(42px,7vw,78px);letter-spacing:2px;line-height:1.0;margin-bottom:18px;}
+  .hero h1 .hl{
+    background:linear-gradient(135deg,#a78bfa 0%,#f472b6 50%,#38bdf8 100%);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  }
+  .hero-sub{font-size:17px;color:rgba(255,255,255,.62);max-width:640px;font-weight:300;line-height:1.75;}
+  .hero-quote{
+    display:inline-block;margin-top:22px;
+    background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.3);
+    border-radius:12px;padding:14px 20px;font-size:14px;
+    color:rgba(255,255,255,.8);line-height:1.6;max-width:560px;
+    font-style:italic;
+  }
+  .hero-quote strong{color:#a78bfa;font-style:normal;}
+  .hero-meta{margin-top:24px;display:flex;gap:12px;flex-wrap:wrap;}
+  .h-badge{background:rgba(139,92,246,.2);border:1px solid rgba(139,92,246,.35);
+    padding:7px 16px;border-radius:100px;font-size:12px;font-weight:600;color:#c4b5fd;}
+
+  /* ─── NAV ─── */
+  .snav{background:white;border-bottom:1px solid var(--border);padding:13px 0;position:sticky;top:0;z-index:200;box-shadow:0 1px 8px rgba(0,0,0,.05);}
+  .snav-i{max-width:900px;margin:0 auto;padding:0 30px;display:flex;align-items:center;justify-content:space-between;}
+  .snav-b{font-size:13px;font-weight:700;
+    background:linear-gradient(90deg,var(--v1),var(--v2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+  .snav-links{display:flex;gap:6px;}
+  .snav-links a{padding:5px 13px;border-radius:100px;font-size:12px;font-weight:600;border:1px solid var(--border);background:white;color:var(--mid);text-decoration:none;transition:all .15s;}
+  .snav-links a:hover,.snav-links a.act{background:var(--v1);color:white;border-color:var(--v1);}
+
+  /* ─── WRAP ─── */
+  .wrap{max-width:900px;margin:0 auto;padding:0 30px;}
+
+  /* ─── OBJECTIVE ─── */
+  .obj{background:var(--v1l);border-left:5px solid var(--v1);border-radius:0 14px 14px 0;padding:28px 32px;margin:40px 0;}
+  .obj h2{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--v1);margin-bottom:14px;}
+  .obj ul{list-style:none;display:flex;flex-direction:column;gap:9px;}
+  .obj li{display:flex;align-items:flex-start;gap:10px;font-size:15px;}
+  .obj li::before{content:'✦';color:var(--v1);font-size:10px;flex-shrink:0;margin-top:5px;}
+
+  /* ─── CONCEPT ─── */
+  .concept{padding:48px 0 20px;}
+  .sec-lbl{font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--mid);margin-bottom:8px;}
+  .concept h2{font-size:27px;font-weight:900;margin-bottom:18px;line-height:1.3;}
+  .concept p{font-size:15.5px;color:#334155;margin-bottom:16px;line-height:1.9;}
+
+  /* ─── VIBE MINDSET CARDS ─── */
+  .vibe-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:24px 0;}
+  .vibe-card{
+    background:linear-gradient(135deg,var(--dark) 0%,#0f0a1e 100%);
+    border-radius:16px;padding:24px 20px;color:white;
+    border:1px solid rgba(139,92,246,.2);
+    transition:transform .2s,box-shadow .2s;
+  }
+  .vibe-card:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(139,92,246,.2);}
+  .vc-num{font-family:'Bebas Neue',sans-serif;font-size:48px;line-height:1;
+    background:linear-gradient(135deg,#a78bfa,#f472b6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    margin-bottom:8px;}
+  .vc-ttl{font-size:15px;font-weight:700;margin-bottom:6px;color:white;}
+  .vc-desc{font-size:13px;color:rgba(255,255,255,.55);line-height:1.6;}
+
+  /* ─── TOOLS COMPARISON ─── */
+  .tools{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:22px 0;}
+  .tool-card{background:white;border:1px solid var(--border);border-radius:14px;padding:22px;}
+  .tool-card.pick{border-color:var(--v1);background:var(--v1l);}
+  .tool-badge{display:inline-block;font-size:10px;font-weight:700;letter-spacing:1px;padding:3px 10px;border-radius:100px;margin-bottom:10px;text-transform:uppercase;}
+  .tool-card.pick .tool-badge{background:var(--v1);color:white;}
+  .tool-card:not(.pick) .tool-badge{background:var(--soft);color:var(--mid);}
+  .tool-card h4{font-size:15px;font-weight:700;margin-bottom:8px;}
+  .tool-card ul{list-style:none;display:flex;flex-direction:column;gap:5px;}
+  .tool-card li{font-size:13px;color:#555;display:flex;align-items:flex-start;gap:7px;}
+  .tool-card li::before{flex-shrink:0;margin-top:1px;}
+  .tool-card.pick li::before{content:'✓';color:var(--v1);font-weight:700;}
+  .tool-card:not(.pick) li::before{content:'•';color:var(--mid);}
+
+  /* ─── LEVEL SECTIONS ─── */
+  .level{padding:48px 0;}
+  .lvhd{display:flex;align-items:center;gap:18px;margin-bottom:32px;padding-bottom:20px;border-bottom:2px solid var(--border);}
+  .lnum{width:64px;height:64px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:26px;flex-shrink:0;}
+  .lv1 .lnum{background:var(--v1l);color:var(--v1);border:2px solid var(--v1);}
+  .lv2 .lnum{background:var(--v2l);color:var(--v2);border:2px solid var(--v2);}
+  .lv3 .lnum{background:var(--v3l);color:#0891b2;border:2px solid var(--v3);}
+  .lttl h2{font-size:22px;font-weight:900;margin-bottom:4px;}
+  .lttl p{font-size:13px;color:var(--mid);font-weight:500;}
+
+  /* ─── METHOD BLOCK ─── */
+  .mblock{background:white;border:1px solid var(--border);border-radius:16px;padding:28px 32px;margin-bottom:22px;box-shadow:0 1px 8px rgba(0,0,0,.04);}
+  .mttl{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+  .lv1 .mttl{color:var(--v1);}
+  .lv2 .mttl{color:var(--v2);}
+  .lv3 .mttl{color:#0891b2;}
+  .mbar{width:4px;height:16px;border-radius:2px;display:inline-block;flex-shrink:0;}
+  .lv1 .mbar{background:var(--v1);}
+  .lv2 .mbar{background:var(--v2);}
+  .lv3 .mbar{background:var(--v3);}
+
+  .slist{list-style:none;display:flex;flex-direction:column;gap:18px;}
+  .si{display:flex;align-items:flex-start;gap:14px;}
+  .snum{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;margin-top:1px;}
+  .lv1 .snum{background:var(--v1l);color:var(--v1);}
+  .lv2 .snum{background:var(--v2l);color:var(--v2);}
+  .lv3 .snum{background:var(--v3l);color:#0891b2;}
+  .sbody strong{display:block;font-weight:700;font-size:15px;margin-bottom:4px;}
+  .sbody p,.sbody span{font-size:14px;color:#475569;line-height:1.8;}
+
+  /* ─── SCENARIO ─── */
+  .scene{
+    background:linear-gradient(135deg,#0a0514 0%,#1a0a2e 100%);
+    border-radius:16px;padding:28px 32px;margin-bottom:22px;color:white;position:relative;overflow:hidden;
+  }
+  .scene::after{content:'';position:absolute;inset:0;
+    background:radial-gradient(ellipse at 90% 20%,rgba(236,72,153,.12) 0%,transparent 55%),
+               radial-gradient(ellipse at 10% 80%,rgba(139,92,246,.10) 0%,transparent 45%);
+    pointer-events:none;}
+  .slbl{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#a78bfa;margin-bottom:10px;position:relative;z-index:1;}
+  .sttl{font-size:19px;font-weight:700;margin-bottom:10px;position:relative;z-index:1;}
+  .sdesc{font-size:14px;color:rgba(255,255,255,.6);line-height:1.8;margin-bottom:18px;position:relative;z-index:1;}
+  .ssteps{list-style:none;display:flex;flex-direction:column;gap:8px;position:relative;z-index:1;}
+  .ssteps li{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:rgba(255,255,255,.78);}
+  .ssteps li::before{content:'✦';color:#a78bfa;flex-shrink:0;font-size:10px;margin-top:5px;}
+
+  /* ─── PROMPT BLOCK ─── */
+  .pblock{background:var(--code);border-radius:16px;padding:28px 32px;margin-bottom:22px;border:1px solid rgba(139,92,246,.2);}
+  .phd{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.06);}
+  .phd h3{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#a78bfa;display:flex;align-items:center;gap:7px;}
+  .ptag{font-size:11px;font-weight:600;padding:4px 11px;border-radius:100px;text-transform:uppercase;}
+  .tv{background:rgba(139,92,246,.2);color:#c4b5fd;}
+  .tp{background:rgba(236,72,153,.2);color:#f9a8d4;}
+  .tc{background:rgba(6,182,212,.18);color:#67e8f9;}
+  .tg{background:rgba(16,185,129,.18);color:#6ee7b7;}
+  .ty{background:rgba(245,158,11,.18);color:#fcd34d;}
+
+  .plbl{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);margin:14px 0 8px;}
+  .plbl:first-of-type{margin-top:0;}
+  .ptxt{font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.85;color:#c9d6e0;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:18px 20px;white-space:pre-wrap;word-break:break-word;}
+  .ph{color:#c084fc;}   /* violet */
+  .pg{color:#86efac;}   /* green */
+  .py{color:#fda4af;}   /* pink */
+  .pc{color:#6b8aad;}   /* comment */
+  .pb{color:#67e8f9;}   /* cyan */
+  .po{color:#fbbf24;}   /* gold */
+
+  /* ─── RESULT PREVIEW ─── */
+  .preview{background:white;border:2px solid var(--border);border-radius:14px;overflow:hidden;margin:18px 0;}
+  .preview-bar{background:#f1f5f9;padding:10px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);}
+  .pv-dot{width:10px;height:10px;border-radius:50%;}
+  .pv-dot.r{background:#ff5f56;} .pv-dot.y{background:#ffbd2e;} .pv-dot.g{background:#27c93f;}
+  .pv-url{flex:1;background:white;border:1px solid var(--border);border-radius:5px;padding:4px 12px;font-size:12px;color:var(--mid);font-family:'JetBrains Mono',monospace;margin:0 20px;}
+  .preview-body{padding:24px;font-size:14px;color:#555;line-height:1.7;}
+  .preview-body h3{font-size:16px;font-weight:700;color:var(--ink);margin-bottom:8px;}
+  .preview-body .tag{display:inline-block;background:var(--v1l);color:var(--v1);padding:2px 9px;border-radius:4px;font-size:12px;font-weight:600;margin-right:4px;}
+
+  /* ─── WORKFLOW VISUAL ─── */
+  .wflow{display:flex;align-items:stretch;gap:0;border-radius:14px;overflow:hidden;border:1px solid var(--border);margin:22px 0;}
+  .wf-step{flex:1;padding:18px 14px;text-align:center;background:white;}
+  .wf-step:not(:last-child){border-right:1px solid var(--border);}
+  .wf-step.act{background:linear-gradient(135deg,#1a0f2e,#0f0a1e);color:white;}
+  .wf-ico{font-size:24px;margin-bottom:8px;}
+  .wf-ttl{font-size:13px;font-weight:700;margin-bottom:4px;}
+  .wf-step.act .wf-ttl{color:#a78bfa;}
+  .wf-desc{font-size:12px;color:var(--mid);line-height:1.5;}
+  .wf-step.act .wf-desc{color:rgba(255,255,255,.5);}
+
+  /* ─── TIPS ─── */
+  .tip{background:var(--v1l);border-left:4px solid var(--v1);border-radius:0 12px 12px 0;padding:16px 20px;margin:18px 0;font-size:14px;line-height:1.75;}
+  .tip strong{color:#5b21b6;display:block;margin-bottom:4px;font-size:13px;}
+  .warn{background:#fff7ed;border-left:4px solid var(--gold);border-radius:0 12px 12px 0;padding:16px 20px;margin:18px 0;font-size:14px;line-height:1.75;}
+  .warn strong{color:#92400e;display:block;margin-bottom:4px;}
+  .info{background:#cffafe;border-left:4px solid var(--v3);border-radius:0 12px 12px 0;padding:16px 20px;margin:18px 0;font-size:14px;line-height:1.75;}
+  .info strong{color:#0e7490;display:block;margin-bottom:4px;}
+
+  /* ─── DIVIDER ─── */
+  hr.div{border:none;border-top:1px solid var(--border);margin:46px 0;}
+
+  /* ─── PORTFOLIO GRID ─── */
+  .project-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin:20px 0;}
+  .project-card{background:white;border:1px solid var(--border);border-radius:13px;padding:18px;transition:transform .2s,box-shadow .2s;}
+  .project-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(139,92,246,.12);}
+  .pc-ico{font-size:28px;margin-bottom:8px;}
+  .project-card h4{font-size:14px;font-weight:700;margin-bottom:5px;}
+  .project-card p{font-size:12.5px;color:var(--mid);line-height:1.6;}
+  .project-card .diff{font-size:11px;font-weight:600;margin-top:6px;padding:2px 8px;border-radius:4px;display:inline-block;}
+  .d1{background:#dcfce7;color:#166534;} .d2{background:var(--v1l);color:#5b21b6;} .d3{background:var(--v2l);color:#9d174d;}
+
+  /* ─── SUMMARY ─── */
+  .summary{background:linear-gradient(135deg,#0a0514 0%,#1a0f2e 100%);color:white;border-radius:20px;padding:44px;margin:50px 0;}
+  .summary h2{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:2px;
+    background:linear-gradient(90deg,#a78bfa,#f472b6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    margin-bottom:26px;}
+  .sgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .sitem{background:rgba(255,255,255,.04);border:1px solid rgba(139,92,246,.2);border-radius:12px;padding:18px 22px;}
+  .sitem h4{font-size:12px;font-weight:700;letter-spacing:1px;color:#a78bfa;text-transform:uppercase;margin-bottom:8px;}
+  .sitem p{font-size:14px;color:rgba(255,255,255,.75);line-height:1.7;}
+
+  /* ─── CHECKLIST ─── */
+  .ckbox{background:white;border:1px solid var(--border);border-radius:16px;padding:28px 32px;margin-bottom:40px;box-shadow:0 1px 8px rgba(0,0,0,.04);}
+  .ckbox h3{font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--green);margin-bottom:18px;}
+
+  /* ─── FOOTER ─── */
+  footer{background:var(--dark);padding:32px 40px;text-align:center;color:rgba(255,255,255,.3);font-size:13px;}
+  footer a{color:#a78bfa;text-decoration:none;}
+
+  code{font-family:'JetBrains Mono',monospace;font-size:13px;background:var(--soft);padding:2px 7px;border-radius:5px;color:var(--v1);}
+
+  @media(max-width:640px){
+    .hero,.wrap{padding-left:18px;padding-right:18px;}
+    .vibe-grid,.tools{grid-template-columns:1fr;}
+    .wflow{flex-direction:column;}
+    .wf-step:not(:last-child){border-right:none;border-bottom:1px solid var(--border);}
+    .sgrid{grid-template-columns:1fr;}
+    .snav-links{display:none;}
+    .mblock,.scene,.pblock{padding:20px 18px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ─── HERO ─── -->
+<header class="hero">
+  <div class="hi">
+    <div class="h-week">4주차 · AI 에이전트와 미래 &nbsp;/&nbsp; DAY 23</div>
+    <h1>바이브 <span class="hl">코딩</span><br>VIBE CODING</h1>
+    <p class="hero-sub">
+      코드 한 줄 몰라도 괜찮습니다.<br>
+      느낌대로, 말하는 대로, 원하는 웹 서비스가 완성됩니다.
+    </p>
+    <div class="hero-quote">
+      <strong>"The hottest new programming language is English."</strong><br>
+      — Andrej Karpathy (전 Tesla AI 디렉터, OpenAI 공동 창립자)
+    </div>
+    <div class="hero-meta">
+      <span class="h-badge">🎯 난이도: 입문 (코딩 지식 불필요)</span>
+      <span class="h-badge">⏱ 학습 시간: 90분</span>
+      <span class="h-badge">💻 Claude.ai 웹 또는 Claude Code</span>
+      <span class="h-badge">✨ 모든 플랜 가능</span>
+    </div>
+  </div>
+</header>
+
+<!-- ─── NAV ─── -->
+<nav class="snav">
+  <div class="snav-i">
+    <span class="snav-b">✨ 바이브 코딩 완전 정복</span>
+    <div class="snav-links">
+      <a href="#concept" class="act">개념</a>
+      <a href="#lv1">L1 첫 페이지</a>
+      <a href="#lv2">L2 웹서비스</a>
+      <a href="#lv3">L3 완성 프로젝트</a>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <!-- ─── OBJECTIVES ─── -->
+  <div class="obj">
+    <h2>✦ 오늘의 학습 목표</h2>
+    <ul>
+      <li>바이브 코딩의 개념과 사고방식을 이해하고 두려움 없이 시작한다.</li>
+      <li>Claude.ai에서 자연어만으로 첫 번째 웹 페이지를 완성한다.</li>
+      <li>랜딩 페이지, 포트폴리오, 비즈니스 사이트 등 실제 서비스를 만든다.</li>
+      <li>반복 수정과 피드백 루프로 원하는 결과물을 정교하게 다듬는다.</li>
+      <li>Claude Code와 연결해 더 복잡한 인터랙티브 앱으로 확장하는 방법을 배운다.</li>
+    </ul>
+  </div>
+
+  <!-- ─── CONCEPT ─── -->
+  <section class="concept" id="concept">
+    <div class="sec-lbl">📖 핵심 개념</div>
+    <h2>바이브 코딩이란? — "느낌대로 만드는 개발"</h2>
+
+    <p>
+      2025년 AI 코딩 도구의 급격한 발전으로 탄생한 새로운 개발 패러다임입니다.
+      <strong>바이브 코딩(Vibe Coding)</strong>은 코드의 세부 사항을 이해하지 않아도,
+      <em>"이런 느낌의 서비스가 필요해"</em>라는 자연어 설명만으로
+      AI가 실제 작동하는 코드를 생성하는 방식입니다.
+    </p>
+    <p>
+      핵심은 <strong>사용자가 "무엇을(What)"을 정의하고, AI가 "어떻게(How)"를 처리</strong>한다는 것입니다.
+      비개발자도 아이디어를 즉시 실제 웹 서비스로 구현할 수 있습니다.
+    </p>
+
+    <div class="vibe-grid">
+      <div class="vibe-card">
+        <div class="vc-num">01</div>
+        <div class="vc-ttl">느낌으로 설명하라</div>
+        <div class="vc-desc">"에어비앤비처럼 깔끔하고", "애플 웹사이트 스타일로", "미니멀하고 전문적으로" — 기술 용어보다 감각적 표현이 더 정확할 때가 많다.</div>
+      </div>
+      <div class="vibe-card">
+        <div class="vc-num">02</div>
+        <div class="vc-ttl">반복으로 완성하라</div>
+        <div class="vc-desc">첫 결과물이 완벽할 필요 없다. "헤더 색상을 더 진하게", "버튼을 오른쪽으로" 같은 작은 수정을 반복하면 원하는 결과에 도달한다.</div>
+      </div>
+      <div class="vibe-card">
+        <div class="vc-num">03</div>
+        <div class="vc-ttl">구체적일수록 좋다</div>
+        <div class="vc-desc">막연한 요청보다 "25~35세 직장인을 타겟으로 하는 커리어 코칭 랜딩 페이지"처럼 대상, 목적, 스타일을 명확히 하면 훨씬 좋은 결과가 나온다.</div>
+      </div>
+    </div>
+
+    <!-- TOOLS CHOICE -->
+    <p style="margin:24px 0 14px;"><strong>어떤 도구로 시작할까?</strong></p>
+    <div class="tools">
+      <div class="tool-card pick">
+        <span class="tool-badge">초보자 추천</span>
+        <h4>🌐 Claude.ai 웹 (Artifacts)</h4>
+        <ul>
+          <li>브라우저에서 바로 미리보기 가능</li>
+          <li>설치 없이 즉시 시작</li>
+          <li>HTML/CSS/JavaScript 파일 즉시 다운로드</li>
+          <li>React 컴포넌트도 지원</li>
+          <li>모든 플랜에서 사용 가능</li>
+        </ul>
+      </div>
+      <div class="tool-card">
+        <span class="tool-badge">심화용</span>
+        <h4>💻 Claude Code (터미널)</h4>
+        <ul>
+          <li>전체 프로젝트 파일 관리</li>
+          <li>패키지 설치 및 실행 환경 포함</li>
+          <li>Git 연동으로 버전 관리</li>
+          <li>복잡한 풀스택 앱 개발 가능</li>
+          <li>Pro 이상 필요</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- THE WORKFLOW -->
+    <p style="margin-bottom:14px;"><strong>바이브 코딩의 기본 흐름</strong></p>
+    <div class="wflow">
+      <div class="wf-step act">
+        <div class="wf-ico">💭</div>
+        <div class="wf-ttl">아이디어</div>
+        <div class="wf-desc">만들고 싶은 것을 자연어로 묘사</div>
+      </div>
+      <div class="wf-step">
+        <div class="wf-ico">⚡</div>
+        <div class="wf-ttl">AI 생성</div>
+        <div class="wf-desc">클로드가 코드 자동 생성</div>
+      </div>
+      <div class="wf-step act">
+        <div class="wf-ico">👀</div>
+        <div class="wf-ttl">미리보기</div>
+        <div class="wf-desc">결과물 확인 & 평가</div>
+      </div>
+      <div class="wf-step">
+        <div class="wf-ico">🔧</div>
+        <div class="wf-ttl">수정 요청</div>
+        <div class="wf-desc">마음에 안 드는 부분 피드백</div>
+      </div>
+      <div class="wf-step act">
+        <div class="wf-ico">🎉</div>
+        <div class="wf-ttl">완성</div>
+        <div class="wf-desc">다운로드 또는 배포</div>
+      </div>
+    </div>
+
+    <div class="tip">
+      <strong>💡 오늘 사용할 Claude.ai Artifacts 기능</strong>
+      Claude.ai에서 웹 페이지 제작을 요청하면 대화창 옆에 <strong>Artifacts(아티팩트) 패널</strong>이 열립니다. 여기서 실시간으로 결과물을 미리보고, 수정 요청을 반복할 수 있습니다. 완성되면 우측 상단의 다운로드 버튼으로 HTML 파일로 저장합니다.
+    </div>
+  </section>
+
+  <hr class="div">
+
+  <!-- ══════════════════════════════════════════ -->
+  <!-- LEVEL 1 -->
+  <!-- ══════════════════════════════════════════ -->
+  <section class="level lv1" id="lv1">
+    <div class="lvhd">
+      <div class="lnum">L1</div>
+      <div class="lttl">
+        <h2>첫 웹 페이지 만들기 — 30분 안에 완성</h2>
+        <p>⏱ 예상 시간 25분 &nbsp;|&nbsp; 코딩 지식 전혀 불필요</p>
+      </div>
+    </div>
+
+    <p style="margin-bottom:18px; font-size:15.5px; color:#334155; line-height:1.9;">
+      처음으로 "내가 만든" 웹 페이지를 경험하는 순간은 생각보다 훨씬 빠르게 옵니다.
+      Claude.ai에서 프롬프트 하나를 입력하면 <strong>1분 안에</strong> 실제 브라우저에서 보이는 웹 페이지가 완성됩니다.
+    </p>
+
+    <!-- METHOD -->
+    <div class="mblock">
+      <div class="mttl"><span class="mbar"></span>적용 방법 | Claude.ai에서 웹 페이지 만드는 법</div>
+      <ol class="slist">
+        <li class="si">
+          <div class="snum">1</div>
+          <div class="sbody">
+            <strong>Claude.ai 접속 → 새 대화 시작</strong>
+            <span>claude.ai에서 로그인 후 새 채팅을 시작합니다. 별도 설정 없이 바로 웹 페이지 제작이 가능합니다.</span>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">2</div>
+          <div class="sbody">
+            <strong>만들고 싶은 것을 구체적으로 설명한다</strong>
+            <span>누구를 위한, 어떤 목적의, 어떤 느낌의 페이지인지 설명합니다. 레퍼런스 사이트를 언급하면 더욱 효과적입니다. 아래 프롬프트 예시를 그대로 복사해서 사용해도 됩니다.</span>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">3</div>
+          <div class="sbody">
+            <strong>Artifacts 패널에서 실시간 미리보기</strong>
+            <span>응답 오른쪽에 Artifacts 패널이 열리면 "Preview" 탭을 클릭해 실제 모습을 확인합니다. 마음에 안 드는 부분이 있으면 바로 대화창에 수정 요청을 입력합니다.</span>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">4</div>
+          <div class="sbody">
+            <strong>반복 수정으로 완성도 높이기</strong>
+            <span>"헤더 배경색을 진한 남색으로", "버튼에 호버 애니메이션 추가", "모바일에서도 잘 보이게" 등 자연어로 계속 수정을 요청합니다. 완성 후 HTML 파일로 다운로드합니다.</span>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <!-- SCENARIO 1 -->
+    <div class="scene">
+      <div class="slbl">🎬 실습 시나리오 01</div>
+      <div class="sttl">내 소개 페이지를 5분 만에 만들기</div>
+      <div class="sdesc">
+        가장 간단하지만 가장 실용적인 시작. 자신을 소개하는 단일 페이지 웹사이트를 만들어봅니다. 포트폴리오, 명함 대용, SNS 링크 모음 등 다양하게 활용 가능합니다.
+      </div>
+      <ul class="ssteps">
+        <li>Claude.ai 열기 → 프롬프트 #1 복사해서 본인 정보로 수정 후 전송</li>
+        <li>오른쪽 Artifacts 패널 → Preview 탭에서 결과 확인</li>
+        <li>마음에 안 드는 부분 3가지를 찾아서 수정 요청 (프롬프트 #2 참고)</li>
+        <li>완성 후 Artifacts 패널 우측 상단 다운로드 버튼 클릭 → HTML 파일 저장</li>
+        <li>저장된 파일을 브라우저에서 직접 열어서 확인</li>
+      </ul>
+    </div>
+
+    <!-- PROMPT #1 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #1</h3>
+        <span class="ptag tv">개인 소개 페이지</span>
+      </div>
+      <div class="plbl">Claude.ai 대화창에 바로 붙여넣기</div>
+      <div class="ptxt"><span class="ph">나를 소개하는 웹 페이지를 만들어줘.</span>
+
+<span class="pc">--- 내 정보 ---</span>
+이름: <span class="py">[이름 입력]</span>
+직업/역할: <span class="py">[예: 마케팅 기획자 / 프리랜서 디자이너 / 대학원생]</span>
+소개 문장: <span class="py">[자신을 한 문장으로 설명]</span>
+주요 스킬/관심사: <span class="py">[예: 브랜드 마케팅, UX 리서치, 데이터 분석]</span>
+연락처: <span class="py">[이메일 또는 링크]</span>
+SNS: <span class="py">[있다면 링크드인, 인스타그램 등]</span>
+
+<span class="pc">--- 디자인 요구사항 ---</span>
+스타일: <span class="py">미니멀하고 전문적인 느낌. 어두운 배경(다크 테마).</span>
+색상: <span class="py">메인 컬러는 보라색 계열.</span>
+레이아웃: <span class="py">스크롤 없이 한 화면에 모든 정보가 보이게.</span>
+애니메이션: <span class="py">부드러운 페이드인 효과로 등장하게 해줘.</span>
+
+<span class="pc">--- 포함할 섹션 ---</span>
+1. 이름과 역할이 크게 보이는 헤더
+2. 짧은 자기소개 (2-3문장)
+3. 주요 스킬 태그 (배지 형태로)
+4. 연락처 버튼
+
+<span class="pb">HTML, CSS, JavaScript를 하나의 파일로 만들어줘.
+모바일에서도 잘 보이는 반응형으로.</span></div>
+    </div>
+
+    <!-- PROMPT #2 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #2</h3>
+        <span class="ptag tv">수정 요청 패턴</span>
+      </div>
+      <div class="plbl">결과물 받은 후 — 이렇게 수정을 요청하세요</div>
+      <div class="ptxt"><span class="pc">━━━ 색상/디자인 수정 ━━━</span>
+<span class="ph">배경색을 더 진한 네이비(#0a0e1a)로 바꿔줘. 
+텍스트는 밝은 흰색으로 유지해줘.</span>
+
+<span class="pc">━━━ 레이아웃 수정 ━━━</span>
+<span class="ph">이름을 화면 정중앙에 배치하고, 
+아래에 타이핑 효과로 "마케터 / 기획자 / 크리에이터"가 
+번갈아가며 나타나는 애니메이션 추가해줘.</span>
+
+<span class="pc">━━━ 콘텐츠 추가 ━━━</span>
+<span class="ph">스킬 섹션 아래에 최근 프로젝트 3개를 카드 형태로 
+보여주는 섹션을 추가해줘. 
+각 카드에는 프로젝트명, 설명 1줄, 태그가 들어가게.</span>
+
+<span class="pc">━━━ 인터랙션 추가 ━━━</span>
+<span class="ph">스킬 태그에 마우스를 올리면 
+해당 스킬에 대한 짧은 설명이 툴팁으로 나타나게 해줘.</span>
+
+<span class="pc">━━━ 반응형 개선 ━━━</span>
+<span class="ph">모바일(세로 화면)에서 봤을 때 
+글씨가 너무 작고 버튼이 겹쳐 보여. 
+모바일 레이아웃을 최적화해줘.</span></div>
+    </div>
+
+    <!-- PROMPT #3 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #3</h3>
+        <span class="ptag tp">링크 모음 페이지 (링크트리 스타일)</span>
+      </div>
+      <div class="plbl">SNS 프로필에 올릴 링크 모음 페이지</div>
+      <div class="ptxt"><span class="ph">인스타그램 바이오에 걸 링크 모음 페이지를 만들어줘.
+linktree 스타일로, 깔끔하고 예쁘게.</span>
+
+<span class="pc">--- 내 정보 ---</span>
+이름/닉네임: <span class="py">[이름]</span>
+한 줄 소개: <span class="py">[예: 마케터 | 콘텐츠 크리에이터 | 커피 애호가]</span>
+프로필 사진: <span class="py">원형 그라데이션 배경으로 이니셜 표시</span>
+
+<span class="pc">--- 링크 목록 ---</span>
+1. <span class="py">인스타그램</span> → https://instagram.com/
+2. <span class="py">유튜브 채널</span> → https://youtube.com/
+3. <span class="py">블로그</span> → https://blog.com/
+4. <span class="py">포트폴리오</span> → https://portfolio.com/
+5. <span class="py">이메일 문의</span> → mailto:
+
+<span class="pc">--- 디자인 ---</span>
+배경: <span class="py">보라색~분홍색 그라데이션</span>
+카드: <span class="py">반투명 유리 효과(글래스모피즘)</span>
+버튼: <span class="py">클릭 시 부드러운 눌림 효과</span>
+전체: <span class="py">모바일 최적화 (세로로 스택)</span>
+
+<span class="pb">방문자 수를 세는 기능은 필요없어.
+심플하게 링크만 예쁘게 보여주면 돼.</span></div>
+    </div>
+
+  </section>
+
+  <hr class="div">
+
+  <!-- ══════════════════════════════════════════ -->
+  <!-- LEVEL 2 -->
+  <!-- ══════════════════════════════════════════ -->
+  <section class="level lv2" id="lv2">
+    <div class="lvhd">
+      <div class="lnum">L2</div>
+      <div class="lttl">
+        <h2>실제 비즈니스 웹서비스 만들기</h2>
+        <p>⏱ 예상 시간 35분 &nbsp;|&nbsp; 실전 활용 프로젝트</p>
+      </div>
+    </div>
+
+    <p style="margin-bottom:18px; font-size:15.5px; color:#334155; line-height:1.9;">
+      이제 진짜 쓸 수 있는 것을 만들어봅니다.
+      사업 홍보용 랜딩 페이지, 이벤트 안내 사이트, 클라이언트에게 보여줄 프로토타입…
+      <strong>몇 시간이면 실제 서비스 수준의 웹사이트가 완성됩니다.</strong>
+    </p>
+
+    <!-- WHAT TO BUILD -->
+    <p style="margin-bottom:14px;"><strong>바이브 코딩으로 만들 수 있는 것들</strong></p>
+    <div class="project-grid">
+      <div class="project-card">
+        <div class="pc-ico">🚀</div>
+        <h4>랜딩 페이지</h4>
+        <p>제품·서비스 소개, CTA 버튼, 가격표</p>
+        <span class="diff d1">쉬움</span>
+      </div>
+      <div class="project-card">
+        <div class="pc-ico">💼</div>
+        <h4>포트폴리오</h4>
+        <p>작업 갤러리, 이력, 연락처 폼</p>
+        <span class="diff d1">쉬움</span>
+      </div>
+      <div class="project-card">
+        <div class="pc-ico">📅</div>
+        <h4>이벤트 페이지</h4>
+        <p>행사 안내, 일정, 신청 폼</p>
+        <span class="diff d1">쉬움</span>
+      </div>
+      <div class="project-card">
+        <div class="pc-ico">🛍️</div>
+        <h4>제품 카탈로그</h4>
+        <p>상품 목록, 필터, 상세보기</p>
+        <span class="diff d2">보통</span>
+      </div>
+      <div class="project-card">
+        <div class="pc-ico">📝</div>
+        <h4>예약/신청 폼</h4>
+        <p>입력 폼, 유효성 검사, 완료 화면</p>
+        <span class="diff d2">보통</span>
+      </div>
+      <div class="project-card">
+        <div class="pc-ico">🧮</div>
+        <h4>계산기/도구</h4>
+        <p>대출계산기, BMI, 환율 변환</p>
+        <span class="diff d2">보통</span>
+      </div>
+      <div class="project-card">
+        <div class="pc-ico">📊</div>
+        <h4>대시보드</h4>
+        <p>차트, 지표, 실시간 업데이트</p>
+        <span class="diff d3">도전</span>
+      </div>
+      <div class="project-card">
+        <div class="pc-ico">🎮</div>
+        <h4>미니 게임/퀴즈</h4>
+        <p>인터랙티브 콘텐츠, 점수 시스템</p>
+        <span class="diff d3">도전</span>
+      </div>
+    </div>
+
+    <!-- METHOD -->
+    <div class="mblock">
+      <div class="mttl"><span class="mbar"></span>적용 방법 | 좋은 결과물을 위한 프롬프트 작성 공식</div>
+      <ol class="slist">
+        <li class="si">
+          <div class="snum">1</div>
+          <div class="sbody">
+            <strong>WHAT + WHO + HOW = 완벽한 프롬프트</strong>
+            <span><strong>WHAT</strong>(무엇): "카페 랜딩 페이지" / <strong>WHO</strong>(누구를 위한): "20~30대 감성 고객 타겟" / <strong>HOW</strong>(어떻게): "따뜻하고 아늑한 느낌, 갈색 톤". 이 세 가지를 명확히 하면 훨씬 좋은 결과가 나옵니다.</span>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">2</div>
+          <div class="sbody">
+            <strong>레퍼런스 URL을 언급하라</strong>
+            <span>"notion.so 같은 클린한 스타일로", "stripe.com처럼 그라데이션이 있는 다크 테마로" — 실제 웹사이트를 레퍼런스로 제시하면 클로드가 해당 스타일을 학습해 더 정확하게 구현합니다.</span>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">3</div>
+          <div class="sbody">
+            <strong>섹션 단위로 나눠서 요청하라</strong>
+            <span>한 번에 모든 것을 만들기보다, 헤더 → 서비스 소개 → 가격표 → 후기 → CTA 순으로 섹션별로 만들고 확인하면서 완성도를 높입니다. 수정하기도 훨씬 쉽습니다.</span>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">4</div>
+          <div class="sbody">
+            <strong>"더 ~하게" 형식의 수정 요청</strong>
+            <span>"더 고급스럽게", "더 젊고 역동적으로", "더 신뢰감 있게", "더 미니멀하게" — 형용사로 방향을 주면 클로드가 알아서 여러 요소를 조정합니다. 구체적인 CSS 값을 몰라도 됩니다.</span>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <!-- SCENARIO 2 -->
+    <div class="scene">
+      <div class="slbl">🎬 실습 시나리오 02</div>
+      <div class="sttl">내 사업/서비스 랜딩 페이지 만들기</div>
+      <div class="sdesc">
+        실제 수익을 낼 수 있는 페이지입니다. 프리랜서 서비스 소개, 소규모 사업 홍보, 이벤트 안내 등 목적에 맞게 수정해서 사용합니다.
+      </div>
+      <ul class="ssteps">
+        <li>프롬프트 #4의 [대괄호] 안 내용을 실제 서비스 정보로 교체</li>
+        <li>Claude.ai에서 실행 → Artifacts 패널에서 미리보기</li>
+        <li>스크롤하면서 각 섹션이 제대로 나오는지 확인</li>
+        <li>마음에 안 드는 섹션 하나를 골라 집중 수정 (프롬프트 #5 참고)</li>
+        <li>완성되면 HTML 파일 다운로드 → GitHub Pages 또는 Netlify에 무료 배포</li>
+      </ul>
+    </div>
+
+    <!-- PROMPT #4 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #4</h3>
+        <span class="ptag tp">비즈니스 랜딩 페이지</span>
+      </div>
+      <div class="plbl">서비스/제품 홍보용 랜딩 페이지 완전 버전</div>
+      <div class="ptxt"><span class="ph">우리 서비스 랜딩 페이지를 만들어줘.</span>
+
+<span class="pc">━━━ 서비스 정보 ━━━</span>
+서비스명: <span class="py">[예: 온라인 영어 회화 클래스]</span>
+대상: <span class="py">[예: 바쁜 직장인, 영어 초보자]</span>
+핵심 가치: <span class="py">[예: 하루 10분, 원어민과 1:1, 부담 없는 가격]</span>
+가격: <span class="py">[예: 월 49,000원, 첫 달 무료 체험]</span>
+연락처: <span class="py">[이메일 또는 카카오 채널]</span>
+
+<span class="pc">━━━ 섹션 구성 (이 순서로) ━━━</span>
+<span class="pg">1. 히어로 섹션</span>
+   - 임팩트 있는 헤드라인 (30자 이내)
+   - 서브 헤드라인 (한 문장)
+   - CTA 버튼 2개 ("무료 체험 신청" / "더 알아보기")
+   - 배경: 밝고 에너지 넘치는 느낌
+
+<span class="pg">2. 문제 제기 섹션</span>
+   - 타겟 고객이 겪는 공감 가는 문제 3가지
+   - 아이콘과 함께 카드 형태로
+
+<span class="pg">3. 서비스 특징 섹션</span>
+   - 핵심 특징 3가지 (아이콘 + 제목 + 설명)
+   - 배경색을 이전 섹션과 다르게
+
+<span class="pg">4. 가격 섹션</span>
+   - 요금제 카드 (추천 플랜 강조)
+   - "첫 달 무료" 배지 표시
+
+<span class="pg">5. 후기 섹션</span>
+   - 가상의 고객 후기 3개 (프로필 이미지는 이니셜로)
+   - 별점 5개 포함
+
+<span class="pg">6. CTA 섹션</span>
+   - 한 번 더 신청 유도
+   - 연락처 표시
+
+<span class="pc">━━━ 디자인 ━━━</span>
+스타일: <span class="py">stripe.com처럼 세련된 SaaS 느낌</span>
+색상: <span class="py">메인 컬러 #6366f1 (인디고), 배경 흰색</span>
+폰트: <span class="py">구글 폰트 Noto Sans KR 사용</span>
+스크롤 애니메이션: <span class="py">섹션이 화면에 들어올 때 부드럽게 나타나게</span>
+
+<span class="pb">하나의 HTML 파일로 모든 것을 포함해줘.
+반응형으로 모바일, 태블릿, PC 모두 최적화.</span></div>
+    </div>
+
+    <!-- PROMPT #5 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #5</h3>
+        <span class="ptag tp">폼(Form) 추가하기</span>
+      </div>
+      <div class="plbl">신청 폼 또는 문의 폼을 페이지에 추가하기</div>
+      <div class="ptxt"><span class="ph">현재 페이지에 신청 폼 섹션을 추가해줘.</span>
+
+<span class="pc">--- 폼 정보 ---</span>
+제목: <span class="py">"무료 체험 신청하기"</span>
+필드:
+- 이름 (필수)
+- 이메일 (필수, 형식 검사)
+- 전화번호 (선택)
+- 현재 영어 수준 (드롭다운: 초급/중급/고급)
+- 희망 수업 시간대 (체크박스: 아침/점심/저녁/주말)
+- 문의사항 (텍스트 영역, 선택)
+
+<span class="pc">--- 동작 ---</span>
+유효성 검사: <span class="py">필수 항목 미입력 시 빨간 테두리 + 메시지</span>
+제출 버튼: <span class="py">클릭 시 "처리 중..." 로딩 표시</span>
+완료 화면: <span class="py">폼 숨기고 "신청 완료! 24시간 내 연락드립니다." 메시지</span>
+
+<span class="pc">주의: 실제로 데이터가 전송되지 않아도 OK.
+화면 동작만 구현해줘. (프론트엔드만)</span>
+
+<span class="py">━━━ 계산기 추가 예시 ━━━
+"페이지에 수강료 계산기를 추가해줘.
+개월 수(1/3/6/12)를 선택하면
+할인율이 적용된 총 금액을 실시간으로 보여주는."</span></div>
+    </div>
+
+    <!-- PROMPT #6 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #6</h3>
+        <span class="ptag tc">포트폴리오 사이트</span>
+      </div>
+      <div class="plbl">디자이너·마케터·개발자를 위한 포트폴리오</div>
+      <div class="ptxt"><span class="ph">내 작업물을 보여주는 포트폴리오 웹사이트를 만들어줘.</span>
+
+<span class="pc">--- 기본 정보 ---</span>
+이름: <span class="py">[이름]</span>
+직업: <span class="py">[예: UX/UI 디자이너]</span>
+전문 분야: <span class="py">[예: 모바일 앱 디자인, 브랜드 아이덴티티]</span>
+경력: <span class="py">[예: 5년차, 前 네이버·카카오]</span>
+
+<span class="pc">--- 페이지 구성 ---</span>
+<span class="pg">헤더 (고정 네비게이션):</span> 로고(이름), 메뉴(About/Work/Contact), 다크모드 토글
+
+<span class="pg">히어로:</span> 
+이름 큰 글씨 + 역할 + 짧은 인트로
+"최근 작업 보기" + "연락하기" CTA 버튼
+
+<span class="pg">About 섹션:</span>
+나에 대한 소개 (2~3문장), 스킬 목록(프로그래스 바), 경력 타임라인
+
+<span class="pg">Work 섹션 (프로젝트 갤러리):</span>
+6개의 프로젝트 카드 (가상 데이터)
+- 썸네일 (색상 블록으로 대체), 프로젝트명, 태그, "보기" 버튼
+- 필터: 전체 / 앱 / 웹 / 브랜딩
+- 카드 클릭 시 모달로 상세 보기
+
+<span class="pg">Contact 섹션:</span>
+이메일 + 링크드인 + 문의 폼
+
+<span class="pc">--- 디자인 ---</span>
+스타일: <span class="py">크리에이터 포트폴리오 (awwwards.com 스타일)</span>
+배경: <span class="py">흰색 기본, 다크모드 지원</span>
+타이포그래피: <span class="py">강한 대비. 헤드라인은 굵고 크게.</span>
+커서: <span class="py">커스텀 커서 (큰 원형이 마우스를 따라다님)</span>
+로딩: <span class="py">페이지 진입 시 숫자 카운트업 로딩 애니메이션</span></div>
+    </div>
+
+  </section>
+
+  <hr class="div">
+
+  <!-- ══════════════════════════════════════════ -->
+  <!-- LEVEL 3 -->
+  <!-- ══════════════════════════════════════════ -->
+  <section class="level lv3" id="lv3">
+    <div class="lvhd">
+      <div class="lnum">L3</div>
+      <div class="lttl">
+        <h2>인터랙티브 웹 앱 & 배포까지</h2>
+        <p>⏱ 예상 시간 30분 &nbsp;|&nbsp; 실제 서비스로 만들기</p>
+      </div>
+    </div>
+
+    <p style="margin-bottom:18px; font-size:15.5px; color:#334155; line-height:1.9;">
+      이제 단순 소개 페이지를 넘어서 <strong>실제로 작동하는 도구</strong>를 만듭니다.
+      계산기, 퀴즈, 할 일 관리 앱, 인터랙티브 대시보드…
+      그리고 완성된 사이트를 인터넷에 <strong>무료로 배포</strong>하는 방법까지 배웁니다.
+    </p>
+
+    <!-- METHOD -->
+    <div class="mblock">
+      <div class="mttl"><span class="mbar"></span>적용 방법 | 인터랙티브 앱을 만드는 고급 기법</div>
+      <ol class="slist">
+        <li class="si">
+          <div class="snum">1</div>
+          <div class="sbody">
+            <strong>로컬 스토리지(LocalStorage)로 데이터 저장</strong>
+            <span>"브라우저를 닫아도 데이터가 남아있게 로컬 스토리지에 저장해줘"라고 하면 새로고침해도 데이터가 유지됩니다. 간단한 메모 앱, 설정 저장, 즐겨찾기 기능에 활용 가능합니다.</span>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">2</div>
+          <div class="sbody">
+            <strong>공개 API를 연결해서 실시간 데이터 표시</strong>
+            <span>"날씨 API(OpenWeatherMap)로 현재 날씨를 보여줘"처럼 공개 API를 연결하면 실시간 데이터를 표시할 수 있습니다. API 키 없이 쓸 수 있는 공개 API도 많습니다.</span>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">3</div>
+          <div class="sbody">
+            <strong>Claude Code로 전환해서 완전한 웹앱 개발</strong>
+            <span>단일 HTML 파일의 한계를 넘으려면 Claude Code를 사용합니다. "React로 만들어줘", "Node.js 백엔드를 추가해줘" 등 복잡한 구조도 가능합니다. 22일차 내용과 연결됩니다.</span>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">4</div>
+          <div class="sbody">
+            <strong>무료 배포 — GitHub Pages / Netlify</strong>
+            <span>완성한 HTML 파일을 인터넷에 올리는 가장 쉬운 방법은 Netlify Drop입니다. app.netlify.com/drop에 파일을 드래그만 하면 30초 만에 실제 URL이 생깁니다.</span>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <!-- SCENARIO 3 -->
+    <div class="scene">
+      <div class="slbl">🎬 실습 시나리오 03</div>
+      <div class="sttl">실용적인 계산 도구 웹앱 만들고 배포하기</div>
+      <div class="sdesc">
+        업무나 일상에서 자주 쓰는 계산 도구를 만들고 실제 URL로 배포해봅니다. 지인들과 공유할 수 있는 실제 서비스입니다.
+      </div>
+      <ul class="ssteps">
+        <li>프롬프트 #7 또는 #8 중 원하는 유형 선택해서 실행</li>
+        <li>Artifacts에서 실제로 계산이 동작하는지 테스트</li>
+        <li>디자인과 기능 수정 반복해서 완성도 높이기</li>
+        <li>HTML 파일 다운로드 → app.netlify.com/drop에 드래그 앤 드롭</li>
+        <li>생성된 URL을 복사해서 카카오톡으로 친구에게 공유!</li>
+      </ul>
+    </div>
+
+    <!-- PROMPT #7 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #7</h3>
+        <span class="ptag tc">실용 계산 도구</span>
+      </div>
+      <div class="plbl">업무/일상에서 바로 쓸 수 있는 계산기 앱</div>
+      <div class="ptxt"><span class="ph">월세 수익률 계산기를 만들어줘.
+부동산 투자를 고민하는 사람들을 위한 실용적인 도구.</span>
+
+<span class="pc">--- 입력 항목 ---</span>
+- 매매가 (만원 단위)
+- 보증금 (만원)
+- 월세 (만원)
+- 관리비 (월, 선택)
+- 공실 예상 기간 (연간 개월 수, 기본값 1개월)
+- 취득세율 (% , 기본값 1.1%)
+- 연간 수리비 예상 (만원)
+
+<span class="pc">--- 계산 결과 (실시간 표시) ---</span>
+- 실투자금: (매매가 - 보증금 + 취득세)
+- 연간 임대 수익: (월세 × (12 - 공실개월))
+- 연간 비용: (관리비 × 12 + 수리비)
+- 순 임대 수익률: (연수익 - 비용) / 실투자금 × 100
+- 투자 회수 기간: 실투자금 / 순연간수익 (년)
+
+<span class="pc">--- 추가 기능 ---</span>
+- 수익률 색상: <span class="py">4% 이상 초록, 2~4% 노랑, 2% 미만 빨강</span>
+- 각 항목에 도움말(?) 아이콘으로 설명 툴팁
+- 결과를 이미지로 저장하는 버튼
+- 계산 결과 공유 기능 (URL 파라미터로 값 저장)
+
+<span class="pb">디자인: 부동산 느낌의 네이비+골드 컬러.
+전문적이고 신뢰감 있는 스타일.
+모바일에서도 사용하기 편하게.</span></div>
+    </div>
+
+    <!-- PROMPT #8 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #8</h3>
+        <span class="ptag tv">인터랙티브 퀴즈 앱</span>
+      </div>
+      <div class="plbl">교육용 또는 마케팅용 퀴즈 앱</div>
+      <div class="ptxt"><span class="ph">마케팅 지식 테스트 퀴즈 앱을 만들어줘.
+마케터 취준생이나 현직자들이 즐길 수 있는.</span>
+
+<span class="pc">--- 퀴즈 구성 ---</span>
+문제 수: 10문제
+유형: 4지선다
+각 문제에 설명/해설 포함
+
+<span class="pc">--- 가상 문제 예시 (직접 만들어줘) ---</span>
+마케팅 펀넬, CTR, ROAS, A/B 테스트,
+퍼포먼스 마케팅, 콘텐츠 마케팅 등
+실무에서 자주 나오는 개념들로
+
+<span class="pc">--- 앱 기능 ---</span>
+시작 화면: <span class="py">타이틀, 시간 제한 선택(ON/OFF), 시작 버튼</span>
+진행 중: <span class="py">진행바, 남은 시간(타이머), 현재 점수</span>
+문제 화면: <span class="py">문제 → 선택지 클릭 → 즉시 정답/오답 표시 → 해설 → 다음</span>
+결과 화면:
+  - 점수 (X / 10)
+  - 등급 (90점 이상: 마케팅 전문가, 70~89: 중급, ~69: 다시 도전)
+  - 틀린 문제 복습 목록
+  - "다시 하기" 버튼
+  - SNS 공유 버튼 (카카오, 트위터)
+
+<span class="pc">--- 디자인 ---</span>
+스타일: <span class="py">듀오링고처럼 생동감 있고 게이미피케이션 요소 강조</span>
+정답: <span class="py">녹색 + 폭죽 이펙트 (CSS)</span>
+오답: <span class="py">빨간색 + 흔들림 애니메이션</span>
+색상: <span class="py">밝고 에너지 있는 그라데이션</span></div>
+    </div>
+
+    <!-- PROMPT #9 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #9</h3>
+        <span class="ptag tg">할 일 관리 앱 (로컬 저장)</span>
+      </div>
+      <div class="plbl">새로고침해도 데이터가 남는 실용 앱</div>
+      <div class="ptxt"><span class="ph">나만의 할 일 관리 앱을 만들어줘.
+심플하고 예쁜 디자인으로, 실제로 매일 쓸 수 있게.</span>
+
+<span class="pc">--- 기능 요구사항 ---</span>
+핵심 기능:
+- 할 일 추가 (Enter키 또는 + 버튼)
+- 완료 체크 (체크 시 취소선 + 색상 변경)
+- 삭제 버튼 (마우스 호버 시 표시)
+- 할 일 드래그로 순서 변경
+
+필터:
+- 전체 / 진행중 / 완료
+- 남은 항목 수 표시
+
+추가 기능:
+- 마감일 설정 (선택 항목)
+- 마감일 지난 항목은 빨간색으로 강조
+- 중요도 설정 (별 아이콘, 클릭으로 토글)
+- 중요 항목 상단 고정
+
+데이터 저장:
+- <span class="py">localStorage에 자동 저장</span>
+- 브라우저 닫고 다시 열어도 데이터 유지
+- "전체 삭제" 버튼 (확인 모달)
+
+<span class="pc">--- 디자인 ---</span>
+스타일: <span class="py">노션(Notion)처럼 군더더기 없는 미니멀</span>
+테마: <span class="py">라이트/다크 토글 지원</span>
+빈 상태: <span class="py">할 일이 없을 때 귀여운 일러스트(SVG)와 메시지</span>
+완료 시: <span class="py">소소한 축하 애니메이션</span></div>
+    </div>
+
+    <!-- PROMPT #10 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #10</h3>
+        <span class="ptag ty">배포 준비 & 마무리</span>
+      </div>
+      <div class="plbl">완성된 페이지를 인터넷에 올리기</div>
+      <div class="ptxt"><span class="ph">내 웹사이트를 배포 전에 마지막으로 점검하고 최적화해줘.</span>
+
+<span class="pc">--- 배포 전 체크리스트 ---</span>
+<span class="pg">1. 모바일 반응형</span>
+   현재 HTML 파일을 모바일(375px), 태블릿(768px), PC(1280px) 
+   화면에서 모두 잘 보이는지 확인하고 문제 있으면 수정해줘.
+
+<span class="pg">2. 성능 최적화</span>
+   - 사용하지 않는 CSS/JS 제거
+   - 이미지 최적화 (있다면)
+   - 페이지 로딩 속도 개선
+
+<span class="pg">3. SEO 기본 설정</span>
+   head 태그에 추가:
+   - title 태그 (서비스명 포함)
+   - meta description (150자 이내 서비스 설명)
+   - og:image, og:title (카카오톡 링크 공유 시 미리보기)
+
+<span class="pg">4. 마지막 점검</span>
+   - 모든 링크가 올바른지 확인
+   - 폼 제출 동작 확인
+   - 오타 확인
+
+<span class="py">━━━ 무료 배포 방법 ━━━</span>
+<span class="pb">가장 쉬운 방법 (Netlify Drop):
+1. app.netlify.com/drop 접속
+2. 완성된 HTML 파일을 창에 드래그
+3. 30초 후 실제 URL 생성!
+   예: https://amazing-site-123456.netlify.app
+
+GitHub Pages도 가능:
+1. github.com에서 repository 생성
+2. HTML 파일 업로드
+3. Settings → Pages → Branch: main 선택
+4. https://[사용자명].github.io/[저장소명] URL 생성</span></div>
+    </div>
+
+    <!-- 심화: Claude Code 연결 -->
+    <div class="mblock" style="margin-top:10px;">
+      <div class="mttl"><span class="mbar"></span>심화 | Claude Code와 연결해서 풀스택으로 확장하기</div>
+      <ol class="slist">
+        <li class="si">
+          <div class="snum">1</div>
+          <div class="sbody">
+            <strong>Claude.ai → Claude Code로 이전하는 시점</strong>
+            <span>단일 HTML 파일이 1,000줄 이상 되거나, 로그인 기능이 필요하거나, DB 연동이 필요하면 Claude Code로 전환합니다. Claude Code에서 "이 HTML 파일을 React 프로젝트로 변환해줘"라고 하면 됩니다.</span>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">2</div>
+          <div class="sbody">
+            <strong>Claude Code에서 바이브 코딩하는 방법</strong>
+            <span>Claude Code를 실행하고 "Next.js로 [서비스 설명] 앱을 만들어줘"라고 하면, 프로젝트 생성부터 코드 작성, 실행까지 자동으로 처리합니다. 복잡한 기능도 자연어로 요청하면 됩니다.</span>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">3</div>
+          <div class="sbody">
+            <strong>Vercel로 자동 배포 파이프라인 구성</strong>
+            <span>GitHub와 Vercel을 연결하면 코드를 올릴 때마다 자동으로 배포됩니다. Claude Code에서 "Vercel 배포를 위한 설정 파일 만들어줘"라고 하면 자동으로 구성해줍니다.</span>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <div class="info">
+      <strong>💡 바이브 코딩의 현실적인 한계 — 그리고 해결책</strong>
+      바이브 코딩으로 만든 코드는 간혹 예상치 못한 버그가 있을 수 있습니다. 해결책은 간단합니다: 그 버그를 클로드에게 보여주고 "이거 왜 이러는지 고쳐줘"라고 하면 됩니다. 진짜 코딩 실력이 없어도 "무엇이 잘못됐는지 설명"하는 능력만 있으면 됩니다. 에러 메시지를 스크린샷으로 찍어서 붙여넣는 것도 완벽한 방법입니다.
+    </div>
+
+  </section>
+
+  <!-- ─── SUMMARY ─── -->
+  <div class="summary">
+    <h2>📌 23일차 핵심 정리</h2>
+    <div class="sgrid">
+      <div class="sitem">
+        <h4>바이브 코딩이란?</h4>
+        <p>코드를 몰라도 자연어로 AI에게 지시해 웹 서비스를 만드는 방식. "느낌대로 설명 → AI가 구현"이 핵심.</p>
+      </div>
+      <div class="sitem">
+        <h4>시작 도구</h4>
+        <p>초보자는 Claude.ai Artifacts에서 시작. 미리보기 바로 가능. 완성 후 HTML 다운로드 → Netlify 무료 배포.</p>
+      </div>
+      <div class="sitem">
+        <h4>좋은 프롬프트 공식</h4>
+        <p>WHAT(무엇) + WHO(누구를 위한) + HOW(어떤 느낌)의 조합. 레퍼런스 사이트 URL 언급이 가장 효과적.</p>
+      </div>
+      <div class="sitem">
+        <h4>수정 전략</h4>
+        <p>"더 ~하게" 형식으로 방향을 주면 AI가 알아서 여러 요소를 조정. 섹션 단위로 반복 수정하면 완성도 ↑.</p>
+      </div>
+      <div class="sitem">
+        <h4>만들 수 있는 것</h4>
+        <p>랜딩 페이지, 포트폴리오, 퀴즈 앱, 계산기, 할 일 앱, 링크 모음 페이지. 데이터 저장은 LocalStorage 활용.</p>
+      </div>
+      <div class="sitem">
+        <h4>내일 예고</h4>
+        <p>24일차: 에이전트 팀 — 여러 서브 에이전트를 만들어 복잡한 프로젝트를 분업하는 방법.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── CHECKLIST ─── -->
+  <div class="ckbox">
+    <h3>✅ 오늘 실습 체크리스트</h3>
+    <ol class="slist">
+      <li class="si">
+        <div class="snum" style="background:#dcfce7;color:#15803d;">1</div>
+        <div class="sbody">
+          <strong>첫 번째 웹 페이지 완성</strong>
+          <p>프롬프트 #1로 개인 소개 페이지를 만들고 Artifacts에서 미리보기를 했나요? 수정 요청을 3번 이상 해봤나요?</p>
+        </div>
+      </li>
+      <li class="si">
+        <div class="snum" style="background:#dcfce7;color:#15803d;">2</div>
+        <div class="sbody">
+          <strong>비즈니스 페이지 또는 포트폴리오 제작</strong>
+          <p>프롬프트 #4, #5, #6 중 하나를 골라 실용적인 웹사이트를 만들었나요?</p>
+        </div>
+      </li>
+      <li class="si">
+        <div class="snum" style="background:#dcfce7;color:#15803d;">3</div>
+        <div class="sbody">
+          <strong>HTML 파일 다운로드 완료</strong>
+          <p>완성된 페이지를 HTML 파일로 저장하고 브라우저에서 직접 열어봤나요?</p>
+        </div>
+      </li>
+      <li class="si">
+        <div class="snum" style="background:#dcfce7;color:#15803d;">4</div>
+        <div class="sbody">
+          <strong>(도전) Netlify로 실제 배포</strong>
+          <p>app.netlify.com/drop에서 HTML 파일을 배포해서 실제 URL을 받았나요? 지인과 공유해봤나요?</p>
+        </div>
+      </li>
+    </ol>
+  </div>
+
+</div><!-- /wrap -->
+
+<footer>
+  <p>클로드(Claude) 활용 및 교육 통합 가이드 · 4주차 23일차 · 바이브 코딩(Vibe Coding)</p>
+  <p style="margin-top:8px;">
+    <a href="https://claude.ai">Claude.ai</a> &nbsp;·&nbsp;
+    <a href="https://app.netlify.com/drop">Netlify Drop (무료 배포)</a> &nbsp;·&nbsp;
+    <a href="https://pages.github.com">GitHub Pages</a>
+  </p>
+</footer>
+
+</body>
+</html>

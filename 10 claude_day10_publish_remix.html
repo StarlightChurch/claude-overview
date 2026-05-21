@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>10일차: Publish & Remix — 아티팩트 공유와 리믹스 마스터</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap');
+
+:root {
+  --ink:#0c0d1a; --ink2:#1e2038; --ink3:#515470;
+  --paper:#f6f7f2; --paper2:#edece8; --paper3:#e0dcd2;
+  --white:#fff;
+  --teal:#0a7a60;  --teal-l:#e0f5ee;  --teal-d:#065040;
+  --blue:#1255a8;  --blue-l:#e2ecfb;  --blue-d:#0b3570;
+  --coral:#c84030; --coral-l:#fde8e4; --coral-d:#8a2818;
+  --violet:#5830b8;--violet-l:#f0ebff;--violet-d:#381898;
+  --amber:#b87010; --amber-l:#fdf3de; --amber-d:#7a4808;
+  --green:#387018; --green-l:#eaf4de; --green-d:#224408;
+  --sky:#0870a8;   --sky-l:#e2f2fb;   --sky-d:#044870;
+  --pink:#b82870;  --pink-l:#fde8f2;  --pink-d:#7a1848;
+  --pub:#0a8060;   --pub-l:#e0f6ee;   --pub-d:#065040;
+  --remix:#5830b8; --remix-l:#f0ebff; --remix-d:#381898;
+  --border:rgba(12,13,26,0.09); --shadow:0 2px 22px rgba(12,13,26,0.07);
+  --r:14px; --r2:20px; --mono:'JetBrains Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--paper);color:var(--ink);line-height:1.8;font-size:15px;}
+.wrap{max-width:920px;margin:0 auto;padding:2rem 1.5rem 6rem;}
+
+/* Cover */
+.cover{border-radius:22px;padding:3.5rem 3rem 3rem;margin-bottom:2.5rem;position:relative;overflow:hidden;
+  background:linear-gradient(135deg,#080c1e 0%,#0e1a38 40%,#080f20 100%);}
+.cv-pub{position:absolute;right:-80px;top:-80px;width:300px;height:300px;border-radius:50%;
+  background:radial-gradient(circle,rgba(10,122,96,.22) 0%,transparent 70%);}
+.cv-remix{position:absolute;left:-60px;bottom:-60px;width:260px;height:260px;border-radius:50%;
+  background:radial-gradient(circle,rgba(88,48,184,.18) 0%,transparent 70%);}
+.cv-mid{position:absolute;right:200px;bottom:-40px;width:200px;height:200px;border-radius:50%;
+  background:radial-gradient(circle,rgba(18,85,168,.14) 0%,transparent 70%);}
+.cover-eyebrow{display:inline-flex;align-items:center;gap:8px;background:rgba(10,122,96,.28);color:#60d8b0;
+  font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:5px 16px;
+  border-radius:30px;margin-bottom:1.25rem;position:relative;}
+.cover h1{font-size:2.1rem;font-weight:900;line-height:1.25;color:#fff;margin-bottom:.7rem;position:relative;}
+.cover h1 em{color:#a888ff;font-style:normal;}
+.cover p{font-size:14px;color:rgba(255,255,255,.62);max-width:530px;line-height:1.75;position:relative;}
+.cover-chips{margin-top:2rem;display:flex;gap:10px;flex-wrap:wrap;position:relative;}
+.chip{background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);font-size:12px;font-weight:500;
+  padding:4px 14px;border-radius:30px;border:1px solid rgba(255,255,255,.1);}
+
+/* dual badge row */
+.dual-badge{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:2rem;}
+.dbadge{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;
+  padding:6px 18px;border-radius:30px;}
+.db-pub{background:var(--pub-l);color:var(--pub-d);border:1px solid #80c8b0;}
+.db-remix{background:var(--remix-l);color:var(--remix-d);border:1px solid #c0b0f0;}
+
+/* TOC */
+.toc{background:var(--white);border:.5px solid var(--border);border-radius:var(--r);
+  padding:1.5rem 2rem;margin-bottom:2.5rem;box-shadow:var(--shadow);}
+.toc-label{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:1rem;}
+.toc-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
+@media(max-width:540px){.toc-grid{grid-template-columns:1fr;}}
+.toc-item{display:flex;align-items:center;gap:10px;padding:.45rem .75rem;border-radius:8px;
+  text-decoration:none;color:var(--ink2);font-size:13.5px;transition:background .15s;}
+.toc-item:hover{background:var(--pub-l);color:var(--pub-d);}
+.toc-num{min-width:24px;height:24px;border-radius:50%;background:var(--teal);color:#fff;
+  font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+
+/* section */
+.sec{background:var(--white);border:.5px solid var(--border);border-radius:var(--r2);
+  padding:2.2rem 2.4rem;margin-bottom:2rem;box-shadow:var(--shadow);}
+.sec-eyebrow{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);margin-bottom:.35rem;}
+.sec h2{font-size:1.5rem;font-weight:900;color:var(--ink);margin-bottom:.3rem;line-height:1.3;}
+.sec .sub{font-size:13.5px;color:var(--ink3);margin-bottom:1.75rem;line-height:1.7;}
+.sec h3{font-size:1rem;font-weight:700;color:var(--ink);margin:1.75rem 0 .7rem;
+  padding-left:.9rem;border-left:3px solid var(--teal);}
+.acc-pub h3{border-left-color:var(--pub);}
+.acc-remix h3{border-left-color:var(--remix);}
+.acc-adv h3{border-left-color:var(--sky);}
+.sec p{margin-bottom:.9rem;font-size:14.5px;}
+.sec ul,.sec ol{padding-left:1.5rem;margin-bottom:1rem;}
+.sec li{margin:.35rem 0;font-size:14.5px;}
+hr{border:none;border-top:.5px solid var(--border);margin:1.8rem 0;}
+
+/* flow diagram */
+.flow{display:flex;align-items:center;flex-wrap:wrap;gap:0;margin:1.5rem 0;}
+.flow-step{flex:1;min-width:120px;border-radius:12px;padding:.9rem .75rem;text-align:center;
+  border:.5px solid var(--border);}
+.flow-arrow{font-size:1.2rem;color:var(--ink3);padding:0 4px;flex-shrink:0;}
+.flow-icon{font-size:1.5rem;margin-bottom:.3rem;}
+.flow-name{font-size:12px;font-weight:800;}
+.flow-desc{font-size:11px;color:var(--ink3);line-height:1.4;margin-top:.2rem;}
+
+/* share method cards */
+.share-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:1.5rem 0;}
+@media(max-width:580px){.share-grid{grid-template-columns:1fr 1fr;}}
+.share-card{border-radius:var(--r);padding:1.1rem 1rem;border:.5px solid var(--border);
+  background:var(--white);box-shadow:var(--shadow);}
+.share-icon{font-size:1.8rem;margin-bottom:.4rem;}
+.share-title{font-size:13px;font-weight:800;margin-bottom:.3rem;}
+.share-desc{font-size:12px;color:var(--ink3);line-height:1.5;}
+.share-tag{display:inline-block;font-size:10px;font-weight:700;padding:1px 7px;border-radius:20px;margin-top:.4rem;}
+
+/* steps */
+.steps{counter-reset:s;margin:1.25rem 0;}
+.step{display:flex;gap:1rem;align-items:flex-start;padding:1rem 0;border-bottom:.5px solid var(--border);}
+.step:last-child{border-bottom:none;}
+.sn{counter-increment:s;min-width:30px;height:30px;border-radius:50%;background:var(--teal);color:#fff;
+  font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
+.sn::before{content:counter(s);}
+.sb{flex:1;}
+.st{font-weight:700;font-size:14.5px;margin-bottom:.3rem;}
+.sd{font-size:13.5px;color:var(--ink3);line-height:1.65;}
+
+/* ba */
+.ba{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:1.2rem 0;}
+@media(max-width:540px){.ba{grid-template-columns:1fr;}}
+.ba-card{border-radius:10px;padding:1rem 1.1rem;font-size:13.5px;line-height:1.7;}
+.ba-before{background:#fdf0f3;border:1px solid #f0b0bc;}
+.ba-after {background:var(--teal-l);border:1px solid #80c8b4;}
+.ba-lbl{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.5rem;}
+.ba-before .ba-lbl{color:var(--coral-d);}
+.ba-after .ba-lbl{color:var(--teal-d);}
+
+/* callout */
+.box{border-radius:10px;padding:1rem 1.25rem;margin:1.2rem 0;font-size:14px;}
+.box-lbl{font-size:10.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;margin-bottom:.5rem;}
+.box.apply{background:var(--teal-l);border-left:3px solid var(--teal);}
+.box.apply .box-lbl{color:var(--teal-d);}
+.box.scenario{background:var(--blue-l);border-left:3px solid var(--blue);}
+.box.scenario .box-lbl{color:var(--blue-d);}
+.box.tip{background:var(--amber-l);border-left:3px solid var(--amber);}
+.box.tip .box-lbl{color:var(--amber-d);}
+.box.warn{background:var(--coral-l);border-left:3px solid var(--coral);}
+.box.warn .box-lbl{color:var(--coral-d);}
+.box.insight{background:var(--violet-l);border-left:3px solid var(--violet);}
+.box.insight .box-lbl{color:var(--violet-d);}
+.box.ok{background:var(--green-l);border-left:3px solid var(--green);}
+.box.ok .box-lbl{color:var(--green-d);}
+
+/* prompt block */
+.pb{background:#0d0e1c;border-radius:12px;padding:1.1rem 1.5rem;margin:1rem 0;position:relative;}
+.pb-lbl{font-size:10.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;
+  color:#78d0c0;margin-bottom:.8rem;display:flex;align-items:center;gap:6px;}
+.pb-lbl::before{content:"📋";font-size:13px;}
+.pb-num{border-radius:5px;font-size:10px;font-weight:800;padding:1px 8px;margin-right:4px;display:inline-block;}
+.pn-0{background:#2a3050;color:#a0a8e0;}
+.pn-p{background:var(--teal);color:#fff;}
+.pn-r{background:var(--remix);color:#fff;}
+.pn-a{background:var(--sky);color:#fff;}
+.pn-c{background:var(--pink);color:#fff;}
+.pn-x{background:var(--ink2);color:#fff;}
+.pt{font-family:var(--mono);font-size:12.5px;line-height:1.95;color:#c8d0e4;
+  white-space:pre-wrap;word-break:break-word;}
+.pt em{color:#68d8c0;font-style:normal;}
+.pt strong{color:#fde68a;}
+.pt .cm{color:#404860;font-style:italic;}
+.pt .ht{color:#f0a060;font-weight:600;}
+.copy-btn{position:absolute;top:.8rem;right:.8rem;background:rgba(255,255,255,.08);border:none;
+  border-radius:6px;color:#7a8099;font-size:11px;padding:4px 10px;cursor:pointer;transition:all .18s;}
+.copy-btn:hover{background:rgba(255,255,255,.16);color:#fff;}
+
+/* mockup */
+.mockup{background:var(--paper2);border:.5px solid var(--border);border-radius:12px;overflow:hidden;margin:1rem 0;}
+.mock-bar{background:var(--ink2);padding:.55rem 1rem;display:flex;align-items:center;gap:8px;}
+.mock-dot{width:10px;height:10px;border-radius:50%;}
+.mock-title{font-size:11px;color:rgba(255,255,255,.45);font-family:var(--mono);flex:1;text-align:center;}
+.mock-body{padding:1.25rem 1.5rem;font-size:13.5px;color:var(--ink2);line-height:1.7;}
+
+/* table */
+.tbl{width:100%;border-collapse:collapse;margin:1.2rem 0;font-size:13.5px;}
+.tbl th{background:var(--ink2);color:#fff;padding:10px 14px;text-align:left;font-weight:700;}
+.tbl th:first-child{border-radius:8px 0 0 0;}
+.tbl th:last-child{border-radius:0 8px 0 0;}
+.tbl td{padding:9px 14px;border-bottom:.5px solid var(--border);}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl tr:nth-child(even) td{background:rgba(10,122,96,.04);}
+.tbl code{background:var(--teal-l);color:var(--teal-d);border-radius:4px;padding:1px 6px;font-size:12px;font-family:var(--mono);}
+.good{color:var(--teal-d);font-weight:600;}
+.bad{color:var(--coral-d);}
+
+/* tag */
+.tag{display:inline-block;border-radius:6px;font-size:11px;font-weight:800;padding:2px 9px;margin:0 2px;vertical-align:middle;}
+.tg-t{background:var(--teal-l);color:var(--teal-d);}
+.tg-r{background:var(--remix-l);color:var(--remix-d);}
+.tg-b{background:var(--blue-l);color:var(--blue-d);}
+.tg-a{background:var(--amber-l);color:var(--amber-d);}
+.tg-c{background:var(--coral-l);color:var(--coral-d);}
+.tg-g{background:var(--green-l);color:var(--green-d);}
+.tg-p{background:var(--pink-l);color:var(--pink-d);}
+
+/* remix card */
+.remix-card{background:var(--remix-l);border:1px solid #c0b0f0;border-radius:var(--r);
+  padding:1.25rem 1.5rem;margin:.75rem 0;}
+.remix-source{font-size:11px;font-weight:700;color:var(--remix-d);letter-spacing:.05em;
+  text-transform:uppercase;margin-bottom:.5rem;display:flex;align-items:center;gap:6px;}
+.remix-desc{font-size:13.5px;color:var(--ink2);line-height:1.7;}
+
+/* summary */
+.summary{background:linear-gradient(135deg,var(--teal-l),var(--remix-l));
+  border:1px solid #a0d0c8;border-radius:var(--r2);padding:1.5rem 2rem;margin-top:2rem;}
+.summary-title{font-size:13px;font-weight:800;color:var(--teal-d);letter-spacing:.06em;text-transform:uppercase;margin-bottom:1rem;}
+.summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+@media(max-width:600px){.summary-grid{grid-template-columns:1fr 1fr;}}
+.summary-card{background:rgba(255,255,255,.72);border-radius:10px;padding:.9rem 1rem;font-size:13px;}
+.summary-card strong{display:block;font-size:11px;color:var(--teal-d);font-weight:800;
+  letter-spacing:.05em;text-transform:uppercase;margin-bottom:.4rem;}
+
+/* collab flow */
+.collab-flow{display:flex;flex-direction:column;gap:8px;margin:1.2rem 0;}
+.cf-step{display:flex;align-items:flex-start;gap:12px;padding:.9rem 1rem;border-radius:10px;background:var(--paper2);border:.5px solid var(--paper3);}
+.cf-num{min-width:26px;height:26px;border-radius:50%;font-size:11px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.cf-body{flex:1;font-size:13.5px;color:var(--ink2);line-height:1.65;}
+.cf-title{font-weight:700;margin-bottom:.2rem;}
+
+code{background:var(--teal-l);color:var(--teal-d);border-radius:4px;padding:1px 6px;font-size:12.5px;font-family:var(--mono);}
+.footer{text-align:center;font-size:12px;color:var(--ink3);margin-top:4rem;padding-top:1.5rem;border-top:.5px solid var(--border);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ══ COVER ══ -->
+<div class="cover">
+  <div class="cv-pub"></div><div class="cv-remix"></div><div class="cv-mid"></div>
+  <div class="cover-eyebrow">📅 Day 10 · 클로드 AI 30일 마스터 코스</div>
+  <h1>Publish &amp; Remix<br>아티팩트를 공유하고<br><em>다른 작업을 내 것으로</em></h1>
+  <p>내가 만든 아티팩트를 링크 하나로 세상에 공유하고 — 다른 사람의 훌륭한 아티팩트를 내 상황에 맞게 리믹스하는 방법을 마스터합니다</p>
+  <div class="cover-chips">
+    <span class="chip">🚀 Publish 완전 가이드</span>
+    <span class="chip">🎛 Remix 6가지 전략</span>
+    <span class="chip">📋 14개 복붙 프롬프트</span>
+    <span class="chip">🤝 협업 워크플로</span>
+    <span class="chip">🔒 공유 설정 & 권한</span>
+  </div>
+</div>
+
+<!-- ══ TOC ══ -->
+<div class="toc">
+  <div class="toc-label">목차</div>
+  <div class="toc-grid">
+    <a class="toc-item" href="#s0"><span class="toc-num">0</span>Publish vs Remix — 핵심 개념 이해</a>
+    <a class="toc-item" href="#s1"><span class="toc-num">1</span>Publish — 아티팩트 공유하기 (단계별)</a>
+    <a class="toc-item" href="#s2"><span class="toc-num">2</span>Publish 활용 사례 — 발표·포트폴리오·팀 공유</a>
+    <a class="toc-item" href="#s3"><span class="toc-num">3</span>Remix — 다른 아티팩트 수정하기</a>
+    <a class="toc-item" href="#s4"><span class="toc-num">4</span>Remix 6가지 전략 — 심화 활용</a>
+    <a class="toc-item" href="#s5"><span class="toc-num">5</span>협업 워크플로 — 팀과 함께 만들기</a>
+    <a class="toc-item" href="#s6"><span class="toc-num">6</span>고급 기법 — Publish+Remix 통합 전략</a>
+  </div>
+</div>
+
+
+<!-- ══ S0: 개념 ══ -->
+<div class="sec" id="s0">
+  <div class="sec-eyebrow">기초 개념 · Publish vs Remix</div>
+  <h2>Publish & Remix — 무엇이고 왜 중요한가?</h2>
+  <p class="sub">아티팩트를 "만드는 것"에서 "나누고 발전시키는 것"으로 — 이 두 기능이 클로드를 개인 도구에서 협업 플랫폼으로 확장시킵니다.</p>
+
+  <div class="dual-badge">
+    <span class="dbadge db-pub">🚀 Publish — 내 아티팩트를 세상에 공개</span>
+    <span class="dbadge db-remix">🎛 Remix — 남의 아티팩트를 내 것으로 개조</span>
+  </div>
+
+  <h3>Publish란?</h3>
+  <p>클로드에서 만든 아티팩트를 <strong>외부 링크로 공유</strong>할 수 있는 기능입니다. 링크를 받은 사람은 Claude 계정이 없어도 해당 아티팩트를 브라우저에서 바로 볼 수 있습니다.</p>
+  <p>단순한 코드 공유가 아닙니다 — 완성된 웹 앱, 인터랙티브 대시보드, 게임이 그 자체로 URL 하나가 되어 누구와도 공유됩니다.</p>
+
+  <h3>Remix란?</h3>
+  <p>다른 사람이 Publish한 아티팩트를 보다가 마음에 드는 것을 발견했을 때, 그것을 <strong>클로드로 가져와서 수정</strong>하는 기능입니다. "이 대시보드에 우리 데이터로 바꿔줘"처럼 다른 사람의 결과물을 출발점으로 삼을 수 있습니다.</p>
+
+  <h3>왜 중요한가 — Publish & Remix가 만드는 3가지 변화</h3>
+  <div class="steps">
+    <div class="step">
+      <div class="sn"></div>
+      <div class="sb">
+        <div class="st">클로드 없이도 공유 가능</div>
+        <div class="sd">팀원, 고객, 파트너가 Claude 계정 없이도 당신이 만든 결과물을 사용할 수 있습니다. 계산기, 대시보드, 게임을 URL 하나로 전달하세요.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="sn"></div>
+      <div class="sb">
+        <div class="st">바퀴를 다시 발명하지 않는다</div>
+        <div class="sd">이미 잘 만들어진 아티팩트를 리믹스하면 처음부터 만드는 시간 없이 더 나은 결과물을 빠르게 완성할 수 있습니다. 오픈소스처럼 서로의 작업 위에 쌓아갑니다.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="sn"></div>
+      <div class="sb">
+        <div class="st">팀 협업의 새로운 방식</div>
+        <div class="sd">기획자가 Publish한 프로토타입을 개발자가 Remix해서 개선하고, 디자이너가 다시 Remix해서 시각을 바꾸는 — 새로운 협업 루프가 생깁니다.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Flow diagram -->
+  <h3>Publish → Remix 전체 플로우</h3>
+  <div class="flow">
+    <div class="flow-step" style="background:var(--teal-l);border-color:#80c8b0;">
+      <div class="flow-icon">🏗️</div>
+      <div class="flow-name" style="color:var(--teal-d);">아티팩트 생성</div>
+      <div class="flow-desc">클로드로 게임·대시보드·도구 제작</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" style="background:var(--blue-l);border-color:#90b8e8;">
+      <div class="flow-icon">🚀</div>
+      <div class="flow-name" style="color:var(--blue-d);">Publish</div>
+      <div class="flow-desc">링크 생성 → 외부 공유</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" style="background:var(--paper2);">
+      <div class="flow-icon">👀</div>
+      <div class="flow-name" style="color:var(--ink2);">다른 사람 발견</div>
+      <div class="flow-desc">링크로 아티팩트 접속·사용</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" style="background:var(--remix-l);border-color:#c0b0f0;">
+      <div class="flow-icon">🎛️</div>
+      <div class="flow-name" style="color:var(--remix-d);">Remix</div>
+      <div class="flow-desc">클로드로 수정·발전</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" style="background:var(--green-l);border-color:#a0c870;">
+      <div class="flow-icon">✨</div>
+      <div class="flow-name" style="color:var(--green-d);">새 버전 탄생</div>
+      <div class="flow-desc">개선된 아티팩트 재공유</div>
+    </div>
+  </div>
+
+  <div class="box tip">
+    <div class="box-lbl">💡 언제 Publish하고 언제 Remix하나?</div>
+    <strong>Publish 할 때:</strong> 팀에 공유할 대시보드, 고객에게 보여줄 프로토타입, 이벤트용 게임, 강의 자료, 포트폴리오 작품<br><br>
+    <strong>Remix 할 때:</strong> 좋은 아티팩트를 발견했지만 데이터·색상·기능이 다를 때, 기존 아티팩트를 다른 언어/맥락에 맞게 바꿀 때, 여러 아티팩트를 합칠 때
+  </div>
+
+  <div class="pb">
+    <div class="pb-lbl"><span class="pb-num pn-0">P-00</span>복사해서 바로 쓰는 프롬프트 — Publish & Remix 개념 이해 체험</div>
+    <button class="copy-btn" onclick="cp(this)">복사</button>
+    <div class="pt"><span class="cm"># Publish & Remix 개념을 클로드에게 직접 물어보기</span>
+
+내가 클로드로 만든 아티팩트를 외부에 공유하고 싶어.
+아래 질문들에 순서대로 답해줘:
+
+① Publish 기능을 사용하면 링크를 받은 사람이 어떤 경험을 하는지 설명해줘
+② 공유 링크의 유효 기간과 접근 권한 설정 방법을 알려줘
+③ Remix와 단순 복사·붙여넣기의 차이점은?
+④ Publish한 아티팩트를 나중에 비공개로 되돌릴 수 있나?
+⑤ 내가 Publish하면 좋을 아티팩트 유형 3가지를 내 상황에 맞게 제안해줘
+
+[내 상황]: <em>[직업/역할과 주로 만드는 아티팩트 종류를 한 줄로]</em></div>
+  </div>
+</div>
+
+
+<!-- ══ S1: PUBLISH 단계 ══ -->
+<div class="sec acc-pub" id="s1">
+  <div class="sec-eyebrow">Section 1 · Publish 완전 가이드</div>
+  <h2>🚀 Publish — 아티팩트를 링크로 공유하기</h2>
+  <p class="sub">만든 아티팩트를 URL 하나로 세상에 공유하는 전체 과정을 단계별로 익힙니다.</p>
+
+  <h3>1-1. Publish 버튼 찾기와 공유 링크 생성</h3>
+
+  <div class="steps">
+    <div class="step">
+      <div class="sn"></div>
+      <div class="sb">
+        <div class="st">아티팩트 패널 상단 오른쪽 → 공유 아이콘(↗) 클릭</div>
+        <div class="sd">아티팩트가 열린 상태에서 패널 상단에 있는 <strong>공유 아이콘</strong> 또는 <strong>"Share" 버튼</strong>을 찾습니다. 아티팩트 미리보기 탭과 코드 탭 사이 상단에 위치합니다.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="sn"></div>
+      <div class="sb">
+        <div class="st">공유 설정 선택</div>
+        <div class="sd">팝업이 열리면 공유 범위를 설정합니다:<br>
+        • <strong>링크 있는 모든 사람</strong> — 링크를 가진 누구나 접근 가능<br>
+        • <strong>클로드 사용자만</strong> — Claude 계정 로그인 필요<br>
+        대부분의 경우 "링크 있는 모든 사람"으로 설정하면 편합니다.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="sn"></div>
+      <div class="sb">
+        <div class="st">"Publish" 또는 "링크 복사" 클릭</div>
+        <div class="sd">공유 링크가 생성됩니다. 클립보드에 자동 복사되거나 수동으로 복사할 수 있습니다. 링크 형식: <code>claude.site/artifacts/[고유ID]</code></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="sn"></div>
+      <div class="sb">
+        <div class="st">링크 테스트 — 다른 브라우저나 시크릿 창에서 열기</div>
+        <div class="sd">공유 전에 반드시 시크릿 창이나 다른 브라우저에서 링크를 열어서 의도한 대로 보이는지 확인하세요. 로그인 없이도 보이는지 확인이 중요합니다.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="sn"></div>
+      <div class="sb">
+        <div class="st">공유 및 수정 반복</div>
+        <div class="sd">아티팩트를 수정한 후 다시 Publish하면 같은 링크에 업데이트된 버전이 반영됩니다. 링크를 새로 만들 필요가 없습니다.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mockup">
+    <div class="mock-bar">
+      <div class="mock-dot" style="background:#ff5f57;"></div>
+      <div class="mock-dot" style="background:#febc2e;"></div>
+      <div class="mock-dot" style="background:#28c840;"></div>
+      <div class="mock-title">아티팩트 공유 설정 화면 구조</div>
+    </div>
+    <div class="mock-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;font-size:13px;">
+        <div style="background:var(--paper3);border-radius:8px;padding:1rem;">
+          <div style="font-weight:800;font-size:11px;color:var(--ink2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.5rem;">공유 설정 옵션</div>
+          🔗 <strong>공개 링크</strong> — 누구나 접근<br>
+          🔒 <strong>비공개</strong> — 나만 볼 수 있음<br>
+          👤 <strong>Claude 사용자만</strong> — 로그인 필요<br><br>
+          <div style="font-size:11px;color:var(--ink3);">* 설정은 언제든 변경 가능</div>
+        </div>
+        <div style="background:var(--teal-l);border-radius:8px;padding:1rem;border:.5px solid #a0d8c8;">
+          <div style="font-weight:800;font-size:11px;color:var(--teal-d);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.5rem;">공유 링크 특징</div>
+          ✅ Claude 계정 없이 접근 가능<br>
+          ✅ 모바일 브라우저 완전 지원<br>
+          ✅ 아티팩트 수정 시 링크 유지<br>
+          ✅ 링크 비활성화로 공유 종료<br>
+          ⚠️ 코드 소스는 기본 비공개
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3>1-2. Publish 전 체크리스트</h3>
+
+  <div class="box warn">
+    <div class="box-lbl">⚠️ 공유 전 반드시 확인하세요</div>
+    <strong>개인정보 확인:</strong> 아티팩트 안에 실명, 이메일, 전화번호, 내부 데이터가 포함되어 있지 않은지 확인<br>
+    <strong>사내 정보 확인:</strong> 매출, 비용, 고객사명 등 기밀 정보는 더미 데이터로 교체 후 공유<br>
+    <strong>저작권 확인:</strong> 외부 이미지, 폰트, 라이브러리 사용 시 라이선스 확인<br>
+    <strong>동작 테스트:</strong> 시크릿 창에서 모든 기능이 의도한 대로 작동하는지 확인
+  </div>
+
+  <div class="box scenario">
+    <div class="box-lbl">🎭 실습 시나리오 1</div>
+    <strong>상황:</strong> Day 08에서 만든 마케팅 KPI 대시보드를 다음 주 팀 회의 전에 팀원들에게 미리 링크로 공유하고 싶습니다. 실제 데이터는 더미로 교체해야 합니다.<br>
+    <strong>목표:</strong> 공유용 버전으로 수정 + Publish 완료
+  </div>
+
+  <div class="pb">
+    <div class="pb-lbl"><span class="pb-num pn-p">P-01</span>복사해서 바로 쓰는 프롬프트 — Publish 준비: 실제 데이터 → 공유용 더미 데이터로 교체</div>
+    <button class="copy-btn" onclick="cp(this)">복사</button>
+    <div class="pt"><span class="cm"># 기존 아티팩트의 민감 데이터를 공유용으로 정제</span>
+
+이 아티팩트를 외부 공유용으로 정제해줘.
+
+[정제 규칙]
+① 실제 회사명 → "A사", "B사" 등 익명 처리
+② 실제 매출/비용 수치 → 비슷한 비율을 유지하는 더미 수치로 교체
+③ 실명이 들어간 곳 → "담당자", "팀원" 등 역할명으로
+④ 내부 URL, 이메일, 전화번호 → 전부 제거 또는 placeholder로
+
+[추가 작업]
+① 아티팩트 상단에 "이 데이터는 설명용 예시입니다" 작은 배너 추가
+② 화면 하단에 "Made with Claude" 작은 크레딧 추가 (선택)
+
+[원본 아티팩트]
+<em>--- 이전 대화에서 만든 아티팩트의 코드나 설명을 붙여넣거나, "방금 만든 대시보드를 기준으로"라고 지정하세요 ---</em></div>
+  </div>
+
+  <div class="pb">
+    <div class="pb-lbl"><span class="pb-num pn-p">P-02</span>복사해서 바로 쓰는 프롬프트 — Publish용: SEO 메타 정보 & 공유 미리보기 최적화</div>
+    <button class="copy-btn" onclick="cp(this)">복사</button>
+    <div class="pt"><span class="cm"># 공유 링크를 더 전문적으로 보이게 만들기</span>
+
+이 HTML 아티팩트를 공유 링크로 게시할 때 보기 좋게 만들어줘.
+
+[추가할 요소]
+① &lt;head&gt;에 메타 태그 추가:
+   - 제목 (title): <em>[아티팩트 이름 + 목적]</em>
+   - 설명 (description): <em>[한 줄 설명]</em>
+   - Open Graph 태그 (카카오톡·슬랙 공유 시 미리보기용)
+     og:title, og:description, og:type="website"
+
+② 브라우저 탭 아이콘(favicon) 이모지로 설정:
+   &lt;link rel="icon" href="data:image/svg+xml,&lt;svg...&gt;📊&lt;/svg&gt;"&gt;
+
+③ 모바일 최적화 확인 (viewport 메타태그)
+
+④ 로딩 시 부드러운 fade-in 애니메이션 (CSS)
+
+아티팩트 기능은 그대로 유지하면서 위 요소들만 추가해줘.</div>
+  </div>
+</div>
+
+
+<!-- ══ S2: PUBLISH 활용 ══ -->
+<div class="sec acc-pub" id="s2">
+  <div class="sec-eyebrow">Section 2 · Publish 활용 사례</div>
+  <h2>📤 Publish 활용 사례 — 발표 · 포트폴리오 · 팀 공유</h2>
+  <p class="sub">어떤 상황에서 Publish가 가장 강력한 효과를 내는지 실전 사례별로 배웁니다.</p>
+
+  <h3>활용 사례 1: 발표 자료 대신 링크 공유</h3>
+
+  <div class="ba">
+    <div class="ba-card ba-before">
+      <div class="ba-lbl">❌ 기존 방식</div>
+      파워포인트 파일을 메일로 보냄<br>
+      → 받는 사람이 다운로드해야 함<br>
+      → 버전 관리가 안 됨<br>
+      → 모바일에서 보기 불편<br>
+      → 수정하면 다시 보내야 함
+    </div>
+    <div class="ba-card ba-after">
+      <div class="ba-lbl">✅ Publish 방식</div>
+      인터랙티브 대시보드 링크 공유<br>
+      → 브라우저에서 즉시 열림<br>
+      → 링크 하나로 항상 최신 버전<br>
+      → 모바일 완벽 지원<br>
+      → 클릭하고 조작 가능
+    </div>
+  </div>
+
+  <div class="box scenario">
+    <div class="box-lbl">🎭 실습 시나리오 2</div>
+    <strong>상황:</strong> 투자자 미팅에서 스타트업 제품을 소개해야 합니다. PPT 대신 실제로 동작하는 랜딩페이지 형태의 아티팩트를 링크로 공유하고 싶습니다.<br>
+    <strong>목표:</strong> 투자자용 제품 소개 인터랙티브 페이지 제작 + Publish
+  </div>
+
+  <div class="pb">
+    <div class="pb-lbl"><span class="pb-num pn-p">P-03</span>복사해서 바로 쓰는 프롬프트 — Publish용: 제품 소개 인터랙티브 원페이저</div>
+    <button class="copy-btn" onclick="cp(this)">복사</button>
+    <div class="pt"><span class="cm"># 투자자·고객에게 링크로 보낼 수 있는 제품 소개 페이지</span>
+
+HTML 아티팩트로 투자자용 제품 소개 원페이저를 만들어줘.
+공유 링크로 보낼 것이기 때문에 완성도 높게.
+
+[제품 정보]
+제품명: <em>[제품명]</em>
+한 줄 설명: <em>[핵심 가치 제안]</em>
+핵심 문제: <em>[해결하는 문제]</em>
+솔루션: <em>[어떻게 해결하나]</em>
+주요 기능 3가지: <em>[기능 1, 2, 3]</em>
+고객 사례 (더미): <em>[성과 수치 예시]</em>
+
+[페이지 구성]
+① 히어로 섹션: 제품명 + 핵심 메시지 + CTA 버튼
+② 문제 → 해결 섹션: 시각적 Before/After
+③ 핵심 기능 3개: 아이콘 + 설명 카드
+④ 지표/성과 섹션: 큰 숫자로 임팩트 표현
+⑤ 팀 소개: 간단한 카드 (더미 정보)
+⑥ CTA 섹션: "데모 요청" 버튼
+
+[디자인]
+스타트업 느낌의 모던한 디자인
+다크/라이트 섹션 교차, 스크롤 애니메이션
+모바일 완벽 반응형</div>
+  </div>
+
+  <h3>활용 사례 2: 포트폴리오 링크 모음</h3>
+
+  <div class="pb">
+    <div class="pb-lbl"><span class="pb-num pn-p">P-04</span>복사해서 바로 쓰는 프롬프트 — Publish용: 개인 포트폴리오 허브 페이지</div>
+    <button class="copy-btn" onclick="cp(this)">복사</button>
+    <div class="pt"><span class="cm"># 여러 아티팩트 링크를 한 페이지에 모아서 포트폴리오로</span>
+
+HTML 아티팩트로 내 아티팩트 포트폴리오 허브 페이지를 만들어줘.
+
+[내 정보]
+이름: <em>[이름]</em>
+직업/역할: <em>[예: 마케터 · 데이터 분석가 · UX 디자이너]</em>
+한 줄 소개: <em>[전문성 한 줄]</em>
+연락처/링크: <em>[LinkedIn, GitHub, 이메일 등]</em>
+
+[포트폴리오 아이템 — 만든 아티팩트들]
+작품 1: 제목 <em>[이름]</em> / 설명 <em>[한 줄]</em> / 링크 <em>[나중에 채울 것이면 #으로]</em>
+작품 2: 제목 <em>[이름]</em> / 설명 <em>[한 줄]</em> / 링크 <em>[#]</em>
+작품 3: 제목 <em>[이름]</em> / 설명 <em>[한 줄]</em> / 링크 <em>[#]</em>
+
+[페이지 구성]
+① 헤더: 이름 + 직업 + 짧은 소개
+② 작품 카드 그리드: 썸네일 영역 + 제목 + 설명 + 링크 버튼
+③ 카드 hover 시 확대 효과
+④ 카테고리 필터 버튼 (전체/대시보드/게임/문서)
+⑤ 연락처 섹션
+
+[디자인]
+미니멀·전문적, 다크 테마 선택 가능
+링크드인 프로필 공유용 수준의 완성도</div>
+  </div>
+
+  <h3>활용 사례 3: 팀 내부 도구 공유</h3>
+
+  <div class="pb">
+    <div class="pb-lbl"><span class="pb-num pn-p">P-05</span>복사해서 바로 쓰는 프롬프트 — Publish용: 팀원 누구나 쓰는 업무 도구</div>
+    <button class="copy-btn" onclick="cp(this)">복사</button>
+    <div class="pt"><span class="cm"># 팀 전체가 링크로 사용하는 공유 업무 도구</span>
+
+React 아티팩트로 팀 전체가 링크로 사용할 수 있는 업무 도구를 만들어줘.
+
+[도구 종류 — 아래 중 선택 또는 조합]
+<span class="cm">--- 옵션 A: 회의 의사결정 투표 도구 ---</span>
+- 주제 입력 + 선택지 추가
+- 팀원들이 투표 (익명/기명 선택)
+- 실시간 결과 시각화
+- 결과 슬랙 공유 텍스트 자동 생성
+
+<span class="cm">--- 옵션 B: 팀 일정 공유 캘린더 ---</span>
+- 주간 그리드 뷰
+- 팀원별 색상 코딩
+- 이벤트 클릭 시 상세 팝업
+- "이번 주 요약" 텍스트 생성
+
+<span class="cm">--- 옵션 C: 팀 작업 현황 칸반보드 ---</span>
+- To Do / In Progress / Done 컬럼
+- 드래그&드롭으로 카드 이동 (또는 버튼)
+- 담당자·우선순위·마감일 표시
+- localStorage로 상태 유지
+
+[공통 요청]
+- Claude 계정 없이 사용 가능해야 함
+- 모바일에서도 편하게 사용 가능
+- 팀 이름/로고 커스터마이즈 가능</div>
+  </div>
+</div>
+
+
+<!-- ══ S3: REMIX 기초 ══ -->
+<div class="sec acc-remix" id="s3">
+  <div class="sec-eyebrow">Section 3 · Remix 기초</div>
+  <h2>🎛️ Remix — 다른 아티팩트를 내 것으로 만들기</h2>
+  <p class="sub">다른 사람이 만든 훌륭한 아티팩트를 발견했을 때, 처음부터 만드는 대신 그것을 출발점으로 삼아 빠르게 내 버전을 완성합니다.</p>
+
+  <h3>Remix 방법 3가지</h3>
+
+  <div class="share-grid">
+    <div class="share-card">
+      <div class="share-icon">🔗</div>
+      <div class="share-title">방법 1: 공유 링크에서 Remix</div>
+      <div class="share-desc">공개된 아티팩트 링크를 열면 "Remix" 버튼이 표시됩니다. 클릭하면 해당 아티팩트가 내 Claude 세션으로 복사되어 수정 가능합니다.</div>
+      <span class="share-tag" style="background:var(--teal-l);color:var(--teal-d);">가장 쉬운 방법</span>
+    </div>
+    <div class="share-card">
+      <div class="share-icon">📋</div>
+      <div class="share-title">방법 2: 코드 복사 후 수정 요청</div>
+      <div class="share-desc">아티팩트 코드 탭에서 전체 코드를 복사하고, 새 대화창에서 "이 코드를 기반으로 [수정 내용]으로 바꿔줘"라고 요청합니다.</div>
+      <span class="share-tag" style="background:var(--blue-l);color:var(--blue-d);">범용적 방법</span>
+    </div>
+    <div class="share-card">
+      <div class="share-icon">💬</div>
+      <div class="share-title">방법 3: URL 언급 후 리믹스</div>
+      <div class="share-desc">Claude 대화창에서 공유 링크를 직접 언급하며 "이 링크의 아티팩트를 [변경 내용]으로 수정해줘"라고 요청합니다.</div>
+      <span class="share-tag" style="background:var(--violet-l);color:var(--violet-d);">직접 링크 방식</span>
+    </div>
+  </div>
+
+  <h3>Remix 시 클로드에게 코드 전달하는 방법</h3>
+  <p>리믹스의 핵심은 기존 코드를 클로드에게 정확히 전달하는 것입니다. 두 가지 방법 중 상황에 맞는 것을 선택하세요:</p>
+
+  <table class="tbl">
+    <thead><tr><th>방법</th><th>언제 사용?</th><th>장점</th><th>단점</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>코드 전체 복사</strong></td>
+        <td>코드가 짧고 단순할 때 (500줄 이하)</td>
+        <td class="good">정확하게 전달됨</td>
+        <td>긴 코드는 프롬프트가 길어짐</td>
+      </tr>
+      <tr>
+        <td><strong>URL + 설명</strong></td>
+        <td>공개 링크가 있을 때</td>
+        <td class="good">간결하고 빠름</td>
+        <td>클로드가 URL 내용 파악이 제한적</td>
+      </tr>
+      <tr>
+        <td><strong>핵심 부분만 복사</strong></td>
+        <td>수정할 부분이 명확할 때</td>
+        <td class="good">필요한 부분만 집중</td>
+        <td>전체 맥락 전달 안 될 수 있음</td>
+      </tr>
+      <tr>
+        <td><strong>스크린샷 + 설명</strong></td>
+        <td>시각적 레이아웃 변경이 목적일 때</td>
+        <td class="good">디자인 의도 명확 전달</td>
+        <td>코드 수준 수정엔 부족</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="box scenario">
+    <div class="box-lbl">🎭 실습 시나리오 3</div>
+    <strong>상황:</strong> 인터넷에서 멋진 마케팅 KPI 대시보드 아티팩트 링크를 발견했습니다. 우리 팀 데이터와 색상으로 바꾸고, 새로운 차트도 추가하고 싶습니다.<br>
+    <strong>목표:</strong> 10분 안에 발견한 아티팩트를 우리 팀 전용 버전으로 리믹스
+  </div>
+
+  <div class="pb">
+    <div class="pb-lbl"><span class="pb-num pn-r">P-06</span>복사해서 바로 쓰는 프롬프트 — Remix 기본: 데이터 교체 + 색상 변경</div>
+    <button class="copy-btn" onclick="cp(this)">복사</button>
+    <div class="pt"><span class="cm"># 기존 아티팩트의 데이터와 스타일을 내 것으로 교체</span>
+
+아래 아티팩트를 우리 팀 버전으로 리믹스해줘.
+
+[기존 코드 — 여기에 붙여넣기]
+<em>--- 리믹스할 아티팩트의 코드를 전체 복사해서 여기에 붙여넣으세요 ---</em>
+
+[변경 사항 1 — 데이터 교체]
+기존 데이터를 아래 우리 팀 데이터로 교체해줘:
+<em>[우리 팀의 실제 또는 더미 데이터를 입력]</em>
+
+[변경 사항 2 — 브랜드 색상]
+색상 팔레트를 우리 브랜드 색상으로 변경:
+메인 컬러: <em>[예: #4F46E5]</em>
+서브 컬러: <em>[예: #10B981]</em>
+배경: <em>[예: #0F172A (다크) 또는 #FFFFFF (라이트)]</em>
+
+[변경 사항 3 — 추가 기능]
+<em>[없으면 "기존 기능 유지"라고 적어도 됩니다]</em>
+
+전체 구조와 레이아웃은 최대한 유지하면서, 위 변경 사항만 적용해줘.</div>
+  </div>
+
+  <div class="pb">
+    <div class="pb-lbl"><span class="pb-num pn-r">P-07</span>복사해서 바로 쓰는 프롬프트 — Remix: 게임 문제 세트 교체 (퀴즈 커스터마이징)</div>
+    <button class="copy-btn" onclick="cp(this)">복사</button>
+    <div class="pt"><span class="cm"># 퀴즈 게임의 문제 세트만 교체해서 완전히 다른 주제의 게임으로</span>
+
+아래 퀴즈 게임의 문제 세트를 교체해서 새로운 주제의 게임으로 만들어줘.
+
+[기존 퀴즈 코드]
+<em>--- 기존 퀴즈 아티팩트 코드 붙여넣기 ---</em>
+
+[새 문제 세트 — 주제: <em>[예: 우리 회사 제품 지식 퀴즈]</em>]
+문제 1: "<em>[질문]</em>"
+  정답: <em>[OX 또는 4지선다 정답]</em>
+  오답 설명: "<em>[틀렸을 때 보여줄 설명]</em>"
+
+문제 2: "<em>[질문]</em>"
+  정답: <em>[정답]</em>
+  오답 설명: "<em>[설명]</em>"
+
+<em>[계속 추가...]</em>
+
+[추가 변경]
+- 게임 제목을 "<em>[새 제목]</em>"으로 변경
+- 시작 화면 안내 문구 교체: "<em>[새 안내 문구]</em>"
+- 완료 화면 메시지: "<em>[새 완료 메시지]</em>"
+
+게임 로직과 UI는 그대로 유지하고, 콘텐츠만 교체해줘.</div>
+  </div>
+</div>
+
+
+<!-- ══ S4: REMIX 심화 ══ -->
+<div class="sec acc-remix" id="s4">
+  <div class="sec-eyebrow">Section 4 · Remix 6가지 전략</div>
+  <h2>🎯 Remix 6가지 전략 — 심화 활용</h2>
+  <p class="sub">단순한 데이터 교체를 넘어 아티팩트를 근본적으로 발전시키는 6가지 고급 리믹스 전략을 배웁니다.</p>
+
+  <div class="remix-card">
+    <div class="remix-source">🔄 전략 1 — 언어·지역화 리믹스</div>
+    <div class="remix-desc">영어로 된 아티팩트를 한국어로, 또는 반대로 변환합니다. UI 텍스트, 날짜 형식, 통화 단위, 문화적 맥락을 현지화합니다.</div>
+  </div>
+
+  <div class="remix-card">
+    <div class="remix-source">🔄 전략 2 — 타겟 오디언스 리믹스</div>
+    <div class="remix-desc">동일한 정보를 다른 독자를 위해 재구성합니다. 임원용 요약본↔실무자용 상세본, 고객용↔내부용, 초보자용↔전문가용 전환.</div>
+  </div>
+
+  <div class="remix-card">
+    <div class="remix-source">🔄 전략 3 — 기능 확장 리믹스</div>
+    <div class="remix-desc">기존 아티팩트에 없는 기능을 추가합니다. 검색 기능, 필터, 내보내기, 다크모드, 저장 기능 등을 기존 코드 위에 층층이 쌓습니다.</div>
+  </div>
+
+  <div class="remix-card">
+    <div class="remix-source">🔄 전략 4 — 합치기(Merge) 리믹스</div>
+    <div class="remix-desc">두 개 이상의 아티팩트를 하나로 합칩니다. 퀴즈 앱 + 리더보드, 대시보드 + 편집 폼, 게임 + 학습 자료 등 조합으로 새로운 가치를 만듭니다.</div>
+  </div>
+
+  <div class="remix-card">
+    <div class="remix-source">🔄 전략 5 — 플랫폼 이식 리믹스</div>
+    <div class="remix-desc">HTML 아티팩트를 React로, 정적 페이지를 인터랙티브로, 또는 반대로 이식합니다. 동일한 기능을 다른 기술 스택으로 재구현합니다.</div>
+  </div>
+
+  <div class="remix-card">
+    <div class="remix-source">🔄 전략 6 — 축소(Micro) 리믹스</div>
+    <div class="remix-desc">복잡한 아티팩트에서 핵심 기능만 추출해 가볍고 빠른 버전을 만듭니다. 전체 대시보드에서 핵심 차트 1개만, 큰 게임에서 핵심 메커니즘만 추출.</div>
+  </div>
+
+  <div class="box scenario">
+    <div class="box-lbl">🎭 실습 시나리오 4</div>
+    <strong>상황:</strong> 영어로 된 프로젝트 관리 대시보드 아티팩트를 발견했습니다. 한국어로 바꾸고 우리 회사 업무 방식에 맞게 기능을 추가하고 싶습니다.<br>
+    <strong>목표:</strong> 전략 1(언어화) + 전략 3(기능 확장)을 동시에 적용한 리믹스
+  </div>
+
+  <div class="pb">
+    <div class="pb-lbl"><span class="pb-num pn-r">P-08</span>복사해서 바로 쓰는 프롬프트 — Remix 심화: 다기능 통합 리믹스</div>
+    <button class="copy-btn" onclick="cp(this)">복사</button>
+    <div class="pt"><span class="cm"># 여러 리믹스 전략을 동시에 적용하는 심화 요청</span>
+
+아래 아티팩트를 여러 방향으로 동시에 리믹스해줘.
+
+[원본 코드]
+<em>--- 리믹스할 코드 붙여넣기 ---</em>
+
+[리믹스 1 — 언어·지역화]
+모든 UI 텍스트를 한국어로 번역해줘.
+날짜 형식: YYYY년 MM월 DD일
+숫자: 천 단위 쉼표 (1,000,000)
+통화: 달러($) → 원(₩)
+
+[리믹스 2 — 기능 확장]
+아래 기능 2가지를 추가해줘:
+① 검색/필터 기능: 상단에 검색창, 입력하면 관련 항목만 표시
+② CSV 내보내기: "엑셀로 다운로드" 버튼 (테이블 데이터를 CSV로)
+
+[리믹스 3 — 오디언스 조정]
+현재 개발자용으로 보이는 기술 용어들을 일반 직원도 이해할 수 있는 용어로 변경해줘.
+예: "API 호출 횟수" → "서버 요청 수", "Latency" → "응답 속도"
+
+원래의 기능과 디자인 방향은 최대한 유지하면서 위 변경만 적용해줘.</div>
+  </div>
+
+  <div class="pb">
+    <div class="pb-lbl"><span class="pb-num pn-r">P-09</span>복사해서 바로 쓰는 프롬프트 — Remix 심화: 두 아티팩트 합치기</div>
+    <button class="copy-btn" onclick="cp(this)">복사</button>
+    <div class="pt"><span class="cm"># 두 개의 아티팩트를 하나의 통합 앱으로 합치기</span>
+
+두 개의 아티팩트를 합쳐서 하나의 통합 앱으로 만들어줘.
+
+[아티팩트 A — 퀴즈 게임]
+<em>--- 첫 번째 아티팩트 코드 붙여넣기 ---</em>
+
+[아티팩트 B — 점수 리더보드]
+<em>--- 두 번째 아티팩트 코드 붙여넣기 ---</em>
+
+[통합 방식]
+① 상단 탭 네비게이션: "퀴즈 플레이" / "리더보드" 탭
+② 퀴즈 완료 시 점수를 자동으로 리더보드에 등록
+③ 플레이어 이름 입력 → 퀴즈 시작 → 완료 시 리더보드로 이동
+④ 리더보드는 localStorage에 저장 (새로고침해도 유지)
+
+[디자인]
+두 아티팩트의 디자인 중 더 나은 것을 기준으로 통일해줘.
+탭 간 전환은 부드러운 애니메이션.</div>
+  </div>
+</div>
+
+
+<!-- ══ S5: 협업 ══ -->
+<div class="sec acc-adv" id="s5">
+  <div class="sec-eyebrow">Section 5 · 협업 워크플로</div>
+  <h2>🤝 협업 워크플로 — 팀과 함께 아티팩트 발전시키기</h2>
+  <p class="sub">Publish와 Remix를 팀 협업에 적용하면 새로운 형태의 비동기 협업이 가능합니다.</p>
+
+  <h3>팀 협업 루프</h3>
+
+  <div class="collab-flow">
+    <div class="cf-step">
+      <div class="cf-num" style="background:var(--teal);color:#fff;">1</div>
+      <div class="cf-body">
+        <div class="cf-title">기획자가 와이어프레임 아티팩트 Publish</div>
+        HTML로 UI 와이어프레임 만들기 → 링크 공유 → "이 구조로 맞나요?" 피드백 수집
+      </div>
+    </div>
+    <div class="cf-step">
+      <div class="cf-num" style="background:var(--remix);color:#fff;">2</div>
+      <div class="cf-body">
+        <div class="cf-title">개발자가 Remix → 실제 데이터 연결</div>
+        와이어프레임 코드 가져와서 → API 연결, 실제 데이터로 교체 → 개선 버전 Publish
+      </div>
+    </div>
+    <div class="cf-step">
+      <div class="cf-num" style="background:var(--blue);color:#fff;">3</div>
+      <div class="cf-body">
+        <div class="cf-title">디자이너가 Remix → 시각 개선</div>
+        개발자 버전 가져와서 → 색상, 타이포그래피, 레이아웃 개선 → 최종 디자인 Publish
+      </div>
+    </div>
+    <div class="cf-step">
+      <div class="cf-num" style="background:var(--amber);color:#fff;">4</div>
+      <div class="cf-body">
+        <div class="cf-title">팀장이 Remix → 최종 검토·수정</div>
+        최종 버전 가져와서 → 내용 정확도 검토, 마지막 수정 → 고객/임원에게 공유
+      </div>
+    </div>
+  </div>
+
+  <div class="box scenario">
+    <div class="box-lbl">🎭 실습 시나리오 5</div>
+    <strong>상황:</strong> 팀 전체가 함께 쓸 주간 보고 대시보드를 만들어야 합니다. 각 팀원이 자신의 KPI를 입력하면 자동으로 요약되는 대시보드가 필요합니다.<br>
+    <strong>목표:</strong> 팀 협업용 주간 보고 대시보드 → Publish → 팀 공유
+  </div>
+
+  <div class="pb">
+    <div class="pb-lbl"><span class="pb-num pn-a">P-10</span>복사해서 바로 쓰는 프롬프트 — 협업: 팀원 모두가 입력하는 주간 보고 앱</div>
+    <button class="copy-btn" onclick="cp(this)">복사</button>
+    <div class="pt"><span class="cm"># 팀원이 각자 데이터 입력 → 자동 집계되는 팀 보고 앱</span>
+
+React 아티팩트로 팀 전체가 함께 쓰는 주간 보고 앱을 만들어줘.
+이 앱은 링크로 공유해서 팀원 모두가 직접 입력할 거야.
+
+[앱 기능]
+
+[화면 1: 입력 폼]
+① 팀원 이름 입력 (또는 드롭다운 선택: <em>[팀원 이름들 입력]</em>)
+② 이번 주 완료 업무 (텍스트 에어리어)
+③ 다음 주 계획 (텍스트 에어리어)
+④ 현재 블로커/이슈 (선택 입력)
+⑤ "제출" 버튼
+
+[화면 2: 팀 현황 뷰]
+① 전체 팀원 보고 현황 목록 (완료/미완료 표시)
+② 각 팀원의 이번 주 업무 요약 카드
+③ "전체 요약 복사" 버튼 (슬랙에 바로 붙여넣을 수 있는 텍스트)
+
+[데이터 처리]
+localStorage 사용 → 같은 기기에서 데이터 유지
+"초기화" 버튼 → 새 주 시작 시 전체 삭제
+
+[디자인]
+모바일 친화적 (팀원들이 폰으로도 입력)
+입력 완료한 팀원 이름에 ✅ 표시</div>
+  </div>
+
+  <div class="pb">
+    <div class="pb-lbl"><span class="pb-num pn-a">P-11</span>복사해서 바로 쓰는 프롬프트 — 협업: 아티팩트 피드백 수집 버전 만들기</div>
+    <button class="copy-btn" onclick="cp(this)">복사</button>
+    <div class="pt"><span class="cm"># 공유한 아티팩트에 피드백 수집 기능 추가하기</span>
+
+기존 아티팩트에 피드백 수집 기능을 추가해줘.
+
+[기존 아티팩트]
+<em>--- 피드백 기능을 추가할 아티팩트 코드 ---</em>
+
+[추가할 피드백 기능]
+① 화면 우하단에 고정된 피드백 버튼 (💬 아이콘)
+② 클릭 시 피드백 패널 열림:
+   - 별점 선택 (1~5개)
+   - 피드백 텍스트 입력
+   - "보내기" 버튼 클릭 시:
+     피드백 내용을 클립보드에 복사 + "복사됐어요! Slack에 붙여넣기 해주세요" 안내
+
+③ 이미 피드백한 경우 "피드백 감사합니다 ✅" 표시 (localStorage)
+
+[디자인]
+피드백 버튼: 오른쪽 하단 고정, 작게
+패널: 위로 슬라이드 애니메이션
+기존 아티팩트 UI에 자연스럽게 녹아들게</div>
+  </div>
+</div>
+
+
+<!-- ══ S6: 고급 통합 ══ -->
+<div class="sec acc-adv" id="s6">
+  <div class="sec-eyebrow">Section 6 · 고급 통합 전략</div>
+  <h2>⚡ 고급 기법 — Publish + Remix 통합 마스터</h2>
+  <p class="sub">Publish와 Remix를 시스템적으로 활용해서 반복 가능한 아티팩트 에코시스템을 구축하는 고급 전략을 배웁니다.</p>
+
+  <h3>나만의 아티팩트 라이브러리 구축하기</h3>
+  <p>자주 쓰는 아티팩트 패턴을 <strong>마스터 템플릿</strong>으로 만들어 두고, 상황마다 리믹스해서 사용하는 방식입니다. 바퀴를 매번 새로 발명하지 않습니다.</p>
+
+  <div class="box insight">
+    <div class="box-lbl">🔑 마스터 템플릿 설계 원칙</div>
+    <strong>데이터 분리:</strong> 데이터(내용)와 UI(구조)를 명확히 분리. 데이터만 바꾸면 완전히 다른 아티팩트가 되도록 설계.<br>
+    <strong>변수화:</strong> 바뀔 수 있는 부분(브랜드 색상, 회사명, 데이터)을 파일 상단에 모아서 한 곳에서 관리.<br>
+    <strong>주석 포함:</strong> 다음에 리믹스할 때 어디를 바꾸면 되는지 주석으로 표시.
+  </div>
+
+  <div class="box scenario">
+    <div class="box-lbl">🎭 실습 시나리오 6 (마스터 레벨)</div>
+    <strong>상황:</strong> 매월 다른 데이터로 동일한 형식의 보고서 대시보드를 만들어야 합니다. 매달 처음부터 만드는 것이 비효율적입니다.<br>
+    <strong>목표:</strong> 데이터만 바꾸면 되는 재사용 가능한 마스터 템플릿 만들기
+  </div>
+
+  <div class="pb">
+    <div class="pb-lbl"><span class="pb-num pn-c">P-12</span>복사해서 바로 쓰는 프롬프트 — 마스터 템플릿: 재사용 가능한 월간 보고서</div>
+    <button class="copy-btn" onclick="cp(this)">복사</button>
+    <div class="pt"><span class="cm"># 매달 데이터만 바꿔서 재사용하는 보고서 아티팩트</span>
+
+HTML 아티팩트로 매월 재사용 가능한 마스터 보고서 템플릿을 만들어줘.
+다음 달에 이 코드를 리믹스할 때 데이터 부분만 바꾸면 완성되도록.
+
+[설계 방식]
+파일 상단에 모든 변경 가능 데이터를 JavaScript 객체로 분리해줘:
+
+<span class="ht">// === 여기만 수정하세요 (매달 업데이트) ===</span>
+const REPORT_DATA = {
+  month: "<em>[월 이름]</em>",
+  year: "<em>[연도]</em>",
+  company: "<em>[회사명]</em>",
+  kpis: [
+    { name: "<em>[KPI명]</em>", value: <em>[수치]</em>, target: <em>[목표]</em>, unit: "<em>[단위]</em>" },
+    // ... 추가
+  ],
+  highlights: [
+    "<em>[이번 달 주요 성과 1]</em>",
+    "<em>[이번 달 주요 성과 2]</em>",
+  ],
+  challenges: ["<em>[이슈 1]</em>"],
+  nextMonthGoals: ["<em>[목표 1]</em>", "<em>[목표 2]</em>"]
+};
+<span class="ht">// === 위만 수정, 아래는 건드리지 마세요 ===</span>
+
+[보고서 UI]
+① 헤더: 회사명 + 월간 보고서 + 날짜
+② KPI 카드 그리드: 각 KPI 수치 + 목표 대비 달성률 + 색상
+③ 주요 성과 목록
+④ 이슈/도전 목록
+⑤ 다음 달 목표
+⑥ 인쇄 버튼 (브라우저 인쇄 다이얼로그)
+
+주석으로 "다음에 사용할 때 변경할 부분"을 명확히 표시해줘.</div>
+  </div>
+
+  <div class="pb">
+    <div class="pb-lbl"><span class="pb-num pn-c">P-13</span>복사해서 바로 쓰는 프롬프트 — 리믹스 체인: 기존 아티팩트에서 새 버전 파생</div>
+    <button class="copy-btn" onclick="cp(this)">복사</button>
+    <div class="pt"><span class="cm"># 잘 만들어진 아티팩트를 완전히 다른 용도로 전환하기</span>
+
+아래 아티팩트를 완전히 다른 용도의 새 아티팩트로 변환해줘.
+핵심 UI 패턴과 코드 구조는 최대한 재활용하면서.
+
+[원본 아티팩트]
+<em>--- 변환할 코드 붙여넣기 ---</em>
+
+[원본의 용도] <em>[예: 팀 KPI 대시보드]</em>
+
+[새 용도] <em>[예: 개인 목표 트래커]</em>
+
+[유지할 것]
+- 전체 레이아웃 구조
+- 차트/시각화 유형
+- 인터랙션 방식 (클릭·호버 등)
+
+[변경할 것]
+- 데이터 구조와 의미 (팀 KPI → 개인 목표)
+- 레이블과 텍스트 전체
+- 색상 팔레트 (새 용도에 맞게: <em>[새 색상 방향]</em>)
+- 기능 추가/제거: <em>[구체적으로 명시]</em>
+
+변환 후 "원본과 새 버전의 주요 차이점"을 3줄로 요약해줘.</div>
+  </div>
+
+  <div class="pb">
+    <div class="pb-lbl"><span class="pb-num pn-x">P-14</span>복사해서 바로 쓰는 프롬프트 — 마스터: Publish & Remix 전체 전략 수립</div>
+    <button class="copy-btn" onclick="cp(this)">복사</button>
+    <div class="pt"><span class="cm"># 내 상황에 맞는 Publish & Remix 활용 전략 받기</span>
+
+내 상황에 맞는 Publish & Remix 활용 전략을 세워줘.
+
+[내 상황]
+직업/역할: <em>[예: 스타트업 PM, 교사, 마케터]</em>
+주로 만드는 아티팩트: <em>[예: 대시보드, 교육 자료, 퀴즈]</em>
+공유 대상: <em>[예: 팀원, 학생, 고객, 투자자]</em>
+현재 불편한 점: <em>[예: 매번 처음부터 만들어야 함, 공유가 불편함]</em>
+
+도출해줄 것:
+① 내가 당장 Publish해야 할 아티팩트 Top 3
+② 내 워크플로에서 Remix로 시간을 줄일 수 있는 부분 2가지
+③ 팀/협업 상황에 맞는 공유 루틴 제안
+④ 내가 먼저 만들어야 할 "마스터 템플릿" 추천 1가지와 그 이유
+⑤ 이번 주 실천할 수 있는 Publish & Remix 미션 1개</div>
+  </div>
+
+  <hr>
+
+  <h3>오늘 배운 내용 최종 정리</h3>
+  <div class="summary">
+    <div class="summary-title">📌 Day 10 — Publish & Remix 핵심 요약</div>
+    <div class="summary-grid">
+      <div class="summary-card">
+        <strong>🚀 Publish 핵심</strong>
+        링크 생성 → 설정 선택 → 테스트 → 공유<br>
+        수정해도 링크 유지
+      </div>
+      <div class="summary-card">
+        <strong>🎛 Remix 3방법</strong>
+        링크 Remix버튼 / 코드 복사 / URL 언급<br>
+        코드 전체 붙여넣기가 가장 정확
+      </div>
+      <div class="summary-card">
+        <strong>6️⃣ Remix 6전략</strong>
+        언어화·오디언스·기능확장·합치기·이식·축소<br>
+        상황에 맞게 선택 또는 조합
+      </div>
+      <div class="summary-card">
+        <strong>🤝 팀 협업 루프</strong>
+        기획→개발→디자인→검토<br>
+        비동기 협업의 새로운 방식
+      </div>
+      <div class="summary-card">
+        <strong>📚 마스터 템플릿</strong>
+        데이터 분리 설계 → 재사용 극대화<br>
+        매달/매주 데이터만 교체
+      </div>
+      <div class="summary-card">
+        <strong>🎓 다음 학습</strong>
+        Day 11 — Claude Projects<br>
+        지식 베이스 구축·문서 업로드
+      </div>
+    </div>
+    <div style="margin-top:1rem;padding:1rem;background:rgba(255,255,255,.65);border-radius:8px;font-size:13px;">
+      <strong>💡 오늘 바로 실천:</strong> Day 08~09에서 만든 아티팩트 중 하나를 골라 Publish 해보세요. 시크릿 창에서 링크가 제대로 열리는지 확인하고, 팀원이나 지인 한 명에게 링크를 공유해보세요. 피드백을 받으면 P-06~P-09 리믹스 프롬프트로 즉시 개선할 수 있습니다.<br><br>
+      <strong>📌 핵심 원칙:</strong> Publish는 완성됐을 때 하는 것이 아닙니다. 70% 완성된 상태에서 공유하고 피드백 받아 리믹스하는 것이 더 빠른 완성의 길입니다.
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <p>이 교재는 2026년 4월 기준 claude.ai Publish &amp; Remix 기능을 바탕으로 작성되었습니다.</p>
+  <p>최신 공유 기능 업데이트: <strong>support.claude.com</strong> · 아티팩트 갤러리: <strong>claude.ai/explore</strong></p>
+</div>
+
+</div>
+
+<script>
+function cp(btn){
+  const b=btn.closest('.pb').querySelector('.pt');
+  const txt=b.innerText||b.textContent;
+  navigator.clipboard.writeText(txt).then(()=>{
+    const o=btn.textContent;
+    btn.textContent='✓ 복사됨'; btn.style.color='#4ade80';
+    setTimeout(()=>{ btn.textContent=o; btn.style.color=''; },1800);
+  }).catch(()=>{ btn.textContent='실패'; setTimeout(()=>{ btn.textContent='복사'; },1800); });
+}
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    e.preventDefault();
+    const t=document.querySelector(a.getAttribute('href'));
+    if(t) t.scrollIntoView({behavior:'smooth',block:'start'});
+  });
+});
+</script>
+</body>
+</html>

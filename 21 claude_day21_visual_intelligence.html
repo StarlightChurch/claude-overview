@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>21일차: 시각 지능 활용 | Claude 활용 가이드</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;500;600&family=Bebas+Neue&display=swap');
+
+  :root {
+    --ink:     #0c0e14;
+    --paper:   #f7f8fc;
+    --a1:      #d97706;   /* amber – 시각 주제색 */
+    --a1l:     #fef3c7;
+    --a2:      #0891b2;   /* cyan */
+    --a2l:     #e0f2fe;
+    --a3:      #7c3aed;   /* violet */
+    --a3l:     #ede9fe;
+    --green:   #059669;
+    --red:     #dc2626;
+    --soft:    #f0f1f7;
+    --mid:     #64748b;
+    --border:  #e2e8f0;
+    --code-bg: #0d1117;
+    --code-t:  #e6edf3;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{font-family:'Noto Sans KR',sans-serif;background:var(--paper);color:var(--ink);line-height:1.8;font-size:16px;}
+
+  /* ── HERO ── */
+  .hero{
+    background:var(--ink);
+    padding:64px 40px 56px;
+    position:relative;overflow:hidden;color:white;
+  }
+  .hero::before{
+    content:'VISION';
+    position:absolute;right:-20px;top:50%;transform:translateY(-50%);
+    font-family:'Bebas Neue',sans-serif;font-size:200px;
+    color:rgba(217,119,6,.06);pointer-events:none;letter-spacing:-4px;line-height:1;
+  }
+  .hero::after{
+    content:'';position:absolute;inset:0;
+    background:radial-gradient(ellipse at 70% 50%,rgba(217,119,6,.12) 0%,transparent 65%);
+    pointer-events:none;
+  }
+  .hi{max-width:900px;margin:0 auto;position:relative;z-index:1;}
+  .h-week{font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:#fbbf24;margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+  .h-week::before{content:'';display:inline-block;width:28px;height:2px;background:#fbbf24;}
+  .hero h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,6.5vw,72px);letter-spacing:2px;line-height:1.05;margin-bottom:22px;}
+  .hero h1 span{color:#fbbf24;}
+  .hero-sub{font-size:17px;color:rgba(255,255,255,.62);max-width:620px;font-weight:300;line-height:1.75;}
+  .hero-meta{margin-top:30px;display:flex;gap:12px;flex-wrap:wrap;}
+  .h-badge{background:rgba(217,119,6,.2);border:1px solid rgba(217,119,6,.35);padding:7px 16px;border-radius:100px;font-size:12px;font-weight:600;color:#fcd34d;}
+
+  /* ── NAV ── */
+  .snav{background:white;border-bottom:1px solid var(--border);padding:13px 0;position:sticky;top:0;z-index:200;box-shadow:0 1px 8px rgba(0,0,0,.05);}
+  .snav-i{max-width:900px;margin:0 auto;padding:0 30px;display:flex;align-items:center;justify-content:space-between;}
+  .snav-brand{font-size:13px;font-weight:700;color:var(--a1);}
+  .snav-links{display:flex;gap:6px;}
+  .snav-links a{padding:5px 13px;border-radius:100px;font-size:12px;font-weight:600;border:1px solid var(--border);background:white;color:var(--mid);text-decoration:none;transition:all .15s;}
+  .snav-links a:hover,.snav-links a.act{background:var(--a1);color:white;border-color:var(--a1);}
+
+  /* ── WRAP ── */
+  .wrap{max-width:900px;margin:0 auto;padding:0 30px;}
+
+  /* ── OBJECTIVE ── */
+  .obj{background:var(--a1l);border-left:5px solid var(--a1);border-radius:0 14px 14px 0;padding:28px 32px;margin:40px 0;}
+  .obj h2{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--a1);margin-bottom:14px;}
+  .obj ul{list-style:none;display:flex;flex-direction:column;gap:9px;}
+  .obj li{display:flex;align-items:flex-start;gap:10px;font-size:15px;}
+  .obj li::before{content:'◆';color:var(--a1);font-size:10px;flex-shrink:0;margin-top:5px;}
+
+  /* ── CONCEPT ── */
+  .concept{padding:48px 0 20px;}
+  .sec-lbl{font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--mid);margin-bottom:8px;}
+  .concept h2{font-size:27px;font-weight:900;margin-bottom:20px;line-height:1.3;}
+  .concept p{font-size:15.5px;color:#334155;margin-bottom:16px;line-height:1.9;}
+
+  /* ── VISION CAPABILITY CARDS ── */
+  .cap-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:24px 0;}
+  .cap-card{background:white;border:1px solid var(--border);border-radius:14px;padding:22px;text-align:center;transition:transform .2s,box-shadow .2s;}
+  .cap-card:hover{transform:translateY(-3px);box-shadow:0 10px 28px rgba(0,0,0,.08);}
+  .cap-card .cc-ico{font-size:36px;margin-bottom:10px;}
+  .cap-card h4{font-size:15px;font-weight:700;margin-bottom:7px;}
+  .cap-card p{font-size:13px;color:var(--mid);line-height:1.6;}
+
+  /* ── HOW TO UPLOAD diagram ── */
+  .upload-flow{display:flex;align-items:stretch;gap:0;border:1px solid var(--border);border-radius:14px;overflow:hidden;margin:24px 0;}
+  .uf-step{flex:1;padding:20px 16px;text-align:center;background:white;}
+  .uf-step:not(:last-child){border-right:1px solid var(--border);}
+  .uf-step.hi{background:var(--a1);color:white;}
+  .uf-ico{font-size:28px;margin-bottom:8px;}
+  .uf-ttl{font-size:13px;font-weight:700;margin-bottom:5px;}
+  .uf-step.hi .uf-ttl{color:white;}
+  .uf-desc{font-size:12px;color:var(--mid);line-height:1.5;}
+  .uf-step.hi .uf-desc{color:rgba(255,255,255,.8);}
+
+  /* ── SUPPORTED FORMATS ── */
+  .fmt-row{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0;}
+  .fmt-tag{background:var(--soft);border:1px solid var(--border);border-radius:7px;padding:5px 13px;font-size:12.5px;font-weight:600;color:var(--mid);}
+  .fmt-tag.ok{background:var(--a1l);border-color:#fbbf24;color:#92400e;}
+
+  /* ── LEVEL SECTIONS ── */
+  .level{padding:48px 0;}
+  .lvhd{display:flex;align-items:center;gap:18px;margin-bottom:32px;padding-bottom:20px;border-bottom:2px solid var(--border);}
+  .lnum{width:64px;height:64px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:26px;flex-shrink:0;}
+  .lv1 .lnum{background:var(--a1l);color:var(--a1);border:2px solid var(--a1);}
+  .lv2 .lnum{background:var(--a2l);color:var(--a2);border:2px solid var(--a2);}
+  .lv3 .lnum{background:var(--a3l);color:var(--a3);border:2px solid var(--a3);}
+  .lttl h2{font-size:22px;font-weight:900;margin-bottom:4px;}
+  .lttl p{font-size:13px;color:var(--mid);font-weight:500;}
+
+  /* ── METHOD BLOCK ── */
+  .mblock{background:white;border:1px solid var(--border);border-radius:16px;padding:28px 32px;margin-bottom:22px;box-shadow:0 1px 8px rgba(0,0,0,.04);}
+  .mttl{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+  .lv1 .mttl{color:var(--a1);}
+  .lv2 .mttl{color:var(--a2);}
+  .lv3 .mttl{color:var(--a3);}
+  .mbar{width:4px;height:16px;border-radius:2px;display:inline-block;flex-shrink:0;}
+  .lv1 .mbar{background:var(--a1);}
+  .lv2 .mbar{background:var(--a2);}
+  .lv3 .mbar{background:var(--a3);}
+
+  .slist{list-style:none;display:flex;flex-direction:column;gap:18px;}
+  .si{display:flex;align-items:flex-start;gap:14px;}
+  .snum{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;margin-top:1px;}
+  .lv1 .snum{background:var(--a1l);color:var(--a1);}
+  .lv2 .snum{background:var(--a2l);color:var(--a2);}
+  .lv3 .snum{background:var(--a3l);color:var(--a3);}
+  .sbody strong{display:block;font-weight:700;font-size:15px;margin-bottom:4px;}
+  .sbody p,.sbody span{font-size:14px;color:#475569;line-height:1.8;}
+
+  /* ── SCENARIO ── */
+  .scene{background:linear-gradient(135deg,#0c0e14 0%,#1a1208 100%);border-radius:16px;padding:28px 32px;margin-bottom:22px;color:white;position:relative;overflow:hidden;}
+  .scene::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 85% 30%,rgba(217,119,6,.18) 0%,transparent 55%);pointer-events:none;}
+  .slbl{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#fbbf24;margin-bottom:10px;position:relative;z-index:1;}
+  .sttl{font-size:19px;font-weight:700;margin-bottom:10px;position:relative;z-index:1;}
+  .sdesc{font-size:14px;color:rgba(255,255,255,.6);line-height:1.8;margin-bottom:18px;position:relative;z-index:1;}
+  .ssteps{list-style:none;display:flex;flex-direction:column;gap:8px;position:relative;z-index:1;}
+  .ssteps li{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:rgba(255,255,255,.78);}
+  .ssteps li::before{content:'→';color:#fbbf24;flex-shrink:0;font-weight:700;margin-top:2px;}
+
+  /* ── PROMPT BLOCK ── */
+  .pblock{background:#0c0e14;border-radius:16px;padding:28px 32px;margin-bottom:22px;border:1px solid rgba(217,119,6,.2);}
+  .phd{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.06);}
+  .phd h3{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#fbbf24;display:flex;align-items:center;gap:7px;}
+  .ptag{font-size:11px;font-weight:600;letter-spacing:.5px;padding:4px 11px;border-radius:100px;text-transform:uppercase;}
+  .tamber{background:rgba(217,119,6,.2);color:#fcd34d;}
+  .tcyan{background:rgba(8,145,178,.2);color:#67e8f9;}
+  .tviolet{background:rgba(124,58,237,.2);color:#c4b5fd;}
+  .tgreen{background:rgba(5,150,105,.18);color:#6ee7b7;}
+
+  .plbl{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);margin:14px 0 8px;}
+  .plbl:first-of-type{margin-top:0;}
+  .ptxt{font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.85;color:#c9d6e0;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:18px 20px;white-space:pre-wrap;word-break:break-word;}
+  .ph{color:#fbbf24;}   /* highlight amber */
+  .pg{color:#7ee787;}   /* green */
+  .py{color:#ffa657;}   /* orange */
+  .pc{color:#6b8aad;}   /* comment */
+  .pp{color:#c084fc;}   /* purple */
+  .pb{color:#67e8f9;}   /* blue */
+
+  /* ── BEFORE/AFTER ── */
+  .ba{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:20px 0;}
+  .ba-box{border-radius:13px;padding:18px 20px;}
+  .ba-b{background:#fef2f2;border:1px solid #fecaca;}
+  .ba-a{background:#f0fdf4;border:1px solid #bbf7d0;}
+  .ba-lbl{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:9px;}
+  .ba-b .ba-lbl{color:var(--red);}
+  .ba-a .ba-lbl{color:var(--green);}
+  .ba-box p{font-size:13px;line-height:1.7;color:#555;}
+
+  /* ── IMAGE QUALITY GUIDE ── */
+  .quality-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:20px 0;}
+  .qcard{border-radius:12px;padding:18px 20px;border:1px solid var(--border);}
+  .qcard.good{background:#f0fdf4;border-color:#bbf7d0;}
+  .qcard.bad{background:#fef2f2;border-color:#fecaca;}
+  .qcard h4{font-size:13px;font-weight:700;margin-bottom:10px;}
+  .qcard.good h4{color:var(--green);}
+  .qcard.bad h4{color:var(--red);}
+  .qcard ul{list-style:none;display:flex;flex-direction:column;gap:6px;}
+  .qcard li{font-size:13px;color:#555;display:flex;align-items:flex-start;gap:6px;}
+  .qcard li::before{flex-shrink:0;margin-top:1px;}
+  .qcard.good li::before{content:'✓';color:var(--green);font-weight:700;}
+  .qcard.bad li::before{content:'✗';color:var(--red);font-weight:700;}
+
+  /* ── USE CASE GRID ── */
+  .uc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin:20px 0;}
+  .uc-card{background:white;border:1px solid var(--border);border-radius:13px;padding:18px;transition:transform .2s,box-shadow .2s;}
+  .uc-card:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(0,0,0,.08);}
+  .uc-ico{font-size:26px;margin-bottom:8px;}
+  .uc-card h4{font-size:14px;font-weight:700;margin-bottom:6px;}
+  .uc-card p{font-size:12.5px;color:var(--mid);line-height:1.6;}
+
+  /* ── TIP/WARN BOXES ── */
+  .tip{background:var(--a1l);border-left:4px solid var(--a1);border-radius:0 12px 12px 0;padding:16px 20px;margin:18px 0;font-size:14px;line-height:1.75;}
+  .tip strong{color:#92400e;display:block;margin-bottom:4px;font-size:13px;}
+  .warn{background:#fff7ed;border-left:4px solid var(--a1);border-radius:0 12px 12px 0;padding:16px 20px;margin:18px 0;font-size:14px;line-height:1.75;}
+  .warn strong{color:#92400e;display:block;margin-bottom:4px;}
+  .info{background:var(--a2l);border-left:4px solid var(--a2);border-radius:0 12px 12px 0;padding:16px 20px;margin:18px 0;font-size:14px;line-height:1.75;}
+  .info strong{color:#0e7490;display:block;margin-bottom:4px;}
+
+  /* ── COMPARE TABLE ── */
+  .ctbl{width:100%;border-collapse:collapse;border-radius:12px;overflow:hidden;margin:20px 0;box-shadow:0 2px 12px rgba(0,0,0,.05);}
+  .ctbl th{background:var(--ink);color:white;padding:13px 18px;text-align:left;font-size:13px;font-weight:700;}
+  .ctbl td{padding:12px 18px;font-size:14px;border-bottom:1px solid var(--border);}
+  .ctbl tr:nth-child(even) td{background:var(--soft);}
+  .ctbl tr:last-child td{border-bottom:none;}
+
+  /* ── WORKFLOW DIAGRAM ── */
+  .workflow{background:var(--code-bg);border-radius:18px;padding:30px;margin:24px 0;}
+  .wf-title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#fbbf24;margin-bottom:22px;}
+  .wf-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+  .wf-box{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:12px 16px;font-size:13px;font-weight:600;color:white;display:flex;align-items:center;gap:8px;}
+  .wf-box.hi{background:rgba(217,119,6,.2);border-color:rgba(217,119,6,.4);}
+  .wf-box .tag{font-size:10px;background:rgba(255,255,255,.1);padding:2px 7px;border-radius:4px;color:rgba(255,255,255,.55);}
+  .wf-arr{color:#4b5563;font-size:18px;}
+
+  /* ── DIVIDER ── */
+  hr.div{border:none;border-top:1px solid var(--border);margin:46px 0;}
+
+  /* ── SUMMARY ── */
+  .summary{background:var(--ink);color:white;border-radius:20px;padding:44px;margin:50px 0;}
+  .summary h2{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:2px;color:#fbbf24;margin-bottom:26px;}
+  .sgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .sitem{background:rgba(255,255,255,.04);border:1px solid rgba(217,119,6,.2);border-radius:12px;padding:18px 22px;}
+  .sitem h4{font-size:12px;font-weight:700;letter-spacing:1px;color:#fbbf24;text-transform:uppercase;margin-bottom:8px;}
+  .sitem p{font-size:14px;color:rgba(255,255,255,.75);line-height:1.7;}
+
+  /* ── CHECKLIST ── */
+  .ckbox{background:white;border:1px solid var(--border);border-radius:16px;padding:28px 32px;margin-bottom:40px;box-shadow:0 1px 8px rgba(0,0,0,.04);}
+  .ckbox h3{font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--green);margin-bottom:18px;}
+
+  /* ── FOOTER ── */
+  footer{background:var(--ink);padding:32px 40px;text-align:center;color:rgba(255,255,255,.3);font-size:13px;}
+  footer a{color:#fbbf24;text-decoration:none;}
+
+  code{font-family:'JetBrains Mono',monospace;font-size:13px;background:var(--soft);padding:2px 7px;border-radius:5px;color:var(--a1);}
+
+  @media(max-width:640px){
+    .hero,.wrap{padding-left:18px;padding-right:18px;}
+    .cap-grid{grid-template-columns:1fr 1fr;}
+    .ba,.quality-grid{grid-template-columns:1fr;}
+    .upload-flow{flex-direction:column;}
+    .uf-step:not(:last-child){border-right:none;border-bottom:1px solid var(--border);}
+    .sgrid{grid-template-columns:1fr;}
+    .snav-links{display:none;}
+    .mblock,.scene,.pblock{padding:20px 18px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ── HERO ── -->
+<header class="hero">
+  <div class="hi">
+    <div class="h-week">3주차 · 업무 자동화 &nbsp;/&nbsp; DAY 21</div>
+    <h1>시각 <span>지능</span> 활용<br>클로드의 눈으로 세상 읽기</h1>
+    <p class="hero-sub">
+      이미지 하나를 붙여넣으면 클로드는 그 안에 담긴 모든 것을 읽습니다.<br>
+      차트, 다이어그램, 손글씨 메모, 사진 속 텍스트까지.
+    </p>
+    <div class="hero-meta">
+      <span class="h-badge">🎯 난이도: 입문 ~ 중급</span>
+      <span class="h-badge">⏱ 학습 시간: 80~100분</span>
+      <span class="h-badge">📱 모든 플랜 사용 가능</span>
+      <span class="h-badge">🖼️ 이미지 파일 준비 권장</span>
+    </div>
+  </div>
+</header>
+
+<!-- ── STICKY NAV ── -->
+<nav class="snav">
+  <div class="snav-i">
+    <span class="snav-brand">👁️ 시각 지능 완전 정복</span>
+    <div class="snav-links">
+      <a href="#concept" class="act">개념</a>
+      <a href="#lv1">L1 차트분석</a>
+      <a href="#lv2">L2 다이어그램</a>
+      <a href="#lv3">L3 손글씨·심화</a>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <!-- ── OBJECTIVES ── -->
+  <div class="obj">
+    <h2>◆ 오늘의 학습 목표</h2>
+    <ul>
+      <li>클로드의 시각 인식 능력 범위와 한계를 정확히 이해한다.</li>
+      <li>차트·그래프 이미지를 텍스트로 변환하고 심층 분석을 요청할 수 있다.</li>
+      <li>플로차트, 와이어프레임, 아키텍처 다이어그램을 해석하고 문서화한다.</li>
+      <li>손글씨 메모와 화이트보드 사진을 깔끔한 디지털 문서로 변환한다.</li>
+      <li>여러 이미지를 비교 분석하는 고급 워크플로우를 설계한다.</li>
+    </ul>
+  </div>
+
+  <!-- ── CONCEPT ── -->
+  <section class="concept" id="concept">
+    <div class="sec-lbl">📖 핵심 개념</div>
+    <h2>클로드의 눈 — 멀티모달 비전 이해하기</h2>
+
+    <p>
+      클로드는 텍스트만 읽는 AI가 아닙니다.
+      <strong>이미지를 이해하고 분석하는 멀티모달(Multimodal) AI</strong>입니다.
+      사진, 스크린샷, 차트, 다이어그램, 손글씨 메모 등 거의 모든 시각 정보를 텍스트처럼 처리합니다.
+    </p>
+    <p>
+      이것이 중요한 이유는 현실 업무의 상당 부분이 <em>이미지 형태로 존재</em>하기 때문입니다.
+      회의실 화이트보드, PPT 스크린샷, 종이 보고서, 인쇄된 계약서, 손으로 그린 기획안…
+      이 모든 것을 클로드에게 바로 보여주고 분석을 요청할 수 있습니다.
+    </p>
+
+    <!-- CAPABILITY CARDS -->
+    <div class="cap-grid">
+      <div class="cap-card">
+        <div class="cc-ico">📊</div>
+        <h4>데이터 시각화 분석</h4>
+        <p>막대/선/원형 차트, 히트맵, 산점도 등의 수치 데이터와 트렌드를 추출하고 해석</p>
+      </div>
+      <div class="cap-card">
+        <div class="cc-ico">🗺️</div>
+        <h4>다이어그램 해석</h4>
+        <p>플로차트, 시스템 아키텍처, ER 다이어그램, 와이어프레임을 읽고 문서화</p>
+      </div>
+      <div class="cap-card">
+        <div class="cc-ico">✍️</div>
+        <h4>손글씨 디지털화</h4>
+        <p>손글씨 메모, 화이트보드 사진, 스케치, 포스트잇을 깔끔한 텍스트로 변환</p>
+      </div>
+      <div class="cap-card">
+        <div class="cc-ico">📄</div>
+        <h4>문서·스크린샷 처리</h4>
+        <p>PDF 페이지 스크린샷, UI 화면, 인쇄 문서에서 텍스트와 정보 추출</p>
+      </div>
+      <div class="cap-card">
+        <div class="cc-ico">🔍</div>
+        <h4>이미지 비교 분석</h4>
+        <p>Before/After 이미지, 여러 차트, 다수의 문서를 동시에 비교하고 차이점 분석</p>
+      </div>
+      <div class="cap-card">
+        <div class="cc-ico">🌐</div>
+        <h4>다국어 텍스트 인식</h4>
+        <p>한국어, 영어, 일본어, 중국어 등 다양한 언어의 이미지 속 텍스트를 인식·번역</p>
+      </div>
+    </div>
+
+    <!-- HOW TO UPLOAD -->
+    <p style="margin-bottom:14px;"><strong>이미지 업로드 방법 — 4가지</strong></p>
+    <div class="upload-flow">
+      <div class="uf-step">
+        <div class="uf-ico">📎</div>
+        <div class="uf-ttl">클립 아이콘</div>
+        <div class="uf-desc">입력창 왼쪽 클립(+) 아이콘 클릭 → 파일 선택</div>
+      </div>
+      <div class="uf-step hi">
+        <div class="uf-ico">🖱️</div>
+        <div class="uf-ttl">드래그 앤 드롭</div>
+        <div class="uf-desc">이미지 파일을 대화창 위로 직접 끌어다 놓기 (가장 빠름)</div>
+      </div>
+      <div class="uf-step">
+        <div class="uf-ico">📋</div>
+        <div class="uf-ttl">클립보드 붙여넣기</div>
+        <div class="uf-desc">스크린샷 후 Ctrl+V / Cmd+V로 바로 붙여넣기 (초강력 추천)</div>
+      </div>
+      <div class="uf-step">
+        <div class="uf-ico">📱</div>
+        <div class="uf-ttl">모바일 카메라</div>
+        <div class="uf-desc">앱에서 카메라 아이콘으로 실시간 촬영 또는 갤러리에서 선택</div>
+      </div>
+    </div>
+
+    <!-- SUPPORTED FORMATS -->
+    <p style="margin-bottom:10px;"><strong>지원 이미지 형식</strong></p>
+    <div class="fmt-row">
+      <span class="fmt-tag ok">PNG ✓</span>
+      <span class="fmt-tag ok">JPG/JPEG ✓</span>
+      <span class="fmt-tag ok">GIF ✓</span>
+      <span class="fmt-tag ok">WEBP ✓</span>
+      <span class="fmt-tag">PDF (이미지 추출)</span>
+      <span class="fmt-tag">BMP</span>
+      <span class="fmt-tag">TIFF</span>
+    </div>
+
+    <!-- QUALITY GUIDE -->
+    <p style="margin:20px 0 12px;"><strong>좋은 결과를 위한 이미지 품질 가이드</strong></p>
+    <div class="quality-grid">
+      <div class="qcard good">
+        <h4>✅ 이런 이미지가 좋아요</h4>
+        <ul>
+          <li>충분한 해상도 (최소 800px 이상)</li>
+          <li>텍스트가 선명하게 보이는 이미지</li>
+          <li>충분한 조명의 실물 사진</li>
+          <li>전체 내용이 한 프레임에 들어온 것</li>
+          <li>배경과 대비가 명확한 손글씨</li>
+        </ul>
+      </div>
+      <div class="qcard bad">
+        <h4>❌ 이런 이미지는 결과가 떨어져요</h4>
+        <ul>
+          <li>너무 작거나 흐릿한 이미지</li>
+          <li>기울어지거나 심하게 왜곡된 사진</li>
+          <li>역광이나 그림자로 가려진 부분</li>
+          <li>지나치게 작은 폰트의 텍스트</li>
+          <li>배경과 색이 비슷한 손글씨</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="info">
+      <strong>💡 스크린샷이 가장 강력한 입력 방법입니다</strong>
+      화면에 보이는 모든 것을 즉시 클로드에게 보낼 수 있습니다. <strong>macOS</strong>: Cmd+Shift+4 (영역 캡처) → Cmd+V 붙여넣기. <strong>Windows</strong>: Win+Shift+S (캡처 도구) → Ctrl+V 붙여넣기. 카카오톡 차트, PPT 슬라이드, 구글 스프레드시트 스크린샷 모두 즉시 분석 가능합니다.
+    </div>
+  </section>
+
+  <hr class="div">
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- LEVEL 1 -->
+  <!-- ════════════════════════════════════════ -->
+  <section class="level lv1" id="lv1">
+    <div class="lvhd">
+      <div class="lnum">L1</div>
+      <div class="lttl">
+        <h2>차트 & 그래프 분석 — 데이터를 인사이트로</h2>
+        <p>⏱ 예상 시간 30분 &nbsp;|&nbsp; 가장 자주 쓰는 기능</p>
+      </div>
+    </div>
+
+    <p style="margin-bottom:18px; font-size:15.5px; color:#334155; line-height:1.9;">
+      업무에서 가장 자주 마주치는 시각 정보는 <strong>차트와 그래프</strong>입니다.
+      엑셀 차트, 구글 애널리틱스 스크린샷, 리서치 보고서 그래프, 뉴스 인포그래픽…
+      클로드에 이미지를 붙여넣는 것만으로 수치 추출, 트렌드 분석, 인사이트 도출까지 가능합니다.
+    </p>
+
+    <div class="ba">
+      <div class="ba-box ba-b">
+        <div class="ba-lbl">❌ 기존 방식</div>
+        <p>차트에서 눈대중으로 수치 파악 → 수동으로 스프레드시트 입력 → 분석 글 작성. 차트 하나에 15~20분 소요.</p>
+      </div>
+      <div class="ba-box ba-a">
+        <div class="ba-lbl">✅ 클로드 시각 분석</div>
+        <p>차트 스크린샷 붙여넣기 → 수치 자동 추출 + 트렌드 분석 + 인사이트 + 보고용 요약까지 2~3분.</p>
+      </div>
+    </div>
+
+    <!-- METHOD -->
+    <div class="mblock">
+      <div class="mttl"><span class="mbar"></span>적용 방법 | 차트 분석 3단계 접근법</div>
+      <ol class="slist">
+        <li class="si">
+          <div class="snum">1</div>
+          <div class="sbody">
+            <strong>먼저 "정확히 무엇을 알고 싶은지"를 명시하라</strong>
+            <p>단순히 "이 차트 분석해줘"보다 "이 차트에서 월별 성장률을 추출하고, 가장 성장이 빨랐던 구간과 이유를 분석해줘"처럼 구체적 질문이 훨씬 깊은 분석을 이끌어냅니다.</p>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">2</div>
+          <div class="sbody">
+            <strong>컨텍스트를 함께 제공하라</strong>
+            <p>차트가 어떤 배경의 데이터인지 알려주면 더 정확한 해석이 가능합니다. "이것은 우리 팀의 지난 6개월 매출 추이입니다. 목표치는 월 1,000만원이었습니다."처럼요.</p>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">3</div>
+          <div class="sbody">
+            <strong>출력 형식을 지정하라</strong>
+            <p>분석 결과를 "임원 보고용 3줄 요약", "표 형식의 수치", "마케팅 팀 공유용 글" 등으로 지정하면 즉시 활용 가능한 형태로 받을 수 있습니다.</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <!-- SCENARIO 1 -->
+    <div class="scene">
+      <div class="slbl">🎬 실습 시나리오 01</div>
+      <div class="sttl">구글 애널리틱스 스크린샷으로 웹사이트 성과 보고서 만들기</div>
+      <div class="sdesc">
+        구글 애널리틱스(또는 다른 분석 도구)의 차트 화면을 캡처해서 클로드에게 보내면, 수치 추출부터 경영진 보고서 초안까지 자동으로 생성합니다.
+      </div>
+      <ul class="ssteps">
+        <li>구글 애널리틱스(또는 엑셀 차트, 구글 시트 차트 등) 화면 스크린샷 캡처</li>
+        <li>Claude.ai 대화창에서 Ctrl+V / Cmd+V로 이미지 붙여넣기</li>
+        <li>아래 프롬프트 #1 또는 #2 복사 후 이미지와 함께 전송</li>
+        <li>출력된 분석 결과를 보고서나 Slack 메시지로 활용</li>
+      </ul>
+    </div>
+
+    <!-- PROMPT #1 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #1</h3>
+        <span class="ptag tamber">차트 기본 분석</span>
+      </div>
+      <div class="plbl">이미지와 함께 붙여넣기 — 범용 차트 분석</div>
+      <div class="ptxt"><span class="pc">[이미지를 먼저 붙여넣은 후 이 텍스트 입력]</span>
+
+<span class="ph">이 차트를 분석해줘.</span>
+
+다음 순서로 알려줘:
+
+<span class="pg">1. 차트 기본 정보</span>
+   - 차트 유형 (막대, 선, 원형 등)
+   - X축, Y축이 나타내는 것
+   - 데이터 범위 (기간, 단위 등)
+
+<span class="pg">2. 핵심 수치 추출</span>
+   - 읽을 수 있는 주요 수치들을 표로 정리
+   - 최고값, 최저값, 평균값
+
+<span class="pg">3. 트렌드 및 패턴</span>
+   - 전체적인 방향성 (상승/하락/보합)
+   - 눈에 띄는 변화 구간
+   - 특이한 패턴이나 이상값
+
+<span class="pg">4. 인사이트 (3가지)</span>
+   - 이 데이터에서 도출할 수 있는 핵심 시사점
+
+<span class="pg">5. 보고용 한 줄 요약</span>
+   - 경영진에게 한 문장으로 보고한다면?</div>
+    </div>
+
+    <!-- PROMPT #2 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #2</h3>
+        <span class="ptag tamber">영업·마케팅 차트 특화</span>
+      </div>
+      <div class="plbl">매출/성과 차트 → 즉시 보고서 변환</div>
+      <div class="ptxt"><span class="pc">[매출 또는 성과 차트 이미지 붙여넣기]</span>
+
+<span class="ph">이 성과 차트를 분석해서 주간 보고서 섹션을 작성해줘.</span>
+
+<span class="pc">배경 정보:</span>
+- 데이터 기간: <span class="py">[예: 2025년 1월~6월]</span>
+- 목표치: <span class="py">[예: 월 매출 1억원]</span>
+- 비교 기준: <span class="py">[예: 전년 동기 대비 / 전월 대비]</span>
+
+<span class="pc">작성해줄 내용:</span>
+
+<span class="pg">【성과 요약】</span>
+(3~4문장, 핵심 수치 포함)
+
+<span class="pg">【목표 달성률】</span>
+- 이번 달: XX% (전월 대비 ▲/▼ XX%p)
+- 누적: XX%
+
+<span class="pg">【긍정 요인】</span>
+- 
+
+<span class="pg">【개선 필요 사항】</span>
+- 
+
+<span class="pg">【다음 달 액션 플랜】</span>
+1. 
+2. </div>
+    </div>
+
+    <!-- PROMPT #3 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #3</h3>
+        <span class="ptag tamber">여러 차트 비교 분석</span>
+      </div>
+      <div class="plbl">2개 이상의 차트를 한 번에 비교 (이미지 여러 개 업로드)</div>
+      <div class="ptxt"><span class="pc">[차트 이미지 1, 2 (또는 그 이상) 동시에 붙여넣기]</span>
+
+<span class="ph">이 두 차트를 비교 분석해줘.</span>
+
+<span class="pc">분석 요청:</span>
+
+<span class="pg">1. 각 차트 개요</span>
+   - 차트1이 보여주는 것:
+   - 차트2가 보여주는 것:
+
+<span class="pg">2. 핵심 차이점 (3가지 이상)</span>
+   - 수치적 차이
+   - 트렌드 방향의 차이
+   - 패턴의 차이
+
+<span class="pg">3. 상관관계 분석</span>
+   - 두 데이터 사이에 연관성이 보이는가?
+   - 한쪽의 변화가 다른 쪽에 영향을 주는 패턴이 있는가?
+
+<span class="pg">4. 통합 인사이트</span>
+   - 두 데이터를 함께 봤을 때 나오는 결론
+
+<span class="pg">5. 의사결정 제안</span>
+   - 이 분석 결과를 바탕으로 어떤 행동을 취해야 하는가?</div>
+    </div>
+
+    <!-- PROMPT #4: 데이터 추출 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #4</h3>
+        <span class="ptag tcyan">차트 → 데이터 추출</span>
+      </div>
+      <div class="plbl">차트 이미지에서 수치 데이터만 뽑아내기</div>
+      <div class="ptxt"><span class="pc">[차트 이미지 붙여넣기]</span>
+
+<span class="ph">이 차트에서 수치 데이터를 최대한 정확하게 추출해줘.</span>
+
+<span class="pc">출력 형식 1 — 마크다운 표:</span>
+| 항목/기간 | 수치 | 단위 |
+|-----------|------|------|
+
+<span class="pc">출력 형식 2 — 엑셀/스프레드시트 붙여넣기용 (탭 구분):</span>
+항목[탭]수치[탭]단위
+
+<span class="py">→ 원하는 형식을 골라서 출력해줘.
+정확히 읽기 어려운 수치는 "~" 표시로 근사값임을 표기해줘.</span>
+
+<span class="pc">추가 요청 (선택):
+이 데이터를 엑셀로 만들어달라면 "xlsx 파일로 만들어줘"라고 추가하세요.</span></div>
+    </div>
+
+  </section>
+
+  <hr class="div">
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- LEVEL 2 -->
+  <!-- ════════════════════════════════════════ -->
+  <section class="level lv2" id="lv2">
+    <div class="lvhd">
+      <div class="lnum">L2</div>
+      <div class="lttl">
+        <h2>다이어그램 해석 — 구조를 텍스트로, 텍스트를 구조로</h2>
+        <p>⏱ 예상 시간 30분 &nbsp;|&nbsp; 기술·기획 업무 필수</p>
+      </div>
+    </div>
+
+    <p style="margin-bottom:18px; font-size:15.5px; color:#334155; line-height:1.9;">
+      플로차트, 시스템 아키텍처, UI 와이어프레임, ER 다이어그램…
+      이런 구조적인 이미지들은 "무엇이 그려져 있는가"를 말로 설명하기가 가장 어렵습니다.
+      클로드는 이 시각적 구조를 읽고, 문서화하고, 개선안까지 제시합니다.
+    </p>
+
+    <!-- USE CASES -->
+    <div class="uc-grid">
+      <div class="uc-card">
+        <div class="uc-ico">🔄</div>
+        <h4>플로차트 분석</h4>
+        <p>업무 프로세스 흐름 파악, 병목 구간 찾기, 절차 문서화</p>
+      </div>
+      <div class="uc-card">
+        <div class="uc-ico">🏗️</div>
+        <h4>시스템 아키텍처</h4>
+        <p>서비스 구조 이해, 컴포넌트 관계 파악, 기술 문서 작성</p>
+      </div>
+      <div class="uc-card">
+        <div class="uc-ico">📐</div>
+        <h4>UI 와이어프레임</h4>
+        <p>화면 구성 이해, 사용자 흐름 분석, 개발 사양서 작성</p>
+      </div>
+      <div class="uc-card">
+        <div class="uc-ico">🗄️</div>
+        <h4>ER 다이어그램</h4>
+        <p>데이터베이스 구조 이해, 관계 파악, SQL 쿼리 작성 보조</p>
+      </div>
+      <div class="uc-card">
+        <div class="uc-ico">🗺️</div>
+        <h4>마인드맵</h4>
+        <p>아이디어 구조화, 주제별 정리, 계층형 목차로 변환</p>
+      </div>
+      <div class="uc-card">
+        <div class="uc-ico">📦</div>
+        <h4>조직도</h4>
+        <p>보고 체계 파악, 담당자 확인, 의사결정 경로 분석</p>
+      </div>
+    </div>
+
+    <!-- METHOD -->
+    <div class="mblock">
+      <div class="mttl"><span class="mbar"></span>적용 방법 | 다이어그램 분석 심화 전략</div>
+      <ol class="slist">
+        <li class="si">
+          <div class="snum">1</div>
+          <div class="sbody">
+            <strong>다이어그램 유형을 명시하면 더 정확하다</strong>
+            <p>클로드는 이미지를 보고 유형을 유추하지만, "이것은 시스템 아키텍처 다이어그램입니다" 또는 "이것은 BPMN 프로세스 플로차트입니다"처럼 명시하면 해당 도메인 기준으로 더 전문적인 분석을 합니다.</p>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">2</div>
+          <div class="sbody">
+            <strong>"이 다이어그램을 코드로 재현해줘" — 강력한 활용법</strong>
+            <p>Mermaid, PlantUML, Draw.io XML 등의 다이어그램 코드로 변환해달라고 하면, 이미지를 편집 가능한 다이어그램으로 만들 수 있습니다. 특히 손으로 그린 초안을 깔끔한 디지털 다이어그램으로 변환할 때 유용합니다.</p>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">3</div>
+          <div class="sbody">
+            <strong>문제점 발견 요청 — 검토자 역할</strong>
+            <p>"이 설계에서 보완이 필요한 부분"이나 "이 프로세스의 병목 구간"을 찾아달라고 하면 클로드가 외부 검토자 관점에서 개선점을 제시합니다. 혼자 만든 다이어그램의 맹점을 찾는 데 효과적입니다.</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <!-- SCENARIO 2 -->
+    <div class="scene">
+      <div class="slbl">🎬 실습 시나리오 02</div>
+      <div class="sttl">업무 프로세스 플로차트 → 절차서 자동 작성</div>
+      <div class="sdesc">
+        손으로 그리거나 화이트보드에 적어둔 업무 흐름도를 사진 찍어 클로드에게 보내면, 공식 절차서나 업무 매뉴얼로 즉시 변환합니다.
+      </div>
+      <ul class="ssteps">
+        <li>업무 흐름도, 서비스 프로세스, 또는 온보딩 플로차트 이미지 준비 (스크린샷 or 사진)</li>
+        <li>클로드에 이미지 업로드 + 프롬프트 #5 입력</li>
+        <li>생성된 절차서를 검토하고 누락된 단계나 오해된 부분 수정 요청</li>
+        <li>선택: "Mermaid 코드로 다시 그려줘"로 편집 가능한 디지털 다이어그램 획득</li>
+      </ul>
+    </div>
+
+    <!-- PROMPT #5 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #5</h3>
+        <span class="ptag tcyan">플로차트 → 절차서</span>
+      </div>
+      <div class="plbl">프로세스 다이어그램을 공식 문서로 변환</div>
+      <div class="ptxt"><span class="pc">[플로차트 또는 프로세스 다이어그램 이미지 업로드]</span>
+
+<span class="ph">이 플로차트를 분석하고 공식 업무 절차서로 변환해줘.</span>
+
+<span class="pc">작성할 내용:</span>
+
+<span class="pg">1. 프로세스 개요</span>
+   - 이 프로세스의 목적과 적용 범위
+   - 시작 조건과 종료 조건
+   - 관련 부서/담당자
+
+<span class="pg">2. 단계별 절차</span>
+   각 단계를 번호와 함께 명확하게:
+   Step 1: [단계명]
+   - 담당: [담당자]
+   - 작업 내용: [설명]
+   - 산출물: [문서/결과물]
+   - 다음 단계로 진행 조건: [조건]
+
+<span class="pg">3. 의사결정 포인트</span>
+   - 분기가 발생하는 지점과 각 경우의 처리 방법
+
+<span class="pg">4. 예외 처리</span>
+   - 오류 또는 예외 상황 발생 시 처리 절차
+
+<span class="py">절차서 형식: 마크다운으로 작성해줘.
+추가로, 이 다이어그램을 Mermaid 코드로도 재현해줘.</span></div>
+    </div>
+
+    <!-- PROMPT #6 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #6</h3>
+        <span class="ptag tcyan">UI 와이어프레임 분석</span>
+      </div>
+      <div class="plbl">와이어프레임 → 화면 명세서 + 개발 사양</div>
+      <div class="ptxt"><span class="pc">[UI 와이어프레임 또는 앱 화면 스크린샷 업로드]</span>
+
+<span class="ph">이 와이어프레임을 분석해서 화면 명세서를 작성해줘.</span>
+
+<span class="pg">1. 화면 개요</span>
+   - 화면 이름 / 목적
+   - 접근 경로 (어디서 이 화면으로 오는가)
+   - 주요 사용자 액션
+
+<span class="pg">2. UI 컴포넌트 목록</span>
+   | 컴포넌트 | 유형 | 설명 | 필수여부 |
+   |---------|------|------|--------|
+
+<span class="pg">3. 사용자 흐름</span>
+   - 이 화면에서 가능한 액션들
+   - 각 액션의 다음 화면
+
+<span class="pg">4. 유효성 검사 규칙</span>
+   - 입력 필드별 제약 조건
+
+<span class="pg">5. 개발 구현 시 고려사항</span>
+   - 반응형 디자인 요구사항
+   - 접근성 고려사항
+   - 성능 고려사항
+
+<span class="py">추가로, 이 화면의 개선 제안 2~3가지도 제시해줘.</span></div>
+    </div>
+
+    <!-- PROMPT #7 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #7</h3>
+        <span class="ptag tcyan">다이어그램 → Mermaid 코드 변환</span>
+      </div>
+      <div class="plbl">이미지를 편집 가능한 Mermaid 다이어그램 코드로 변환</div>
+      <div class="ptxt"><span class="pc">[플로차트, 순서도, 또는 어떤 다이어그램이든 업로드]</span>
+
+<span class="ph">이 다이어그램을 Mermaid 코드로 재현해줘.</span>
+
+<span class="pc">요구사항:
+- 원본 구조를 최대한 정확하게 재현
+- 노드 이름은 한국어 그대로 사용
+- 화살표 방향과 레이블 유지
+- 조건 분기(Yes/No)가 있다면 명확히 표시</span>
+
+<span class="py">코드 생성 후:
+1. 코드 블록 형태로 제공
+2. 주요 수정 포인트 안내 (내용을 바꾸고 싶을 때 어디를 수정하면 되는지)
+3. Mermaid Live Editor(mermaid.live)에서 미리볼 수 있다고 안내</span>
+
+<span class="pc">플로차트가 아닌 경우 적절한 Mermaid 다이어그램 유형을 선택해서:
+- 순서도 → flowchart TD
+- 시퀀스 다이어그램 → sequenceDiagram
+- ER 다이어그램 → erDiagram
+- 간트 차트 → gantt
+- 클래스 다이어그램 → classDiagram</span></div>
+    </div>
+
+  </section>
+
+  <hr class="div">
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- LEVEL 3 -->
+  <!-- ════════════════════════════════════════ -->
+  <section class="level lv3" id="lv3">
+    <div class="lvhd">
+      <div class="lnum">L3</div>
+      <div class="lttl">
+        <h2>손글씨 디지털화 & 심화 시각 워크플로우</h2>
+        <p>⏱ 예상 시간 30분 &nbsp;|&nbsp; 실무 완전 정복</p>
+      </div>
+    </div>
+
+    <p style="margin-bottom:18px; font-size:15.5px; color:#334155; line-height:1.9;">
+      회의 중 화이트보드에 적은 내용, 아이디어를 메모한 노트, 현장에서 손으로 그린 기획안…
+      이런 <strong>아날로그 정보를 디지털로 전환</strong>하는 것이 실무에서 가장 빛나는 활용법입니다.
+      그리고 마지막으로 여러 이미지를 조합한 고급 분석 워크플로우를 배웁니다.
+    </p>
+
+    <!-- METHOD -->
+    <div class="mblock">
+      <div class="mttl"><span class="mbar"></span>적용 방법 | 손글씨 & 화이트보드 디지털화 핵심</div>
+      <ol class="slist">
+        <li class="si">
+          <div class="snum">1</div>
+          <div class="sbody">
+            <strong>촬영 품질이 결과를 결정한다</strong>
+            <p>화이트보드 사진은 정면에서, 충분한 조명 아래, 글씨가 선명하게 보이도록 찍어야 합니다. 스마트폰의 "문서 스캔" 기능을 사용하면 왜곡 보정과 대비 향상이 자동으로 됩니다. iOS: 메모 앱 스캔. Android: 구글 포토 스캔.</p>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">2</div>
+          <div class="sbody">
+            <strong>"내용을 정확히 옮겨라" vs "내용을 구조화해라"를 구분하라</strong>
+            <p>단순 텍스트 변환이 필요할 때와 내용을 재구성해서 보기 좋은 문서로 만들어야 할 때를 구분해서 프롬프트를 다르게 작성하세요. 전자는 정확성이, 후자는 구조화가 핵심입니다.</p>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">3</div>
+          <div class="sbody">
+            <strong>불확실한 부분을 명시적으로 표시하도록 요청하라</strong>
+            <p>흐릿하거나 읽기 어려운 부분은 "[불명확]" 또는 "[?]"으로 표시해달라고 요청하세요. 추후 확인이 필요한 부분을 명확히 알 수 있습니다. 있는 것처럼 만들어내는 것보다 훨씬 낫습니다.</p>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">4</div>
+          <div class="sbody">
+            <strong>스캔 문서에서 양식 데이터 추출하기</strong>
+            <p>종이 설문지, 주문서, 신청서 등을 사진 찍어 올리면 데이터를 구조화된 표나 JSON 형태로 추출할 수 있습니다. 데이터 입력 업무를 크게 줄여줍니다.</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <!-- SCENARIO 3 -->
+    <div class="scene">
+      <div class="slbl">🎬 실습 시나리오 03</div>
+      <div class="sttl">회의 화이트보드 → 공식 회의록 + 액션 아이템 추출</div>
+      <div class="sdesc">
+        회의가 끝난 직후 화이트보드를 스마트폰으로 찍어 클로드에게 보내면, 공식 회의록 초안과 담당자별 액션 아이템이 즉시 생성됩니다. 회의록 작성 시간을 90% 줄여줍니다.
+      </div>
+      <ul class="ssteps">
+        <li>회의 직후 화이트보드 사진을 정면에서 선명하게 촬영 (문서 스캔 모드 권장)</li>
+        <li>손으로 적은 메모, 포스트잇이 있다면 함께 촬영해서 여러 장 업로드</li>
+        <li>아래 프롬프트 #8에 참석자 이름을 추가해서 전송</li>
+        <li>생성된 회의록을 팀 메신저나 프로젝트 도구에 바로 공유</li>
+      </ul>
+    </div>
+
+    <!-- PROMPT #8 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #8</h3>
+        <span class="ptag tviolet">화이트보드 → 회의록</span>
+      </div>
+      <div class="plbl">화이트보드·메모 사진 → 공식 회의록 자동 생성</div>
+      <div class="ptxt"><span class="pc">[화이트보드 또는 메모 사진 업로드 (여러 장도 가능)]</span>
+
+<span class="ph">이 화이트보드/메모의 내용을 읽고 공식 회의록을 작성해줘.</span>
+
+<span class="pc">회의 기본 정보:</span>
+- 일시: <span class="py">[오늘 날짜]</span>
+- 참석자: <span class="py">[이름1, 이름2, 이름3]</span>
+- 회의 주제: <span class="py">[주제 입력]</span>
+
+<span class="pc">작성 방식:</span>
+1. 읽은 내용을 그대로 옮기되 문장을 정리해서 이해하기 쉽게
+2. 읽기 어려운 부분은 <span class="py">[불명확]</span>으로 표시
+3. 관련된 내용끼리 묶어서 주제별로 정리
+
+<span class="pg">출력 형식:</span>
+
+**📋 회의록**
+
+**1. 논의 주제별 내용**
+[주제1]
+- (내용 정리)
+
+**2. 결정 사항** ⭐
+- [결정1]
+- [결정2]
+
+**3. 액션 아이템**
+| 담당자 | 내용 | 기한 |
+|--------|------|------|
+
+**4. 다음 회의 준비사항**
+- 
+
+**5. 참고사항 / 기타**
+- </div>
+    </div>
+
+    <!-- PROMPT #9 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #9</h3>
+        <span class="ptag tviolet">손글씨 메모 → 구조화 문서</span>
+      </div>
+      <div class="plbl">노트, 메모장, 포스트잇 → 깔끔한 디지털 문서</div>
+      <div class="ptxt"><span class="pc">[손글씨 노트 또는 메모 사진 업로드]</span>
+
+<span class="ph">이 손글씨 메모를 디지털 문서로 변환해줘.</span>
+
+<span class="pc">처리 방식 선택 (해당하는 것 명시해서 사용):</span>
+
+<span class="pg">방식 A: 정확한 텍스트 변환</span>
+"내용을 최대한 그대로 텍스트로 변환해줘.
+내 표현과 단어를 유지하고, 
+읽기 어려운 부분은 [?]로 표시해줘."
+
+<span class="pg">방식 B: 구조화 정리</span>
+"내용을 파악하고 체계적으로 재정리해줘.
+- 관련 내용끼리 묶기
+- 번호/계층 구조 적용
+- 핵심 키워드 강조"
+
+<span class="pg">방식 C: 특정 문서 형식으로 변환</span>
+<span class="py">"이 메모를 [할 일 목록 / 기획서 / 제안서 / 보고서]
+형식으로 변환해줘."</span>
+
+<span class="pg">방식 D: 다국어 메모 처리</span>
+"한국어와 영어가 섞여 있다면 모두 파악해서
+한국어로 통일해줘."</div>
+    </div>
+
+    <!-- PROMPT #10 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #10</h3>
+        <span class="ptag tviolet">인쇄 문서 → 데이터 추출</span>
+      </div>
+      <div class="plbl">종이 양식, 스캔 문서에서 구조화 데이터 추출</div>
+      <div class="ptxt"><span class="pc">[종이 양식 / 설문지 / 주문서 / 신청서 사진 업로드]</span>
+
+<span class="ph">이 문서에서 데이터를 추출해서 구조화해줘.</span>
+
+<span class="pc">요청 1 — 표 형식 추출:</span>
+문서에 있는 모든 필드와 값을 표로 정리해줘:
+| 항목 | 내용 |
+|------|------|
+
+<span class="pc">요청 2 — JSON 형식 추출 (개발/데이터 활용):</span>
+동일한 내용을 JSON 형식으로도 출력해줘:
+{
+  "항목명": "값",
+  ...
+}
+
+<span class="pc">요청 3 — 여러 장의 같은 양식 처리:</span>
+<span class="py">여러 장을 동시에 업로드하면:
+"이 [N]장의 양식을 모두 읽어서 
+하나의 통합 표로 만들어줘.
+각 행이 하나의 양식 데이터가 되도록."</span>
+
+<span class="pc">주의: 읽기 어려운 글씨는 [불명확]으로 표시
+개인정보가 포함된 경우 필요한 항목만 추출 요청 가능</span></div>
+    </div>
+
+    <!-- 심화: 멀티이미지 워크플로우 -->
+    <div class="mblock" style="margin-top:10px;">
+      <div class="mttl"><span class="mbar"></span>심화 | 여러 이미지를 조합한 고급 분석 워크플로우</div>
+      <ol class="slist">
+        <li class="si">
+          <div class="snum">1</div>
+          <div class="sbody">
+            <strong>경쟁사 비교 분석 (여러 스크린샷)</strong>
+            <p>경쟁사 A, B, C의 가격 페이지 스크린샷을 동시에 올리고 "이 세 서비스의 가격 정책을 비교해줘"라고 하면 즉시 비교 분석표가 생성됩니다. 시장 조사 업무에 강력합니다.</p>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">2</div>
+          <div class="sbody">
+            <strong>디자인 리뷰 (UI 스크린샷 + 피드백)</strong>
+            <p>앱 화면 스크린샷을 올리고 "UX 관점에서 개선할 점을 찾아줘" 또는 "이 화면이 [특정 가이드라인]을 준수하는지 검토해줘"라고 요청합니다.</p>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">3</div>
+          <div class="sbody">
+            <strong>논문·보고서 그림 일괄 해석</strong>
+            <p>PDF를 페이지별 이미지로 저장하거나, 논문의 그림들을 여러 장 올리면 각 그림의 핵심 내용을 한 번에 요약해줍니다. 리서치 리뷰 속도를 크게 높입니다.</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <!-- PROMPT #11 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #11</h3>
+        <span class="ptag tgreen">경쟁사 스크린샷 비교</span>
+      </div>
+      <div class="plbl">여러 서비스/제품 스크린샷 → 비교 분석표</div>
+      <div class="ptxt"><span class="pc">[경쟁사 A, B, C (또는 2개 이상) 화면 스크린샷 동시 업로드]</span>
+
+<span class="ph">이 [N]개 서비스/제품을 비교 분석해줘.</span>
+
+<span class="pc">분석 관점 (해당하는 것 명시):</span>
+□ 가격 및 요금제 구조
+□ UI/UX 디자인 및 사용성
+□ 기능 구성 및 차별점
+□ 고객 타겟팅 전략 (카피, 소구 포인트)
+□ CTA(행동 유도) 전략
+
+<span class="pg">출력 형식:</span>
+
+**비교 분석표**
+| 항목 | [서비스A] | [서비스B] | [서비스C] |
+|------|---------|---------|---------|
+
+**핵심 차별점**
+- [서비스A]의 강점:
+- [서비스B]의 강점:
+- [서비스C]의 강점:
+
+**우리에게 주는 시사점**
+1. [따라할 만한 것]
+2. [차별화할 기회]
+3. [주의할 점]</div>
+    </div>
+
+    <!-- PROMPT #12 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #12</h3>
+        <span class="ptag tgreen">영수증·명함·카드 텍스트 추출</span>
+      </div>
+      <div class="plbl">일상에서 가장 자주 쓰는 OCR 실전 활용</div>
+      <div class="ptxt"><span class="pc">[영수증 / 명함 / 카드 / 인쇄물 사진 업로드]</span>
+
+<span class="pc">━━ 영수증 처리 ━━</span>
+<span class="ph">이 영수증의 내용을 경비 처리용으로 정리해줘.</span>
+항목, 금액, 날짜, 사업장명을 표로 뽑아줘.
+VAT 포함 여부와 합계도 표시해줘.
+
+<span class="pc">━━ 명함 처리 ━━</span>
+<span class="ph">이 명함의 연락처 정보를 추출해줘.</span>
+이름, 회사, 직책, 이메일, 전화번호를
+연락처 앱에 바로 복사할 수 있는 형식으로.
+영문/국문이 섞여 있으면 둘 다 추출해줘.
+
+<span class="pc">━━ 외국어 인쇄물 처리 ━━</span>
+<span class="ph">이 [언어] 문서를 읽고 한국어로 번역해줘.</span>
+원문 텍스트도 함께 보여주고,
+중요한 날짜, 금액, 이름은 특별히 강조해줘.
+
+<span class="pc">━━ 여러 명함 일괄 처리 ━━</span>
+<span class="py">명함 사진 여러 장 올리고:
+"이 [N]장의 명함 정보를 모두 추출해서
+하나의 연락처 목록 표로 만들어줘."</span></div>
+    </div>
+
+    <!-- 워크플로우 다이어그램 -->
+    <div class="workflow">
+      <div class="wf-title">⚡ 시각 지능 실전 워크플로우 — 업무 유형별 최적 조합</div>
+      <div class="wf-row">
+        <div class="wf-box hi">📊 차트 스크린샷</div>
+        <div class="wf-arr">→</div>
+        <div class="wf-box">프롬프트 #1~4</div>
+        <div class="wf-arr">→</div>
+        <div class="wf-box hi">보고서 초안 <span class="tag">5분</span></div>
+      </div>
+      <div class="wf-row">
+        <div class="wf-box hi">🗺️ 다이어그램 사진</div>
+        <div class="wf-arr">→</div>
+        <div class="wf-box">프롬프트 #5~7</div>
+        <div class="wf-arr">→</div>
+        <div class="wf-box hi">절차서 + 코드 <span class="tag">10분</span></div>
+      </div>
+      <div class="wf-row">
+        <div class="wf-box hi">✍️ 화이트보드 사진</div>
+        <div class="wf-arr">→</div>
+        <div class="wf-box">프롬프트 #8~9</div>
+        <div class="wf-arr">→</div>
+        <div class="wf-box hi">회의록 완성 <span class="tag">3분</span></div>
+      </div>
+      <div class="wf-row">
+        <div class="wf-box hi">📄 종이 문서 사진</div>
+        <div class="wf-arr">→</div>
+        <div class="wf-box">프롬프트 #10~12</div>
+        <div class="wf-arr">→</div>
+        <div class="wf-box hi">구조화 데이터 <span class="tag">2분</span></div>
+      </div>
+    </div>
+
+    <!-- PROMPT #13: 시각 + 스킬 조합 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #13</h3>
+        <span class="ptag tgreen">시각 분석 + 19일차 스킬 조합</span>
+      </div>
+      <div class="plbl">이미지 분석 결과를 비서 스킬 출력과 연결하기</div>
+      <div class="ptxt"><span class="pc">[차트 또는 데이터 이미지 업로드]</span>
+
+<span class="ph">이 차트를 분석하고, 분석 결과로 주간 보고 초안을 바로 작성해줘.</span>
+
+<span class="pg">1단계: 차트 분석</span>
+- 핵심 수치와 트렌드 파악
+- 목표 대비 달성률 계산 (목표값: <span class="py">[입력]</span>)
+
+<span class="pg">2단계: 주간 보고서 작성 (/weekly-report 스킬 적용)</span>
+분석 결과를 바탕으로:
+
+**주간 성과 보고서**
+보고 기간: [날짜]
+
+**핵심 지표 요약**
+[차트에서 읽은 수치 기반으로 표 작성]
+
+**이번 주 성과**
+[차트 분석 결과 기반 서술]
+
+**다음 주 집중 사항**
+[데이터 기반 개선 방향 3가지]
+
+<span class="pc">보고서는 임원 보고 가능한 톤으로, 200자 이내 요약도 추가해줘.</span></div>
+    </div>
+
+  </section>
+
+  <!-- ── SUMMARY ── -->
+  <div class="summary">
+    <h2>📌 21일차 핵심 정리</h2>
+    <div class="sgrid">
+      <div class="sitem">
+        <h4>클로드의 시각 능력</h4>
+        <p>차트·다이어그램·손글씨·문서 사진 모두 처리. PNG/JPG/WEBP 지원. 스크린샷 Ctrl+V가 가장 빠른 방법.</p>
+      </div>
+      <div class="sitem">
+        <h4>차트 분석 핵심</h4>
+        <p>구체적 질문 + 배경 컨텍스트 + 출력 형식 지정 = 즉시 활용 가능한 보고서. 여러 차트 동시 업로드로 비교 분석 가능.</p>
+      </div>
+      <div class="sitem">
+        <h4>다이어그램 활용</h4>
+        <p>이미지 → 절차서·명세서 자동 변환. Mermaid 코드 재현으로 편집 가능한 디지털 다이어그램 획득.</p>
+      </div>
+      <div class="sitem">
+        <h4>손글씨 디지털화</h4>
+        <p>화이트보드 사진 → 회의록 자동 생성. 읽기 어려운 부분은 [?]로 표시 요청. 문서 스캔 앱 활용 권장.</p>
+      </div>
+      <div class="sitem">
+        <h4>품질 높이는 팁</h4>
+        <p>선명한 이미지 + 다이어그램 유형 명시 + 불확실한 부분 표시 요청 = 훨씬 정확한 결과.</p>
+      </div>
+      <div class="sitem">
+        <h4>다음 주 예고</h4>
+        <p>4주차: AI 에이전트와 미래 — 22일차: Claude Code 입문. 터미널에서 실행하는 AI 코딩 도구.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CHECKLIST ── -->
+  <div class="ckbox">
+    <h3>✅ 오늘 실습 체크리스트</h3>
+    <ol class="slist">
+      <li class="si">
+        <div class="snum" style="background:#d1fae5;color:var(--green);">1</div>
+        <div class="sbody">
+          <strong>차트 이미지 분석 완료</strong>
+          <p>실제 차트 스크린샷(엑셀, 구글 애널리틱스, 뉴스 그래프 등)을 프롬프트 #1로 분석해봤나요? 수치가 정확하게 추출됐나요?</p>
+        </div>
+      </li>
+      <li class="si">
+        <div class="snum" style="background:#d1fae5;color:var(--green);">2</div>
+        <div class="sbody">
+          <strong>다이어그램 → Mermaid 변환 시도</strong>
+          <p>어떤 플로차트나 순서도를 프롬프트 #7로 Mermaid 코드로 변환해봤나요? mermaid.live에서 미리보기 확인도 해봤나요?</p>
+        </div>
+      </li>
+      <li class="si">
+        <div class="snum" style="background:#d1fae5;color:var(--green);">3</div>
+        <div class="sbody">
+          <strong>손글씨 메모 디지털화 완료</strong>
+          <p>본인의 손글씨 메모 또는 화이트보드 사진을 찍어서 프롬프트 #8 또는 #9로 디지털화해봤나요?</p>
+        </div>
+      </li>
+      <li class="si">
+        <div class="snum" style="background:#d1fae5;color:var(--green);">4</div>
+        <div class="sbody">
+          <strong>스크린샷 → 즉시 분석 워크플로우 습관화</strong>
+          <p>오늘부터 "화면에 뭔가 분석하고 싶은 게 보이면 → 스크린샷 → 클로드 붙여넣기" 루틴을 시작했나요?</p>
+        </div>
+      </li>
+    </ol>
+  </div>
+
+</div><!-- /wrap -->
+
+<footer>
+  <p>클로드(Claude) 활용 및 교육 통합 가이드 · 3주차 21일차 · 시각 지능 활용</p>
+  <p style="margin-top:8px;">
+    <a href="https://docs.anthropic.com/en/docs/vision">Vision 공식 문서</a> &nbsp;·&nbsp;
+    <a href="https://mermaid.live">Mermaid Live Editor</a>
+  </p>
+</footer>
+
+</body>
+</html>

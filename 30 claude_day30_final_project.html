@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>30일차: 최종 프로젝트 — 나만의 AI 워크플로우 완성 | Claude 활용 가이드</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;500;600&family=Bebas+Neue&display=swap');
+
+  :root {
+    --ink:    #07060a;
+    --paper:  #faf8f0;
+    --gold:   #d97706;
+    --goldl:  #fef3c7;
+    --goldd:  #92400e;
+    --a1:     #7c3aed;
+    --a1l:    #ede9fe;
+    --a2:     #059669;
+    --a2l:    #d1fae5;
+    --a3:     #0ea5e9;
+    --a3l:    #e0f2fe;
+    --red:    #dc2626;
+    --soft:   #f5f2e6;
+    --mid:    #78716c;
+    --brd:    #e5dfc8;
+    --dark:   #07060a;
+    --code:   #0d1117;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{font-family:'Noto Sans KR',sans-serif;background:var(--paper);color:var(--ink);line-height:1.8;font-size:16px;}
+
+  /* ─── HERO ─── */
+  .hero{
+    background:linear-gradient(135deg,#1a1208 0%,#2d1a00 40%,#0a0a14 100%);
+    padding:72px 40px 60px;position:relative;overflow:hidden;color:white;
+  }
+  .hero::before{content:'';position:absolute;inset:0;
+    background:radial-gradient(ellipse at 30% 50%,rgba(217,119,6,.22) 0%,transparent 55%),
+               radial-gradient(ellipse at 80% 20%,rgba(124,58,237,.12) 0%,transparent 45%),
+               radial-gradient(ellipse at 60% 90%,rgba(5,150,105,.08) 0%,transparent 40%);}
+  /* Stars decoration */
+  .stars{position:absolute;inset:0;overflow:hidden;pointer-events:none;}
+  .star{position:absolute;width:2px;height:2px;border-radius:50%;background:rgba(255,255,255,.8);animation:twinkle 3s ease-in-out infinite;}
+  @keyframes twinkle{0%,100%{opacity:.2;}50%{opacity:1;transform:scale(1.5);}}
+  /* Trophy */
+  .hero-trophy{position:absolute;right:60px;top:50%;transform:translateY(-50%);font-size:120px;opacity:.12;pointer-events:none;}
+  .hi{max-width:900px;margin:0 auto;position:relative;z-index:1;}
+  .h-week{font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:#fbbf24;margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+  .h-week::before{content:'';display:inline-block;width:28px;height:2px;background:#fbbf24;}
+  .hero-day{
+    font-family:'Bebas Neue',sans-serif;font-size:clamp(80px,14vw,160px);
+    line-height:1;letter-spacing:-2px;
+    background:linear-gradient(135deg,#fbbf24 0%,#f59e0b 40%,#fcd34d 70%,#f59e0b 100%);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    margin-bottom:-10px;
+  }
+  .hero h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,58px);letter-spacing:2px;line-height:1.1;margin-bottom:20px;color:white;}
+  .hero h1 span{
+    background:linear-gradient(90deg,#fbbf24,#f59e0b);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  }
+  .hero-sub{font-size:17px;color:rgba(255,255,255,.65);max-width:600px;font-weight:300;line-height:1.75;}
+  .hero-meta{margin-top:28px;display:flex;gap:12px;flex-wrap:wrap;}
+  .h-badge{background:rgba(217,119,6,.2);border:1px solid rgba(217,119,6,.4);padding:7px 16px;border-radius:100px;font-size:12px;font-weight:600;color:#fde68a;}
+  /* Congrats banner */
+  .congrats{
+    display:inline-block;
+    background:linear-gradient(90deg,rgba(217,119,6,.2),rgba(217,119,6,.1));
+    border:1px solid rgba(217,119,6,.4);
+    border-radius:12px;padding:12px 24px;margin-top:24px;
+    font-size:16px;font-weight:700;color:#fde68a;
+    letter-spacing:.5px;
+  }
+
+  /* ─── NAV ─── */
+  .snav{background:white;border-bottom:1px solid var(--brd);padding:13px 0;position:sticky;top:0;z-index:200;box-shadow:0 1px 8px rgba(0,0,0,.05);}
+  .snav-i{max-width:900px;margin:0 auto;padding:0 30px;display:flex;align-items:center;justify-content:space-between;}
+  .snav-b{font-size:13px;font-weight:700;color:var(--gold);}
+  .snav-links{display:flex;gap:6px;}
+  .snav-links a{padding:5px 13px;border-radius:100px;font-size:12px;font-weight:600;border:1px solid var(--brd);background:white;color:var(--mid);text-decoration:none;transition:all .15s;}
+  .snav-links a:hover,.snav-links a.act{background:var(--gold);color:white;border-color:var(--gold);}
+
+  /* ─── WRAP ─── */
+  .wrap{max-width:900px;margin:0 auto;padding:0 30px;}
+
+  /* ─── JOURNEY RECAP ─── */
+  .journey{padding:48px 0 20px;}
+  .sec-lbl{font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--mid);margin-bottom:8px;}
+  .journey h2{font-size:27px;font-weight:900;margin-bottom:18px;line-height:1.3;}
+  .journey p{font-size:15.5px;color:#44403c;margin-bottom:16px;line-height:1.9;}
+
+  /* ─── 29 SKILLS GRID ─── */
+  .skills-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:10px;margin:24px 0;}
+  .skill-chip{
+    background:white;border:1px solid var(--brd);border-radius:10px;
+    padding:12px 14px;display:flex;align-items:flex-start;gap:8px;
+    transition:transform .15s,box-shadow .15s;
+  }
+  .skill-chip:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.08);}
+  .skill-chip .sc-day{
+    font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;
+    color:white;background:var(--gold);padding:2px 6px;border-radius:4px;
+    flex-shrink:0;margin-top:1px;
+  }
+  .skill-chip .sc-name{font-size:12px;font-weight:600;color:var(--ink);line-height:1.4;}
+  /* color coding by week */
+  .w2 .sc-day{background:#0891b2;}
+  .w3 .sc-day{background:#7c3aed;}
+  .w4 .sc-day{background:#059669;}
+
+  /* ─── WORKFLOW FRAMEWORK ─── */
+  .wf-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:24px 0;}
+  .wf-card{
+    background:linear-gradient(135deg,#1a1208 0%,#0a0a14 100%);
+    color:white;border-radius:16px;padding:22px 18px;
+    border:1px solid rgba(217,119,6,.2);
+    position:relative;overflow:hidden;
+  }
+  .wf-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(217,119,6,.1) 0%,transparent 60%);pointer-events:none;}
+  .wf-card .wc-num{font-family:'Bebas Neue',sans-serif;font-size:42px;line-height:1;
+    background:linear-gradient(135deg,#fbbf24,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    margin-bottom:8px;}
+  .wf-card h4{font-size:14px;font-weight:700;color:#fde68a;margin-bottom:6px;}
+  .wf-card p{font-size:12.5px;color:rgba(255,255,255,.55);line-height:1.5;}
+
+  /* ─── PROJECT TEMPLATES ─── */
+  .proj-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:22px 0;}
+  .proj-card{background:white;border:1px solid var(--brd);border-radius:16px;padding:22px;transition:transform .2s,box-shadow .2s;}
+  .proj-card:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(217,119,6,.12);}
+  .proj-card.featured{border-color:var(--gold);background:var(--goldl);}
+  .proj-ico{font-size:32px;margin-bottom:10px;}
+  .proj-card h4{font-size:16px;font-weight:700;margin-bottom:6px;}
+  .proj-card p{font-size:13px;color:var(--mid);line-height:1.6;margin-bottom:12px;}
+  .proj-tags{display:flex;flex-wrap:wrap;gap:5px;}
+  .proj-tag{font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;background:var(--soft);color:var(--mid);}
+  .proj-card.featured .proj-tag{background:rgba(217,119,6,.15);color:var(--goldd);}
+  .diff-badge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:100px;display:inline-block;margin-bottom:8px;}
+  .d1{background:var(--a2l);color:#065f46;}
+  .d2{background:var(--a1l);color:#4c1d95;}
+  .d3{background:var(--a3l);color:#075985;}
+
+  /* ─── LEVEL SECTIONS ─── */
+  .level{padding:48px 0;}
+  .lvhd{display:flex;align-items:center;gap:18px;margin-bottom:32px;padding-bottom:20px;border-bottom:2px solid var(--brd);}
+  .lnum{width:64px;height:64px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:26px;flex-shrink:0;}
+  .lv1 .lnum{background:var(--a2l);color:var(--a2);border:2px solid var(--a2);}
+  .lv2 .lnum{background:var(--a1l);color:var(--a1);border:2px solid var(--a1);}
+  .lv3 .lnum{background:var(--goldl);color:var(--gold);border:2px solid var(--gold);}
+  .lttl h2{font-size:22px;font-weight:900;margin-bottom:4px;}
+  .lttl p{font-size:13px;color:var(--mid);font-weight:500;}
+
+  /* ─── METHOD BLOCK ─── */
+  .mblock{background:white;border:1px solid var(--brd);border-radius:16px;padding:28px 32px;margin-bottom:22px;box-shadow:0 1px 8px rgba(0,0,0,.04);}
+  .mttl{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--brd);display:flex;align-items:center;gap:10px;}
+  .lv1 .mttl{color:var(--a2);}
+  .lv2 .mttl{color:var(--a1);}
+  .lv3 .mttl{color:var(--gold);}
+  .mbar{width:4px;height:16px;border-radius:2px;display:inline-block;flex-shrink:0;}
+  .lv1 .mbar{background:var(--a2);}
+  .lv2 .mbar{background:var(--a1);}
+  .lv3 .mbar{background:var(--gold);}
+
+  .slist{list-style:none;display:flex;flex-direction:column;gap:18px;}
+  .si{display:flex;align-items:flex-start;gap:14px;}
+  .snum{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;margin-top:1px;}
+  .lv1 .snum{background:var(--a2l);color:var(--a2);}
+  .lv2 .snum{background:var(--a1l);color:var(--a1);}
+  .lv3 .snum{background:var(--goldl);color:var(--gold);}
+  .sbody strong{display:block;font-weight:700;font-size:15px;margin-bottom:4px;}
+  .sbody p,.sbody span{font-size:14px;color:#57534e;line-height:1.8;}
+
+  /* ─── SCENARIO ─── */
+  .scene{background:linear-gradient(135deg,#1a1208 0%,#0a1020 100%);border-radius:16px;padding:28px 32px;margin-bottom:22px;color:white;position:relative;overflow:hidden;}
+  .scene::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 85% 25%,rgba(217,119,6,.14) 0%,transparent 55%);pointer-events:none;}
+  .slbl{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#fbbf24;margin-bottom:10px;position:relative;z-index:1;}
+  .sttl{font-size:19px;font-weight:700;margin-bottom:10px;position:relative;z-index:1;}
+  .sdesc{font-size:14px;color:rgba(255,255,255,.6);line-height:1.8;margin-bottom:18px;position:relative;z-index:1;}
+  .ssteps{list-style:none;display:flex;flex-direction:column;gap:8px;position:relative;z-index:1;}
+  .ssteps li{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:rgba(255,255,255,.78);}
+  .ssteps li::before{content:'✦';color:#fbbf24;font-size:10px;flex-shrink:0;margin-top:4px;}
+
+  /* ─── PROMPT BLOCK ─── */
+  .pblock{background:var(--code);border-radius:16px;padding:28px 32px;margin-bottom:22px;border:1px solid rgba(217,119,6,.2);}
+  .phd{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.06);}
+  .phd h3{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#fbbf24;display:flex;align-items:center;gap:7px;}
+  .ptag{font-size:11px;font-weight:600;padding:4px 11px;border-radius:100px;text-transform:uppercase;}
+  .tg{background:rgba(217,119,6,.2);color:#fde68a;}
+  .tv{background:rgba(124,58,237,.2);color:#c4b5fd;}
+  .ts{background:rgba(5,150,105,.18);color:#6ee7b7;}
+  .tb{background:rgba(14,165,233,.18);color:#7dd3fc;}
+
+  .plbl{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);margin:14px 0 8px;}
+  .plbl:first-of-type{margin-top:0;}
+  .ptxt{font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.85;color:#c9d6e0;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:18px 20px;white-space:pre-wrap;word-break:break-word;}
+  .ph{color:#fbbf24;}   /* gold */
+  .pg{color:#6ee7b7;}   /* green */
+  .py{color:#fda172;}   /* orange */
+  .pc{color:#6b8aad;}   /* comment */
+  .pp{color:#c4b5fd;}   /* purple */
+  .pb{color:#7dd3fc;}   /* blue */
+  .pw{color:white;font-weight:600;}
+
+  /* ─── TIPS ─── */
+  .tip{background:var(--goldl);border-left:4px solid var(--gold);border-radius:0 12px 12px 0;padding:16px 20px;margin:18px 0;font-size:14px;line-height:1.75;}
+  .tip strong{color:var(--goldd);display:block;margin-bottom:4px;font-size:13px;}
+  .ok{background:var(--a2l);border-left:4px solid var(--a2);border-radius:0 12px 12px 0;padding:16px 20px;margin:18px 0;font-size:14px;line-height:1.75;}
+  .ok strong{color:#065f46;display:block;margin-bottom:4px;}
+
+  /* ─── DIVIDER ─── */
+  hr.div{border:none;border-top:1px solid var(--brd);margin:46px 0;}
+
+  /* ─── FINAL CERTIFICATE ZONE ─── */
+  .cert{
+    background:linear-gradient(135deg,#1a1208 0%,#2d1a00 50%,#0a0a14 100%);
+    border-radius:20px;padding:50px 44px;margin:50px 0;
+    color:white;text-align:center;position:relative;overflow:hidden;
+    border:2px solid rgba(217,119,6,.3);
+  }
+  .cert::before{content:'';position:absolute;inset:0;
+    background:radial-gradient(ellipse at 50% 50%,rgba(217,119,6,.12) 0%,transparent 60%);}
+  .cert-inner{position:relative;z-index:1;}
+  .cert-trophy{font-size:64px;margin-bottom:16px;display:block;}
+  .cert-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,4vw,44px);letter-spacing:3px;
+    background:linear-gradient(90deg,#fbbf24,#f59e0b,#fde68a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    margin-bottom:10px;}
+  .cert-sub{font-size:16px;color:rgba(255,255,255,.6);margin-bottom:24px;line-height:1.6;}
+  .cert-stats{display:flex;justify-content:center;gap:40px;flex-wrap:wrap;margin-bottom:28px;}
+  .cs{text-align:center;}
+  .cs-num{font-family:'Bebas Neue',sans-serif;font-size:40px;color:#fbbf24;line-height:1;}
+  .cs-lbl{font-size:12px;color:rgba(255,255,255,.45);letter-spacing:1px;text-transform:uppercase;}
+  .cert-message{font-size:15px;color:rgba(255,255,255,.7);line-height:1.8;max-width:580px;margin:0 auto 28px;}
+  .cert-cta{
+    display:inline-block;
+    background:linear-gradient(90deg,#d97706,#f59e0b);
+    color:white;font-weight:700;font-size:15px;
+    padding:14px 32px;border-radius:100px;letter-spacing:.5px;
+    text-decoration:none;
+  }
+
+  /* ─── NEXT STEPS ─── */
+  .next-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:24px 0;}
+  .next-card{background:white;border:1px solid var(--brd);border-radius:14px;padding:20px;}
+  .next-card .nc-ico{font-size:28px;margin-bottom:8px;}
+  .next-card h4{font-size:14px;font-weight:700;margin-bottom:6px;}
+  .next-card p{font-size:13px;color:var(--mid);line-height:1.6;}
+
+  /* ─── FOOTER ─── */
+  footer{
+    background:linear-gradient(135deg,#1a1208 0%,#0a0a14 100%);
+    padding:40px 40px 32px;text-align:center;color:rgba(255,255,255,.3);font-size:13px;
+    border-top:1px solid rgba(217,119,6,.2);
+  }
+  footer a{color:#fbbf24;text-decoration:none;}
+  .footer-title{
+    font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;
+    background:linear-gradient(90deg,#fbbf24,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    margin-bottom:10px;
+  }
+
+  code{font-family:'JetBrains Mono',monospace;font-size:13px;background:var(--soft);padding:2px 7px;border-radius:5px;color:var(--gold);}
+
+  @media(max-width:640px){
+    .hero,.wrap{padding-left:18px;padding-right:18px;}
+    .hero-trophy{display:none;}
+    .wf-cards,.proj-grid{grid-template-columns:1fr;}
+    .next-grid{grid-template-columns:1fr;}
+    .cert-stats{gap:20px;}
+    .snav-links{display:none;}
+    .mblock,.scene,.pblock{padding:20px 18px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ─── HERO ─── -->
+<header class="hero">
+  <!-- Stars -->
+  <div class="stars">
+    <div class="star" style="top:10%;left:15%;animation-delay:0s;"></div>
+    <div class="star" style="top:20%;left:70%;animation-delay:.5s;"></div>
+    <div class="star" style="top:60%;left:5%;animation-delay:1s;"></div>
+    <div class="star" style="top:30%;left:90%;animation-delay:1.5s;"></div>
+    <div class="star" style="top:75%;left:40%;animation-delay:2s;"></div>
+    <div class="star" style="top:15%;left:50%;animation-delay:.3s;"></div>
+    <div class="star" style="top:80%;left:80%;animation-delay:.8s;"></div>
+    <div class="star" style="top:45%;left:25%;animation-delay:1.2s;"></div>
+  </div>
+  <div class="hero-trophy">🏆</div>
+  <div class="hi">
+    <div class="h-week">4주차 · AI 에이전트와 미래 &nbsp;/&nbsp; FINAL DAY</div>
+    <div class="hero-day">30</div>
+    <h1>최종 <span>프로젝트</span><br>나만의 AI 워크플로우</h1>
+    <p class="hero-sub">
+      29일간 쌓아온 모든 기술을 하나로 통합합니다.<br>
+      지금 이 순간, 진짜 나만의 AI 시스템이 완성됩니다.
+    </p>
+    <div class="congrats">🎉 축하합니다! 30일 과정을 완주하셨습니다.</div>
+    <div class="hero-meta" style="margin-top:18px;">
+      <span class="h-badge">🏆 최종 프로젝트</span>
+      <span class="h-badge">⏱ 학습 시간: 3~4시간</span>
+      <span class="h-badge">📦 29일 전체 통합</span>
+      <span class="h-badge">🎯 실제 업무 완전 적용</span>
+    </div>
+  </div>
+</header>
+
+<!-- ─── NAV ─── -->
+<nav class="snav">
+  <div class="snav-i">
+    <span class="snav-b">🏆 30일차 최종 프로젝트</span>
+    <div class="snav-links">
+      <a href="#journey" class="act">여정 복습</a>
+      <a href="#lv1">L1 진단</a>
+      <a href="#lv2">L2 설계</a>
+      <a href="#lv3">L3 완성</a>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <!-- ─── JOURNEY RECAP ─── -->
+  <section class="journey" id="journey">
+    <div class="sec-lbl">🗺️ 29일간의 여정 복습</div>
+    <h2>우리가 함께 쌓아온 것들</h2>
+    <p>
+      29일 동안 클로드의 기초부터 에이전트 팀, 컴퓨터 제어, 적응형 사고까지
+      AI 활용의 전 영역을 탐험했습니다.
+      오늘은 이 모든 기술을 <strong>하나의 일관된 AI 워크플로우</strong>로 통합합니다.
+    </p>
+
+    <!-- 29 skills recap -->
+    <div class="skills-grid">
+      <div class="skill-chip w2"><span class="sc-day">D18</span><span class="sc-name">스킬 기초</span></div>
+      <div class="skill-chip w2"><span class="sc-day">D19</span><span class="sc-name">AI 비서 스킬</span></div>
+      <div class="skill-chip w2"><span class="sc-day">D20</span><span class="sc-name">MCP 연결</span></div>
+      <div class="skill-chip w2"><span class="sc-day">D21</span><span class="sc-name">시각 지능</span></div>
+      <div class="skill-chip w3"><span class="sc-day">D22</span><span class="sc-name">Claude Code</span></div>
+      <div class="skill-chip w3"><span class="sc-day">D23</span><span class="sc-name">바이브 코딩</span></div>
+      <div class="skill-chip w3"><span class="sc-day">D24</span><span class="sc-name">에이전트 팀</span></div>
+      <div class="skill-chip w3"><span class="sc-day">D25</span><span class="sc-name">컴퓨터 제어 원리</span></div>
+      <div class="skill-chip w3"><span class="sc-day">D26</span><span class="sc-name">실전 자동화</span></div>
+      <div class="skill-chip w4"><span class="sc-day">D27</span><span class="sc-name">보안·데이터 정책</span></div>
+      <div class="skill-chip w4"><span class="sc-day">D28</span><span class="sc-name">플랜 최적화</span></div>
+      <div class="skill-chip w4"><span class="sc-day">D29</span><span class="sc-name">적응형 사고</span></div>
+    </div>
+
+    <!-- WORKFLOW FRAMEWORK -->
+    <p style="margin:28px 0 14px;"><strong>최종 프로젝트의 4단계 프레임워크</strong></p>
+    <div class="wf-cards">
+      <div class="wf-card">
+        <div class="wc-num">01</div>
+        <h4>진단</h4>
+        <p>내 업무 패턴을 분석하고 AI가 가장 큰 임팩트를 줄 영역을 찾는다</p>
+      </div>
+      <div class="wf-card">
+        <div class="wc-num">02</div>
+        <h4>설계</h4>
+        <p>스킬, MCP, 에이전트, 자동화를 연결하는 나만의 AI 시스템 청사진을 그린다</p>
+      </div>
+      <div class="wf-card">
+        <div class="wc-num">03</div>
+        <h4>구현</h4>
+        <p>설계한 워크플로우를 실제로 만들고 테스트한다. 작은 것부터 시작</p>
+      </div>
+      <div class="wf-card">
+        <div class="wc-num">04</div>
+        <h4>문서화</h4>
+        <p>나만의 AI 운용 매뉴얼을 작성해서 지속적으로 개선한다</p>
+      </div>
+    </div>
+
+    <!-- PROJECT IDEAS -->
+    <p style="margin:28px 0 14px;"><strong>최종 프로젝트 유형 — 나에게 맞는 것을 선택하세요</strong></p>
+    <div class="proj-grid">
+      <div class="proj-card featured">
+        <span class="diff-badge d1">입문자 추천</span>
+        <div class="proj-ico">🤖</div>
+        <h4>개인 AI 비서 시스템</h4>
+        <p>아침 브리핑, 이메일 처리, 회의록, 하루 마감 리뷰를 하나의 통합 시스템으로 구축</p>
+        <div class="proj-tags">
+          <span class="proj-tag">Skills</span>
+          <span class="proj-tag">D19 비서 스킬</span>
+          <span class="proj-tag">D27 보안</span>
+        </div>
+      </div>
+      <div class="proj-card">
+        <span class="diff-badge d2">중급자 추천</span>
+        <div class="proj-ico">🔬</div>
+        <h4>업무 자동화 파이프라인</h4>
+        <p>뉴스 수집 → 분석 → 보고서 → 팀 공유까지 완전 자동화</p>
+        <div class="proj-tags">
+          <span class="proj-tag">MCP</span>
+          <span class="proj-tag">Cowork</span>
+          <span class="proj-tag">D26 자동화</span>
+        </div>
+      </div>
+      <div class="proj-card">
+        <span class="diff-badge d2">개발자 추천</span>
+        <div class="proj-ico">🚀</div>
+        <h4>AI 기반 웹 서비스</h4>
+        <p>바이브 코딩으로 실제 서비스를 만들고 배포까지 완성</p>
+        <div class="proj-tags">
+          <span class="proj-tag">Claude Code</span>
+          <span class="proj-tag">D23 바이브</span>
+          <span class="proj-tag">D24 에이전트 팀</span>
+        </div>
+      </div>
+      <div class="proj-card">
+        <span class="diff-badge d3">팀 리더 추천</span>
+        <div class="proj-ico">👥</div>
+        <h4>팀 AI 운영 체계</h4>
+        <p>팀 플랜 설정, 공유 스킬, 가이드라인, 온보딩 문서 완성</p>
+        <div class="proj-tags">
+          <span class="proj-tag">Team 플랜</span>
+          <span class="proj-tag">D28 플랜 최적화</span>
+          <span class="proj-tag">D27 가이드</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="tip">
+      <strong>💡 어떤 프로젝트를 선택해야 할까요?</strong>
+      지금 가장 반복적으로 하면서 시간이 많이 드는 업무가 무엇인가요?
+      그것부터 AI화하세요. 거창하게 시작할 필요 없습니다.
+      오늘 완성하지 않아도 됩니다 — 시작하는 것이 목표입니다.
+    </div>
+  </section>
+
+  <hr class="div">
+
+  <!-- ════════════════════════════ -->
+  <!-- LEVEL 1 -->
+  <!-- ════════════════════════════ -->
+  <section class="level lv1" id="lv1">
+    <div class="lvhd">
+      <div class="lnum">L1</div>
+      <div class="lttl">
+        <h2>진단 — 나의 AI 활용 현황 점검</h2>
+        <p>⏱ 예상 시간 30분 &nbsp;|&nbsp; 시작 전 필수 단계</p>
+      </div>
+    </div>
+
+    <p style="margin-bottom:18px; font-size:15.5px; color:#44403c; line-height:1.9;">
+      최종 프로젝트를 시작하기 전에 먼저 현재 나의 AI 활용 수준을 정직하게 점검합니다.
+      어느 기술은 완벽하게 쓰고 있고, 어느 기술은 아직 어색할 수 있습니다.
+      그 격차를 파악해야 진짜 도움이 되는 워크플로우를 설계할 수 있습니다.
+    </p>
+
+    <!-- METHOD -->
+    <div class="mblock">
+      <div class="mttl"><span class="mbar"></span>적용 방법 | AI 활용 현황 자가 진단 4단계</div>
+      <ol class="slist">
+        <li class="si">
+          <div class="snum">1</div>
+          <div class="sbody">
+            <strong>지금까지 실제로 사용한 기능 목록화</strong>
+            <span>29일 과정에서 직접 실습한 기능들을 나열합니다. 프롬프트를 실제로 입력해봤는지, 설정을 변경해봤는지를 기준으로 솔직하게 체크합니다.</span>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">2</div>
+          <div class="sbody">
+            <strong>일주일에 몇 번 사용했는지 측정</strong>
+            <span>지식을 가지고 있는 것과 실제로 쓰는 것은 다릅니다. 지난 7일 동안 클로드를 업무에 몇 번 사용했나요? 어떤 용도로 가장 많이 썼나요?</span>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">3</div>
+          <div class="sbody">
+            <strong>가장 큰 시간 절약을 가져온 기능 파악</strong>
+            <span>"이 기능 덕분에 X분을 아꼈다"는 구체적인 경험이 있나요? 그 기능을 중심으로 최종 프로젝트를 설계하면 실제 ROI가 가장 높습니다.</span>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">4</div>
+          <div class="sbody">
+            <strong>아직 써보지 못한 기능 중 가장 가치 있을 것 선택</strong>
+            <span>배웠지만 아직 적용하지 못한 기능 중 내 업무에 가장 큰 임팩트를 줄 것 하나를 골라 최종 프로젝트의 핵심으로 삼습니다.</span>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <!-- SCENARIO 1 -->
+    <div class="scene">
+      <div class="slbl">🎬 실습 시나리오 01</div>
+      <div class="sttl">클로드와 함께 나의 AI 활용 현황 완전 진단하기</div>
+      <div class="sdesc">
+        클로드에게 솔직하게 지금까지의 AI 활용 상황을 설명하고, 최적의 최종 프로젝트 방향을 제안받습니다. 클로드가 외부 코치 역할을 해줍니다.
+      </div>
+      <ul class="ssteps">
+        <li>아래 프롬프트 #1을 본인 상황에 맞게 수정해서 Claude.ai에 입력</li>
+        <li>클로드의 진단 결과를 읽고 가장 공감되는 부분 3가지에 표시</li>
+        <li>추천받은 최종 프로젝트 방향 중 하나를 선택</li>
+        <li>프롬프트 #2로 선택한 프로젝트의 구체적 계획서 생성</li>
+      </ul>
+    </div>
+
+    <!-- PROMPT #1 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #1</h3>
+        <span class="ptag tg">AI 활용 현황 자가 진단 & 최종 프로젝트 방향 제안</span>
+      </div>
+      <div class="plbl">지금 Claude.ai에 바로 입력</div>
+      <div class="ptxt"><span class="ph">나의 AI 활용 현황을 진단하고 최종 프로젝트 방향을 제안해줘.</span>
+
+<span class="pc">== 나에 대해 ==</span>
+직업/역할: <span class="py">[예: 마케팅 기획자 / 스타트업 대표 / 백엔드 개발자]</span>
+주요 업무 3가지: <span class="py">[예: 콘텐츠 기획, 데이터 분석, 팀 관리]</span>
+현재 Claude 플랜: <span class="py">[Free / Pro / Max / Team]</span>
+AI 사용 기간: <span class="py">[예: 1개월]</span>
+
+<span class="pc">== 지금까지 실제로 써본 기능 (아래 중 체크) ==</span>
+□ 기본 대화 및 문서 작성 ✓
+□ 시스템 프롬프트 / Projects 설정
+□ Skills (스킬) 만들고 사용
+□ MCP 연결 (파일 시스템 접근)
+□ Claude Code 터미널 사용
+□ Extended / Adaptive Thinking
+□ Cowork 또는 Computer Use
+□ 에이전트 팀 구성
+
+<span class="pc">== 솔직한 자기 평가 ==</span>
+가장 많이 쓰는 기능: <span class="py">[입력]</span>
+가장 큰 시간 절약: <span class="py">[입력]</span>
+아직 못 써본 것 중 써보고 싶은 것: <span class="py">[입력]</span>
+AI 때문에 겪는 가장 큰 불편함: <span class="py">[입력]</span>
+
+<span class="pb">위 내용을 바탕으로:
+1. 내 AI 활용 수준을 솔직하게 평가해줘 (약점 포함)
+2. 내 업무 유형에서 AI로 가장 큰 임팩트를 줄 수 있는 영역 TOP 3
+3. 오늘 완성하기 좋은 최종 프로젝트 아이디어 2가지 (현실적인 범위로)
+4. 1개월 후 내가 AI를 어떻게 쓰고 있어야 하는지 목표 상태 묘사</span></div>
+    </div>
+
+    <!-- PROMPT #2 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #2</h3>
+        <span class="ptag tg">최종 프로젝트 계획서 자동 생성</span>
+      </div>
+      <div class="plbl">프로젝트 방향이 정해졌으면 — 구체적 계획서 작성</div>
+      <div class="ptxt"><span class="ph">내 최종 AI 워크플로우 프로젝트 계획서를 작성해줘.</span>
+
+<span class="pc">== 선택한 프로젝트 ==</span>
+프로젝트 명칭: <span class="py">[예: 마케터를 위한 개인 AI 비서 시스템]</span>
+핵심 목표: <span class="py">[예: 매일 반복되는 리서치·보고서 작업 90% 자동화]</span>
+
+<span class="pc">== 사용할 기술 스택 (해당하는 것 선택) ==</span>
+□ Claude.ai Skills (스킬 정의)
+□ Projects (공유 컨텍스트)
+□ MCP (파일/앱 연결)
+□ Claude Code (자동화 스크립트)
+□ Cowork (GUI 작업)
+□ 에이전트 팀 (병렬 처리)
+
+<span class="pb">작성해줄 내용:
+
+## 프로젝트 개요
+- 목표: 한 줄 요약
+- 이 프로젝트로 절약될 예상 시간: 주 X시간
+
+## 구성 요소
+각 기능이 어떤 역할을 하는지 명확하게
+
+## 구현 순서 (오늘 할 수 있는 것부터)
+Step 1: (30분 안에 완성 가능한 것)
+Step 2: (1~2시간)
+Step 3: (장기적으로 발전)
+
+## 성공 기준
+이 프로젝트가 "완성됐다"고 판단하는 구체적인 기준
+
+## 오늘 당장 시작할 첫 번째 액션
+가장 작고 즉시 가능한 첫 걸음</span></div>
+    </div>
+
+  </section>
+
+  <hr class="div">
+
+  <!-- ════════════════════════════ -->
+  <!-- LEVEL 2 -->
+  <!-- ════════════════════════════ -->
+  <section class="level lv2" id="lv2">
+    <div class="lvhd">
+      <div class="lnum">L2</div>
+      <div class="lttl">
+        <h2>설계 & 구현 — 핵심 워크플로우 완성하기</h2>
+        <p>⏱ 예상 시간 90분 &nbsp;|&nbsp; 실제 구현의 핵심</p>
+      </div>
+    </div>
+
+    <p style="margin-bottom:18px; font-size:15.5px; color:#44403c; line-height:1.9;">
+      계획이 나왔으면 지금 바로 만들어야 합니다.
+      완벽하게 만들 필요 없습니다. 오늘 <strong>60%만 작동해도 성공</strong>입니다.
+      나머지는 실제로 사용하면서 개선하면 됩니다.
+      가장 많이 쓰일 기능 하나를 완성하는 것이 목표입니다.
+    </p>
+
+    <!-- METHOD -->
+    <div class="mblock">
+      <div class="mttl"><span class="mbar"></span>적용 방법 | 워크플로우 구현 4가지 패턴</div>
+      <ol class="slist">
+        <li class="si">
+          <div class="snum">1</div>
+          <div class="sbody">
+            <strong>패턴 A: 비서 스킬 중심 (코딩 불필요)</strong>
+            <span>가장 쉽고 즉시 사용 가능한 방법. /morning, /mail, /eod 같은 비서 스킬을 본인 업무에 맞게 커스터마이징해서 Claude.ai에 등록합니다. 19일차 내용을 직접 적용합니다.</span>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">2</div>
+          <div class="sbody">
+            <strong>패턴 B: MCP + 스킬 통합 (중간 난이도)</strong>
+            <span>로컬 파일 시스템 MCP를 연결하고, 업무 스킬과 조합합니다. "내 Downloads 폴더를 스캔해서 오늘 처리할 문서를 정리해줘" 같은 실제 파일 기반 워크플로우를 만듭니다.</span>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">3</div>
+          <div class="sbody">
+            <strong>패턴 C: 바이브 코딩으로 도구 만들기 (개발자 추천)</strong>
+            <span>Claude Code나 Claude.ai Artifacts로 실제 쓸 수 있는 웹 도구를 만듭니다. 업무에서 반복되는 계산, 분석, 보고서를 자동화하는 간단한 도구부터 시작합니다.</span>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">4</div>
+          <div class="sbody">
+            <strong>패턴 D: 에이전트 팀으로 대형 분석 (고급)</strong>
+            <span>복잡한 분석을 여러 전문 에이전트로 분업합니다. 경쟁사 분석, 시장 조사, 코드 리뷰 등 여러 관점이 필요한 작업에 적합합니다.</span>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <!-- SCENARIO 2 -->
+    <div class="scene">
+      <div class="slbl">🎬 실습 시나리오 02 — 핵심 워크플로우 구현</div>
+      <div class="sttl">"마케터의 아침 루틴 완전 자동화" 실전 구현</div>
+      <div class="sdesc">
+        예시 프로젝트로 마케터를 위한 아침 루틴 자동화를 구현합니다. 이 패턴을 참고해서 본인 업무에 맞게 수정하세요.
+      </div>
+      <ul class="ssteps">
+        <li>Step 1 (15분): /morning 스킬을 마케터 버전으로 커스터마이징 (프롬프트 #3)</li>
+        <li>Step 2 (20분): /competitor-watch 스킬 생성 — 경쟁사 모니터링 자동화 (프롬프트 #4)</li>
+        <li>Step 3 (30분): /weekly-report 스킬로 주간 보고서 반자동화 (프롬프트 #5)</li>
+        <li>Step 4 (15분): 세 스킬을 하나의 통합 /monday-startup 명령으로 연결</li>
+      </ul>
+    </div>
+
+    <!-- PROMPT #3 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #3</h3>
+        <span class="ptag tv">핵심 비서 스킬 완성 (업종별 커스터마이징)</span>
+      </div>
+      <div class="plbl">내 업무에 완전히 맞춘 마스터 비서 스킬 생성</div>
+      <div class="ptxt"><span class="ph">내 업무에 최적화된 핵심 비서 스킬 SKILL.md를 만들어줘.</span>
+
+<span class="pc">== 나의 역할 프로필 ==</span>
+직책: <span class="py">[입력]</span>
+소속: <span class="py">[팀명/회사명]</span>
+주요 책임: <span class="py">[예: 디지털 마케팅 KPI 관리, 콘텐츠 캘린더 운영]</span>
+핵심 관계자: <span class="py">[상사, 주요 클라이언트, 팀원 등]</span>
+가장 반복되는 업무 Top 3: <span class="py">[입력]</span>
+가장 싫어하는 반복 업무: <span class="py">[입력]</span>
+선호하는 커뮤니케이션 스타일: <span class="py">[예: 두괄식, 수치 중심, 간결하게]</span>
+
+<span class="pc">== 만들어줄 스킬들 ==</span>
+
+<span class="pg">스킬 1: /[업무]-morning</span>
+나의 아침 루틴에 맞춤화된 일일 브리핑 스킬
+- 오늘의 우선순위 업무 정리
+- 마감 임박 항목 알림
+- 오늘 집중해야 할 것 TOP 3
+
+<span class="pg">스킬 2: /[업무]-report</span>
+내 업무 유형에 특화된 정기 보고서 작성 스킬
+- 주간/월간 성과 정리
+- KPI 달성률 계산
+- 다음 주 계획 자동 생성
+
+<span class="pg">스킬 3: /[업무]-review</span>
+내 결과물을 비판적으로 검토하는 리뷰어 스킬
+- 품질 기준 정의
+- 개선 포인트 발견
+- 최종 승인 체크리스트
+
+<span class="pb">각 스킬을 완전한 SKILL.md 형식으로 만들어줘.
+설명(description)에 자동 트리거 키워드를 충분히 포함해줘.</span></div>
+    </div>
+
+    <!-- PROMPT #4 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #4</h3>
+        <span class="ptag tv">나만의 마스터 워크플로우 프롬프트</span>
+      </div>
+      <div class="plbl">하루 업무 전체를 한 번에 처리하는 통합 명령</div>
+      <div class="ptxt"><span class="ph">오늘 하루 업무를 AI로 완전 가동해줘.</span>
+
+<span class="pc">━━━ 오늘의 컨텍스트 ━━━</span>
+날짜: <span class="py">[오늘 날짜]</span>
+오늘 주요 일정: <span class="py">[일정 나열]</span>
+오늘 마감 항목: <span class="py">[마감 목록]</span>
+어제 못 한 것: <span class="py">[이월 항목]</span>
+현재 진행 중인 주요 프로젝트: <span class="py">[프로젝트 상태]</span>
+
+<span class="pc">━━━ 처리 요청 ━━━</span>
+
+<span class="pg">1. 아침 브리핑 (/morning)</span>
+위 컨텍스트로 오늘 하루 브리핑 생성
+→ 우선순위 3가지, 주의사항, 집중 시간 제안
+
+<span class="pg">2. 이슈 분석</span>
+현재 가장 해결이 필요한 업무 이슈가 있다면:
+<span class="py">[이슈 설명]</span>
+→ 원인 분석 + 해결 방향 + 내가 해야 할 액션
+
+<span class="pg">3. 오늘의 핵심 산출물 초안</span>
+오늘 반드시 완성해야 할 것:
+<span class="py">[산출물 설명]</span>
+→ 초안 또는 구조 제안
+
+<span class="pc">각 섹션은 구분해서 보여주고,
+총 소요 예상 시간도 추정해줘.</span></div>
+    </div>
+
+    <!-- PROMPT #5 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #5</h3>
+        <span class="ptag tv">바이브 코딩으로 업무 도구 만들기</span>
+      </div>
+      <div class="plbl">코딩 없이 나만의 업무 도구 제작</div>
+      <div class="ptxt"><span class="ph">내 업무에서 매일 반복되는 계산/분석 작업을 
+자동화하는 웹 도구를 만들어줘.</span>
+
+<span class="pc">도구 목적: </span><span class="py">[예: 콘텐츠 성과 계산기 / 업무 시간 추적기 / KPI 대시보드]</span>
+
+<span class="pc">기능 요구사항:</span>
+<span class="pg">핵심 기능 1:</span> <span class="py">[예: 포스트별 CPE, 도달률, 참여율 자동 계산]</span>
+<span class="pg">핵심 기능 2:</span> <span class="py">[예: 목표 대비 달성률 실시간 표시]</span>
+<span class="pg">핵심 기능 3:</span> <span class="py">[예: 결과를 표로 정리하고 클립보드에 복사]</span>
+
+<span class="pc">디자인 요구사항:</span>
+- 매일 쓰기 편한 깔끔한 UI
+- 모바일에서도 동작
+- 우리 팀 색상: <span class="py">[브랜드 색상 또는 선호 색상]</span>
+
+<span class="pb">HTML + CSS + JavaScript로 하나의 파일에 만들어줘.
+다운로드해서 브라우저에서 바로 열 수 있게.
+저장 기능이 필요하면 로컬스토리지 사용.</span></div>
+    </div>
+
+  </section>
+
+  <hr class="div">
+
+  <!-- ════════════════════════════ -->
+  <!-- LEVEL 3 -->
+  <!-- ════════════════════════════ -->
+  <section class="level lv3" id="lv3">
+    <div class="lvhd">
+      <div class="lnum">L3</div>
+      <div class="lttl">
+        <h2>문서화 & 지속 발전 — 나만의 AI 운용 매뉴얼</h2>
+        <p>⏱ 예상 시간 45분 &nbsp;|&nbsp; 장기 지속을 위한 기반</p>
+      </div>
+    </div>
+
+    <p style="margin-bottom:18px; font-size:15.5px; color:#44403c; line-height:1.9;">
+      만든 것을 문서화하지 않으면 잊어버립니다.
+      그리고 문서화된 시스템은 팀에 공유하거나, 미래의 내가 다시 쓸 수 있습니다.
+      <strong>나만의 AI 운용 매뉴얼</strong>은 30일 과정의 진짜 결과물입니다.
+    </p>
+
+    <!-- METHOD -->
+    <div class="mblock">
+      <div class="mttl"><span class="mbar"></span>적용 방법 | AI 운용 매뉴얼 구성 요소</div>
+      <ol class="slist">
+        <li class="si">
+          <div class="snum">1</div>
+          <div class="sbody">
+            <strong>나의 AI 스택 정의</strong>
+            <span>어떤 플랜을 사용하고, 어떤 스킬이 등록되어 있고, 어떤 MCP가 연결되어 있는지를 문서화합니다. 새 기기로 이동하거나 팀원에게 공유할 때 필수입니다.</span>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">2</div>
+          <div class="sbody">
+            <strong>핵심 프롬프트 라이브러리 구축</strong>
+            <span>자주 쓰는 프롬프트들을 체계적으로 정리합니다. 목적별로 분류하고, 어떤 상황에서 어떤 프롬프트를 쓰는지 주석을 달아둡니다. Notion이나 메모 앱에 저장하면 됩니다.</span>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">3</div>
+          <div class="sbody">
+            <strong>월간 AI 성과 측정 루틴</strong>
+            <span>매달 1회 "AI 덕분에 절약한 시간", "가장 효과적인 기능", "개선이 필요한 부분"을 기록합니다. 3개월이면 나만의 AI 활용 패턴이 명확해집니다.</span>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">4</div>
+          <div class="sbody">
+            <strong>지속 학습 플랜</strong>
+            <span>Anthropic은 매달 새 기능을 출시합니다. 주요 채널(Anthropic 블로그, Claude 공식 채널)을 팔로우하고, 분기별로 새 기능을 탐색하는 "AI 업그레이드 데이"를 캘린더에 잡아두세요.</span>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <!-- SCENARIO 3 -->
+    <div class="scene">
+      <div class="slbl">🎬 실습 시나리오 03 — 최종 완성</div>
+      <div class="sttl">나만의 AI 운용 매뉴얼 + 앞으로의 성장 로드맵 완성</div>
+      <div class="sdesc">
+        오늘 만든 워크플로우를 문서로 정리하고, 앞으로 3개월 동안 어떻게 AI 활용을 발전시킬지 로드맵을 만듭니다.
+      </div>
+      <ul class="ssteps">
+        <li>프롬프트 #6으로 나만의 AI 운용 매뉴얼 초안 자동 생성</li>
+        <li>생성된 문서를 Notion, 메모 앱, 또는 Google Docs에 저장</li>
+        <li>프롬프트 #7로 3개월 AI 성장 로드맵 생성</li>
+        <li>캘린더에 "AI 업그레이드 데이" (매달 1일)를 반복 일정으로 등록</li>
+        <li>오늘 완성한 것을 팀원 또는 지인에게 공유</li>
+      </ul>
+    </div>
+
+    <!-- PROMPT #6 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #6</h3>
+        <span class="ptag tg">나만의 AI 운용 매뉴얼 자동 생성</span>
+      </div>
+      <div class="plbl">30일 과정의 진짜 결과물 — 나만의 AI 사용 가이드</div>
+      <div class="ptxt"><span class="ph">내 AI 활용을 체계화한 개인 운용 매뉴얼을 만들어줘.</span>
+
+<span class="pc">== 내 AI 설정 현황 ==</span>
+현재 플랜: <span class="py">[입력]</span>
+등록된 스킬: <span class="py">[스킬 이름 나열]</span>
+연결된 MCP: <span class="py">[예: 파일시스템, 없음]</span>
+사용하는 주요 도구: <span class="py">[예: Claude Code, Cowork]</span>
+
+<span class="pc">== 나의 핵심 워크플로우 ==</span>
+매일 쓰는 것: <span class="py">[예: /morning 브리핑, 이메일 초안]</span>
+주 1회 쓰는 것: <span class="py">[예: 주간 보고서, 경쟁사 분석]</span>
+특수 상황에 쓰는 것: <span class="py">[예: 프레젠테이션, 계약서 검토]</span>
+
+<span class="pb">작성해줄 문서 구조:
+
+# 나의 AI 운용 매뉴얼
+## 작성일: [날짜]
+
+## 1. 내 AI 스택
+- 플랜 및 설정 현황
+- 등록된 스킬 목록 (용도 설명 포함)
+- 연결된 도구
+
+## 2. 일상 워크플로우
+### 아침 루틴 (X분)
+### 업무 중 활용
+### 마감/저녁 루틴
+
+## 3. 핵심 프롬프트 라이브러리
+상황별 10개 핵심 프롬프트 (짧은 설명 포함)
+
+## 4. 금지 사항 & 보안 원칙
+내가 지키는 데이터 보안 규칙
+
+## 5. 월간 점검 체크리스트
+매달 확인할 항목들
+
+## 6. 알고 싶은 것 / 더 배울 것
+현재 내 수준에서 다음 도전할 기능</span>
+
+<span class="pc">마크다운 형식으로, 실제로 사용할 수 있게 구체적으로.</span></div>
+    </div>
+
+    <!-- PROMPT #7 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #7</h3>
+        <span class="ptag tg">3개월 AI 성장 로드맵</span>
+      </div>
+      <div class="plbl">지금부터 3개월 후의 나를 설계하기</div>
+      <div class="ptxt"><span class="ph">내 현재 AI 활용 수준에서 3개월 후 목표 상태로 가는
+구체적인 성장 로드맵을 만들어줘.</span>
+
+<span class="pc">현재 나의 수준:</span>
+<span class="py">[프롬프트 #1 결과에서 받은 현재 평가를 여기에 붙여넣기]</span>
+
+<span class="pc">3개월 후 목표:</span>
+<span class="py">[되고 싶은 AI 활용 상태 묘사]</span>
+
+<span class="pb">로드맵 구성:
+
+## 1개월차 목표 (기초 탄탄히)
+- 이번 달 집중할 기능 1~2가지
+- 매일 30분 실습할 것
+- 이번 달 완성할 프롬프트 라이브러리
+
+## 2개월차 목표 (심화 및 자동화)
+- 첫 달 결과를 바탕으로 확장할 것
+- 팀 또는 업무에 도입할 기능
+- 시간 절약 목표: 주 X시간
+
+## 3개월차 목표 (통합 및 공유)
+- 완성된 AI 워크플로우 운용
+- 팀에 공유하거나 가르칠 것
+- 나만의 AI 전문 영역
+
+## 월간 체크포인트 질문
+매달 스스로에게 물어볼 3가지 질문
+
+## 추천 학습 자료
+내 수준과 목표에 맞는 다음 학습 소스</span></div>
+    </div>
+
+    <!-- PROMPT #8 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #8</h3>
+        <span class="ptag tb">팀 공유용 — AI 사용 현황 리포트</span>
+      </div>
+      <div class="plbl">팀장·관리자가 경영진에게 보고하는 AI 도입 성과 리포트</div>
+      <div class="ptxt"><span class="ph">우리 팀의 AI 도입 현황과 성과를 정리한 
+경영진 보고용 리포트를 작성해줘.</span>
+
+<span class="pc">== 팀 현황 ==</span>
+팀 규모: <span class="py">[명]</span>
+AI 도입 기간: <span class="py">[예: 30일]</span>
+사용 도구: <span class="py">[예: Claude Pro 5명, Claude Code 2명]</span>
+월 AI 비용: <span class="py">[원 또는 달러]</span>
+
+<span class="pc">== 주요 성과 ==</span>
+가장 효과적인 활용 사례: <span class="py">[예: 주간 보고서 작성 시간 50% 단축]</span>
+팀원별 주요 활용 영역: <span class="py">[예: 마케팅팀: 콘텐츠 / 개발팀: 코드 리뷰]</span>
+예상 월간 절약 시간: <span class="py">[시간]</span>
+
+<span class="pb">리포트 포함 내용:
+
+## Executive Summary (1페이지)
+## AI 도입 현황
+## 주요 성과 (정량 + 정성)
+## 비용 대비 효과 (ROI)
+## 도전 과제 & 개선 방향
+## 다음 3개월 계획
+
+형식: 임원 보고용, 간결하고 수치 중심
+분량: A4 2페이지 이내</span></div>
+    </div>
+
+    <!-- PROMPT #9 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #9</h3>
+        <span class="ptag tg">나의 AI 명함 — 한 문장 소개</span>
+      </div>
+      <div class="plbl">30일 과정을 마친 나를 한 문장으로 소개하기</div>
+      <div class="ptxt"><span class="ph">30일간 AI를 배운 나를 한 문장으로 소개하는 
+"AI 전문 소개"를 여러 버전으로 만들어줘.</span>
+
+<span class="pc">내 배경:</span>
+직업: <span class="py">[입력]</span>
+30일 동안 마스터한 기능: <span class="py">[핵심 2~3가지]</span>
+가장 큰 성취: <span class="py">[예: 주간 보고서 작성 시간 80% 단축]</span>
+
+<span class="pb">만들어줄 버전:
+
+1. LinkedIn 소개용 (50자 이내)
+   "저는 [직업]으로 AI를 활용해 [성과]를 달성한 [설명]입니다."
+
+2. 팀 내 자기소개용 (2~3문장)
+   AI 활용 사례를 구체적으로 포함
+
+3. 이력서/포트폴리오용 (3~5줄)
+   어떤 기술을 어떻게 활용해서 어떤 성과를 냈는지
+
+4. 멘토링/강의 소개용
+   다른 사람들에게 가르칠 수 있는 것</span></div>
+    </div>
+
+  </section>
+
+  <!-- ─── FINAL CERTIFICATE ─── -->
+  <div class="cert">
+    <div class="cert-inner">
+      <span class="cert-trophy">🏆</span>
+      <div class="cert-title">30일 과정 완주</div>
+      <div class="cert-sub">
+        Claude AI 마스터 과정 · 입문부터 에이전트 실무까지<br>
+        당신은 AI를 쓰는 사람에서 <strong style="color:#fbbf24;">AI를 설계하는 사람</strong>이 되었습니다.
+      </div>
+      <div class="cert-stats">
+        <div class="cs">
+          <div class="cs-num">30</div>
+          <div class="cs-lbl">학습일</div>
+        </div>
+        <div class="cs">
+          <div class="cs-num">200+</div>
+          <div class="cs-lbl">프롬프트 템플릿</div>
+        </div>
+        <div class="cs">
+          <div class="cs-num">15+</div>
+          <div class="cs-lbl">핵심 기능</div>
+        </div>
+        <div class="cs">
+          <div class="cs-num">∞</div>
+          <div class="cs-lbl">가능성</div>
+        </div>
+      </div>
+      <div class="cert-message">
+        스킬부터 MCP, Claude Code, 바이브 코딩, 에이전트 팀, 컴퓨터 제어, 보안, 플랜 최적화, 적응형 사고까지—
+        이 과정에서 배운 것들은 앞으로 여러분의 일하는 방식을 근본적으로 바꿔놓을 것입니다.
+        AI는 도구가 아니라 동료입니다. 이제 진짜 여정이 시작됩니다.
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── NEXT STEPS ─── -->
+  <p style="font-size:18px;font-weight:900;margin-bottom:16px;">🚀 이제 무엇을 해야 할까요?</p>
+  <div class="next-grid">
+    <div class="next-card">
+      <div class="nc-ico">📌</div>
+      <h4>지금 당장</h4>
+      <p>오늘 만든 워크플로우를 내일 실제 업무에 사용하세요. 첫 사용이 가장 중요합니다.</p>
+    </div>
+    <div class="next-card">
+      <div class="nc-ico">📅</div>
+      <h4>이번 주</h4>
+      <p>운용 매뉴얼을 팀원 1명에게 공유하거나 Notion에 정리하세요. 공유가 내 것을 강화합니다.</p>
+    </div>
+    <div class="next-card">
+      <div class="nc-ico">🌱</div>
+      <h4>이번 달</h4>
+      <p>아직 써보지 못한 기능 하나를 실제 업무에 적용하세요. 매달 한 가지씩만 늘려가세요.</p>
+    </div>
+  </div>
+
+</div><!-- /wrap -->
+
+<!-- ─── FOOTER ─── -->
+<footer>
+  <div class="footer-title">30 DAYS WITH CLAUDE</div>
+  <p style="margin-bottom:8px;color:rgba(255,255,255,.5);">클로드(Claude) 활용 및 교육 통합 가이드 — 완주를 진심으로 축하합니다 🎉</p>
+  <p>
+    <a href="https://claude.ai">Claude.ai</a> &nbsp;·&nbsp;
+    <a href="https://docs.anthropic.com">Anthropic 공식 문서</a> &nbsp;·&nbsp;
+    <a href="https://www.anthropic.com/news">최신 소식</a>
+  </p>
+</footer>
+
+</body>
+</html>
