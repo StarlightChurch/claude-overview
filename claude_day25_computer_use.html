@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>25일차: 컴퓨터 제어(Computer Use) | Claude 활용 가이드</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;500;600&family=Bebas+Neue&display=swap');
+
+  :root {
+    --ink:    #08090d;
+    --paper:  #f6f7fb;
+    --a1:     #ef4444;   /* red — control/power */
+    --a1l:    #fee2e2;
+    --a2:     #f97316;   /* orange accent */
+    --a2l:    #ffedd5;
+    --a3:     #6366f1;   /* indigo */
+    --a3l:    #e0e7ff;
+    --green:  #10b981;
+    --gold:   #f59e0b;
+    --soft:   #eeeef6;
+    --mid:    #6b7280;
+    --border: #e2e3ee;
+    --dark:   #0f0a1e;
+    --code:   #0d1117;
+    --screen: #1a1a2e; /* screen/monitor color */
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{font-family:'Noto Sans KR',sans-serif;background:var(--paper);color:var(--ink);line-height:1.8;font-size:16px;}
+
+  /* ─── HERO ─── */
+  .hero{background:var(--dark);padding:64px 40px 56px;position:relative;overflow:hidden;color:white;}
+  .hero::before{
+    content:'';position:absolute;inset:0;
+    background:radial-gradient(ellipse at 80% 20%,rgba(239,68,68,.15) 0%,transparent 50%),
+               radial-gradient(ellipse at 20% 80%,rgba(99,102,241,.12) 0%,transparent 50%);
+  }
+  /* Screen/cursor decoration */
+  .hero-screen{
+    position:absolute;right:50px;top:50%;transform:translateY(-50%);
+    width:200px;height:140px;
+    background:#1a1a2e;border:2px solid rgba(239,68,68,.3);border-radius:10px;
+    overflow:hidden;padding:12px;
+    box-shadow:0 0 40px rgba(239,68,68,.15);
+    opacity:.7;
+  }
+  .hs-bar{height:6px;background:rgba(239,68,68,.4);border-radius:3px;margin-bottom:8px;width:60%;}
+  .hs-line{height:4px;background:rgba(255,255,255,.1);border-radius:2px;margin-bottom:5px;}
+  .hs-line.s{width:80%;} .hs-line.m{width:60%;} .hs-line.l{width:90%;}
+  .hs-btn{
+    display:inline-block;width:40px;height:14px;background:rgba(239,68,68,.5);
+    border-radius:3px;margin-top:8px;position:relative;
+  }
+  .hs-cursor{
+    position:absolute;width:14px;height:14px;
+    border-left:2px solid rgba(239,68,68,.9);border-top:2px solid rgba(239,68,68,.9);
+    bottom:20px;right:20px;
+    animation:cursor-move 3s ease-in-out infinite;
+  }
+  @keyframes cursor-move{
+    0%{transform:translate(0,0);}
+    30%{transform:translate(-30px,-10px);}
+    60%{transform:translate(-10px,-30px);}
+    100%{transform:translate(0,0);}
+  }
+
+  .hi{max-width:900px;margin:0 auto;position:relative;z-index:1;}
+  .h-week{font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--a1);margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+  .h-week::before{content:'';display:inline-block;width:28px;height:2px;background:var(--a1);}
+  .hero h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,6.5vw,72px);letter-spacing:2px;line-height:1.05;margin-bottom:20px;}
+  .hero h1 span{color:var(--a1);}
+  .hero-sub{font-size:17px;color:rgba(255,255,255,.62);max-width:580px;font-weight:300;line-height:1.75;}
+  .hero-meta{margin-top:28px;display:flex;gap:12px;flex-wrap:wrap;}
+  .h-badge{background:rgba(239,68,68,.18);border:1px solid rgba(239,68,68,.35);padding:7px 16px;border-radius:100px;font-size:12px;font-weight:600;color:#fca5a5;}
+
+  /* ─── NAV ─── */
+  .snav{background:white;border-bottom:1px solid var(--border);padding:13px 0;position:sticky;top:0;z-index:200;box-shadow:0 1px 8px rgba(0,0,0,.05);}
+  .snav-i{max-width:900px;margin:0 auto;padding:0 30px;display:flex;align-items:center;justify-content:space-between;}
+  .snav-brand{font-size:13px;font-weight:700;color:var(--a1);}
+  .snav-links{display:flex;gap:6px;}
+  .snav-links a{padding:5px 13px;border-radius:100px;font-size:12px;font-weight:600;border:1px solid var(--border);background:white;color:var(--mid);text-decoration:none;transition:all .15s;}
+  .snav-links a:hover,.snav-links a.act{background:var(--a1);color:white;border-color:var(--a1);}
+
+  /* ─── WRAP ─── */
+  .wrap{max-width:900px;margin:0 auto;padding:0 30px;}
+
+  /* ─── OBJECTIVE ─── */
+  .obj{background:var(--a1l);border-left:5px solid var(--a1);border-radius:0 14px 14px 0;padding:28px 32px;margin:40px 0;}
+  .obj h2{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#b91c1c;margin-bottom:14px;}
+  .obj ul{list-style:none;display:flex;flex-direction:column;gap:9px;}
+  .obj li{display:flex;align-items:flex-start;gap:10px;font-size:15px;}
+  .obj li::before{content:'⬡';color:var(--a1);font-size:12px;flex-shrink:0;margin-top:3px;}
+
+  /* ─── CONCEPT ─── */
+  .concept{padding:48px 0 20px;}
+  .sec-lbl{font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--mid);margin-bottom:8px;}
+  .concept h2{font-size:27px;font-weight:900;margin-bottom:18px;line-height:1.3;}
+  .concept p{font-size:15.5px;color:#334155;margin-bottom:16px;line-height:1.9;}
+
+  /* ─── VISION ACTION LOOP ─── */
+  .val-loop{background:var(--screen);border-radius:20px;padding:36px;margin:26px 0;position:relative;overflow:hidden;}
+  .val-loop::before{content:'';position:absolute;inset:0;
+    background:radial-gradient(ellipse at 50% 50%,rgba(239,68,68,.08) 0%,transparent 60%);
+    pointer-events:none;}
+  .val-title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#fca5a5;margin-bottom:26px;}
+  .val-steps{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap;}
+  .val-step{
+    background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
+    border-radius:14px;padding:20px 16px;text-align:center;
+    min-width:130px;flex:1;position:relative;
+  }
+  .val-step.hi{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.4);}
+  .val-ico{font-size:28px;margin-bottom:8px;}
+  .val-num{font-family:'Bebas Neue',sans-serif;font-size:36px;color:rgba(239,68,68,.25);position:absolute;top:8px;right:12px;}
+  .val-name{font-size:13px;font-weight:700;color:white;margin-bottom:4px;}
+  .val-step.hi .val-name{color:#fca5a5;}
+  .val-desc{font-size:11px;color:rgba(255,255,255,.45);line-height:1.5;}
+  .val-arr{color:#374151;font-size:22px;padding:0 4px;flex-shrink:0;}
+  .val-note{font-size:12px;color:rgba(255,255,255,.3);margin-top:18px;text-align:center;font-family:'JetBrains Mono',monospace;}
+
+  /* ─── COMPARISON TABLE ─── */
+  .ctbl{width:100%;border-collapse:collapse;border-radius:12px;overflow:hidden;margin:20px 0;box-shadow:0 2px 12px rgba(0,0,0,.05);}
+  .ctbl th{background:var(--ink);color:white;padding:12px 18px;text-align:left;font-size:13px;font-weight:700;}
+  .ctbl td{padding:12px 18px;font-size:14px;border-bottom:1px solid var(--border);vertical-align:top;}
+  .ctbl tr:nth-child(even) td{background:var(--soft);}
+  .ctbl tr:last-child td{border-bottom:none;}
+  .ck{color:var(--green);font-weight:700;}
+  .cx{color:var(--a1);}
+  .co{color:var(--gold);font-weight:600;}
+
+  /* ─── LEVEL SECTIONS ─── */
+  .level{padding:48px 0;}
+  .lvhd{display:flex;align-items:center;gap:18px;margin-bottom:32px;padding-bottom:20px;border-bottom:2px solid var(--border);}
+  .lnum{width:64px;height:64px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:26px;flex-shrink:0;}
+  .lv1 .lnum{background:var(--a1l);color:var(--a1);border:2px solid var(--a1);}
+  .lv2 .lnum{background:var(--a2l);color:var(--a2);border:2px solid var(--a2);}
+  .lv3 .lnum{background:var(--a3l);color:var(--a3);border:2px solid var(--a3);}
+  .lttl h2{font-size:22px;font-weight:900;margin-bottom:4px;}
+  .lttl p{font-size:13px;color:var(--mid);font-weight:500;}
+
+  /* ─── METHOD BLOCK ─── */
+  .mblock{background:white;border:1px solid var(--border);border-radius:16px;padding:28px 32px;margin-bottom:22px;box-shadow:0 1px 8px rgba(0,0,0,.04);}
+  .mttl{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+  .lv1 .mttl{color:var(--a1);}
+  .lv2 .mttl{color:var(--a2);}
+  .lv3 .mttl{color:var(--a3);}
+  .mbar{width:4px;height:16px;border-radius:2px;display:inline-block;flex-shrink:0;}
+  .lv1 .mbar{background:var(--a1);}
+  .lv2 .mbar{background:var(--a2);}
+  .lv3 .mbar{background:var(--a3);}
+
+  .slist{list-style:none;display:flex;flex-direction:column;gap:18px;}
+  .si{display:flex;align-items:flex-start;gap:14px;}
+  .snum{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;margin-top:1px;}
+  .lv1 .snum{background:var(--a1l);color:#b91c1c;}
+  .lv2 .snum{background:var(--a2l);color:#c2410c;}
+  .lv3 .snum{background:var(--a3l);color:var(--a3);}
+  .sbody strong{display:block;font-weight:700;font-size:15px;margin-bottom:4px;}
+  .sbody p,.sbody span{font-size:14px;color:#475569;line-height:1.8;}
+
+  /* ─── SCENARIO ─── */
+  .scene{background:linear-gradient(135deg,#08090d 0%,#150a0a 100%);border-radius:16px;padding:28px 32px;margin-bottom:22px;color:white;position:relative;overflow:hidden;}
+  .scene::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 85% 25%,rgba(239,68,68,.12) 0%,transparent 55%);pointer-events:none;}
+  .slbl{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--a1);margin-bottom:10px;position:relative;z-index:1;}
+  .sttl{font-size:19px;font-weight:700;margin-bottom:10px;position:relative;z-index:1;}
+  .sdesc{font-size:14px;color:rgba(255,255,255,.6);line-height:1.8;margin-bottom:18px;position:relative;z-index:1;}
+  .ssteps{list-style:none;display:flex;flex-direction:column;gap:8px;position:relative;z-index:1;}
+  .ssteps li{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:rgba(255,255,255,.78);}
+  .ssteps li::before{content:'▶';color:var(--a1);flex-shrink:0;font-size:10px;margin-top:5px;}
+
+  /* ─── PROMPT BLOCK ─── */
+  .pblock{background:var(--code);border-radius:16px;padding:28px 32px;margin-bottom:22px;border:1px solid rgba(239,68,68,.18);}
+  .phd{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.06);}
+  .phd h3{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#fca5a5;display:flex;align-items:center;gap:7px;}
+  .ptag{font-size:11px;font-weight:600;padding:4px 11px;border-radius:100px;text-transform:uppercase;}
+  .tred{background:rgba(239,68,68,.2);color:#fca5a5;}
+  .tora{background:rgba(249,115,22,.2);color:#fdba74;}
+  .tind{background:rgba(99,102,241,.2);color:#a5b4fc;}
+  .tgrn{background:rgba(16,185,129,.18);color:#6ee7b7;}
+  .tyel{background:rgba(245,158,11,.18);color:#fcd34d;}
+
+  .plbl{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);margin:14px 0 8px;}
+  .plbl:first-of-type{margin-top:0;}
+  .ptxt{font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.85;color:#c9d6e0;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:18px 20px;white-space:pre-wrap;word-break:break-word;}
+  .ph{color:#fca5a5;}   /* red highlight */
+  .pg{color:#86efac;}   /* green */
+  .py{color:#fda4af;}   /* pink */
+  .pc{color:#6b8aad;}   /* comment */
+  .po{color:#fbbf24;}   /* gold */
+  .pb{color:#93c5fd;}   /* blue */
+  .pp{color:#d2a8ff;}   /* purple */
+
+  /* ─── USE CASE CARDS ─── */
+  .uc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin:20px 0;}
+  .uc-card{background:white;border:1px solid var(--border);border-radius:13px;padding:18px;transition:transform .2s,box-shadow .2s;}
+  .uc-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(239,68,68,.1);}
+  .uc-ico{font-size:26px;margin-bottom:8px;}
+  .uc-card h4{font-size:14px;font-weight:700;margin-bottom:5px;}
+  .uc-card p{font-size:12.5px;color:var(--mid);line-height:1.6;}
+
+  /* ─── SAFETY GRID ─── */
+  .safety-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:20px 0;}
+  .safety-box{border-radius:12px;padding:18px 20px;}
+  .sb-do{background:#f0fdf4;border:1px solid #bbf7d0;}
+  .sb-dont{background:#fef2f2;border:1px solid #fecaca;}
+  .sb-ttl{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;}
+  .sb-do .sb-ttl{color:#166534;}
+  .sb-dont .sb-ttl{color:#991b1b;}
+  .safety-box ul{list-style:none;display:flex;flex-direction:column;gap:7px;}
+  .safety-box li{font-size:13px;color:#555;display:flex;align-items:flex-start;gap:7px;}
+  .sb-do li::before{content:'✓';color:var(--green);font-weight:700;flex-shrink:0;}
+  .sb-dont li::before{content:'✗';color:var(--a1);font-weight:700;flex-shrink:0;}
+
+  /* ─── ACCESS METHODS ─── */
+  .access-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:20px 0;}
+  .acc-card{background:white;border:1px solid var(--border);border-radius:14px;padding:20px;text-align:center;}
+  .acc-card.hi{border-color:var(--a1);background:var(--a1l);}
+  .acc-ico{font-size:28px;margin-bottom:10px;}
+  .acc-card h4{font-size:14px;font-weight:700;margin-bottom:6px;}
+  .acc-card p{font-size:12.5px;color:var(--mid);line-height:1.6;}
+  .acc-badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:100px;display:inline-block;margin-bottom:6px;text-transform:uppercase;}
+  .ab-free{background:#dcfce7;color:#166534;}
+  .ab-pro{background:var(--a1l);color:#b91c1c;}
+  .ab-dev{background:var(--a3l);color:var(--a3);}
+
+  /* ─── TERM ─── */
+  .term{background:var(--code);border-radius:13px;overflow:hidden;margin:18px 0;}
+  .term-bar{background:#1c1c1e;padding:10px 16px;display:flex;align-items:center;gap:7px;}
+  .td{width:11px;height:11px;border-radius:50%;}
+  .td.r{background:#ff5f56;} .td.y{background:#ffbd2e;} .td.g{background:#27c93f;}
+  .term-title{flex:1;text-align:center;font-size:11px;color:#555;font-family:'JetBrains Mono',monospace;margin-left:-55px;}
+  .term-body{padding:20px 22px;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.9;color:#e6edf3;}
+  .tg{color:#3fb950;} .ty{color:#e3b341;} .tb{color:#79c0ff;} .tp{color:#d2a8ff;} .tr{color:#ff7b72;} .tc{color:#8b949e;} .tw{color:white;font-weight:600;}
+
+  /* ─── TIPS ─── */
+  .tip{background:var(--a2l);border-left:4px solid var(--a2);border-radius:0 12px 12px 0;padding:16px 20px;margin:18px 0;font-size:14px;line-height:1.75;}
+  .tip strong{color:#c2410c;display:block;margin-bottom:4px;font-size:13px;}
+  .warn{background:var(--a1l);border-left:4px solid var(--a1);border-radius:0 12px 12px 0;padding:16px 20px;margin:18px 0;font-size:14px;line-height:1.75;}
+  .warn strong{color:#b91c1c;display:block;margin-bottom:4px;}
+  .info{background:var(--a3l);border-left:4px solid var(--a3);border-radius:0 12px 12px 0;padding:16px 20px;margin:18px 0;font-size:14px;line-height:1.75;}
+  .info strong{color:#3730a3;display:block;margin-bottom:4px;}
+
+  /* ─── DIVIDER ─── */
+  hr.div{border:none;border-top:1px solid var(--border);margin:46px 0;}
+
+  /* ─── SUMMARY ─── */
+  .summary{background:var(--dark);color:white;border-radius:20px;padding:44px;margin:50px 0;}
+  .summary h2{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:2px;color:var(--a1);margin-bottom:26px;}
+  .sgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .sitem{background:rgba(255,255,255,.04);border:1px solid rgba(239,68,68,.18);border-radius:12px;padding:18px 22px;}
+  .sitem h4{font-size:12px;font-weight:700;letter-spacing:1px;color:#fca5a5;text-transform:uppercase;margin-bottom:8px;}
+  .sitem p{font-size:14px;color:rgba(255,255,255,.75);line-height:1.7;}
+
+  /* ─── CHECKLIST ─── */
+  .ckbox{background:white;border:1px solid var(--border);border-radius:16px;padding:28px 32px;margin-bottom:40px;box-shadow:0 1px 8px rgba(0,0,0,.04);}
+  .ckbox h3{font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--green);margin-bottom:18px;}
+
+  /* ─── FOOTER ─── */
+  footer{background:var(--dark);padding:32px 40px;text-align:center;color:rgba(255,255,255,.3);font-size:13px;}
+  footer a{color:var(--a1);text-decoration:none;}
+
+  code{font-family:'JetBrains Mono',monospace;font-size:13px;background:var(--soft);padding:2px 7px;border-radius:5px;color:var(--a1);}
+
+  @media(max-width:640px){
+    .hero,.wrap{padding-left:18px;padding-right:18px;}
+    .access-grid,.safety-grid{grid-template-columns:1fr;}
+    .val-steps{flex-direction:column;gap:10px;}
+    .val-arr{transform:rotate(90deg);}
+    .sgrid{grid-template-columns:1fr;}
+    .snav-links{display:none;}
+    .mblock,.scene,.pblock{padding:20px 18px;}
+    .hero-screen{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ─── HERO ─── -->
+<header class="hero">
+  <div class="hi">
+    <div class="h-week">4주차 · AI 에이전트와 미래 &nbsp;/&nbsp; DAY 25</div>
+    <h1>컴퓨터 <span>제어</span><br>Computer Use</h1>
+    <p class="hero-sub">
+      클로드가 화면을 보고, 클릭하고, 타이핑합니다.<br>
+      인간처럼 컴퓨터를 다루는 AI — 그 원리를 깊이 이해합니다.
+    </p>
+    <div class="hero-meta">
+      <span class="h-badge">🎯 오늘은 "이해" 중심</span>
+      <span class="h-badge">⏱ 학습 시간: 80~100분</span>
+      <span class="h-badge">💡 원리 + 실전 프롬프트</span>
+      <span class="h-badge">🔒 보안·안전 포함</span>
+    </div>
+  </div>
+  <div class="hero-screen">
+    <div class="hs-bar"></div>
+    <div class="hs-line l"></div>
+    <div class="hs-line m"></div>
+    <div class="hs-line s"></div>
+    <div class="hs-btn"></div>
+    <div class="hs-cursor"></div>
+  </div>
+</header>
+
+<!-- ─── NAV ─── -->
+<nav class="snav">
+  <div class="snav-i">
+    <span class="snav-brand">🖥️ Computer Use 원리 이해</span>
+    <div class="snav-links">
+      <a href="#concept" class="act">개념·원리</a>
+      <a href="#lv1">L1 Claude Cowork</a>
+      <a href="#lv2">L2 Claude Code</a>
+      <a href="#lv3">L3 API 활용</a>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <!-- ─── OBJECTIVES ─── -->
+  <div class="obj">
+    <h2>⬡ 오늘의 학습 목표</h2>
+    <ul>
+      <li>Computer Use가 무엇이며, 기존 자동화 도구(RPA)와 근본적으로 다른 이유를 이해한다.</li>
+      <li>비전-액션 루프(Vision-Action Loop)의 작동 원리를 명확히 이해한다.</li>
+      <li>Computer Use를 안전하게 활용하기 위한 원칙을 습득한다.</li>
+      <li>세 가지 접근법(Cowork, Claude Code, API)의 차이와 각각의 활용 시나리오를 파악한다.</li>
+      <li>실전에서 효과적인 프롬프트를 작성하는 패턴을 익힌다.</li>
+    </ul>
+  </div>
+
+  <!-- ─── CONCEPT ─── -->
+  <section class="concept" id="concept">
+    <div class="sec-lbl">📖 핵심 개념 & 원리</div>
+    <h2>Computer Use란? — "AI가 인간처럼 컴퓨터를 다룬다"</h2>
+
+    <p>
+      2024년 10월, Anthropic이 발표한 <strong>Computer Use</strong>는 AI 역사에서 전환점이 되는 기능입니다.
+      클로드가 단순히 텍스트를 생성하는 것을 넘어,
+      <strong>화면을 보고 → 상황을 판단하고 → 마우스를 클릭하고 → 키보드를 타이핑하는</strong> 행동을 직접 수행합니다.
+    </p>
+    <p>
+      마치 처음 컴퓨터 앞에 앉은 사람처럼, 클로드는 화면을 스캔하고 어디를 눌러야 할지 파악합니다.
+      인간이 하는 방식과 동일하게 — 하지만 24시간, 실수 없이.
+    </p>
+
+    <!-- VISION-ACTION LOOP -->
+    <div class="val-loop">
+      <div class="val-title">🔄 비전-액션 루프 (Vision-Action Loop) — 작동 원리</div>
+      <div class="val-steps">
+        <div class="val-step hi">
+          <div class="val-num">1</div>
+          <div class="val-ico">📸</div>
+          <div class="val-name">스크린샷</div>
+          <div class="val-desc">현재 화면 상태를 이미지로 캡처</div>
+        </div>
+        <div class="val-arr">→</div>
+        <div class="val-step">
+          <div class="val-num">2</div>
+          <div class="val-ico">🧠</div>
+          <div class="val-name">분석·판단</div>
+          <div class="val-desc">무엇이 보이는지, 다음에 뭘 해야 할지 추론</div>
+        </div>
+        <div class="val-arr">→</div>
+        <div class="val-step hi">
+          <div class="val-num">3</div>
+          <div class="val-ico">🖱️</div>
+          <div class="val-name">액션 실행</div>
+          <div class="val-desc">클릭, 타이핑, 드래그, 스크롤 등 실행</div>
+        </div>
+        <div class="val-arr">→</div>
+        <div class="val-step">
+          <div class="val-num">4</div>
+          <div class="val-ico">✅</div>
+          <div class="val-name">결과 확인</div>
+          <div class="val-desc">액션 후 다시 스크린샷으로 결과 검증</div>
+        </div>
+        <div class="val-arr">↺</div>
+      </div>
+      <div class="val-note">이 루프가 작업 완료까지 자동으로 반복됩니다</div>
+    </div>
+
+    <div class="warn">
+      <strong>⚠️ 오늘 교재의 포커스: "이해와 설계"</strong>
+      25일차는 Computer Use의 <strong>원리와 적용 방법을 이해</strong>하는 데 집중합니다.
+      26일차에서 "실전 컴퓨터 제어 — 다단계 자동화 실습"을 다루므로,
+      오늘은 개념, 안전 원칙, 프롬프트 패턴을 탄탄히 다집니다.
+    </div>
+
+    <!-- COMPARE WITH RPA -->
+    <p style="margin:24px 0 12px;"><strong>기존 자동화(RPA)와 Computer Use의 근본적 차이</strong></p>
+    <table class="ctbl">
+      <thead><tr><th>비교 항목</th><th>기존 RPA (Selenium, AutoHotkey)</th><th>Computer Use ⭐</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>작동 방식</td>
+          <td>픽셀 좌표·엘리먼트 ID 기반 스크립트</td>
+          <td>화면을 "보고" 시각적으로 이해 후 실행</td>
+        </tr>
+        <tr>
+          <td>UI 변경 대응</td>
+          <td class="cx">✗ UI가 조금만 바뀌면 스크립트 깨짐</td>
+          <td class="ck">✓ 버튼이 이동해도 시각적으로 찾아서 클릭</td>
+        </tr>
+        <tr>
+          <td>새 앱 적응</td>
+          <td class="cx">✗ 앱마다 별도 스크립트 작성 필요</td>
+          <td class="ck">✓ 어떤 앱이든 화면만 보여주면 작동</td>
+        </tr>
+        <tr>
+          <td>설정 난이도</td>
+          <td>전문 프로그래밍 지식 필요</td>
+          <td class="ck">자연어로 지시 (코딩 불필요)</td>
+        </tr>
+        <tr>
+          <td>강점</td>
+          <td>정해진 작업에서 빠르고 안정적</td>
+          <td class="ck">✓ API 없는 레거시 시스템, GUI 전용 앱</td>
+        </tr>
+        <tr>
+          <td>처리 속도</td>
+          <td class="ck">매우 빠름</td>
+          <td>상대적으로 느림 (스크린샷 → API 왕복)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- ACCESS METHODS -->
+    <p style="margin:24px 0 12px;"><strong>Computer Use를 경험하는 3가지 방법</strong></p>
+    <div class="access-grid">
+      <div class="acc-card hi">
+        <span class="acc-badge ab-pro">비개발자 추천</span>
+        <div class="acc-ico">🤝</div>
+        <h4>Claude Cowork</h4>
+        <p>GUI 기반 데스크탑 에이전트. 클릭 한 번으로 파일 시스템과 앱 제어. 코딩 불필요. (Pro/Max)</p>
+      </div>
+      <div class="acc-card">
+        <span class="acc-badge ab-pro">개발자 추천</span>
+        <div class="acc-ico">💻</div>
+        <h4>Claude Code Desktop</h4>
+        <p>터미널 기반. /mcp 명령으로 computer-use 활성화. macOS 연구 프리뷰. (Pro/Max)</p>
+      </div>
+      <div class="acc-card">
+        <span class="acc-badge ab-dev">개발자 전용</span>
+        <div class="acc-ico">🔧</div>
+        <h4>Anthropic API</h4>
+        <p>완전한 제어권. Docker 샌드박스 환경에서 실행. 커스텀 워크플로우 구축. (API 키 필요)</p>
+      </div>
+    </div>
+
+    <!-- USE CASES -->
+    <p style="margin:24px 0 12px;"><strong>Computer Use가 빛나는 상황들</strong></p>
+    <div class="uc-grid">
+      <div class="uc-card">
+        <div class="uc-ico">🏛️</div>
+        <h4>레거시 시스템 자동화</h4>
+        <p>API 없는 구형 사내 시스템, ERP, 정부 민원 사이트 등</p>
+      </div>
+      <div class="uc-card">
+        <div class="uc-ico">📊</div>
+        <h4>데이터 수집·입력</h4>
+        <p>여러 GUI 앱 간 데이터 이동. 화면 캡처 후 표로 변환</p>
+      </div>
+      <div class="uc-card">
+        <div class="uc-ico">🧪</div>
+        <h4>UI 테스트 자동화</h4>
+        <p>Selenium 대비 UI 변경에 강인한 탐색적 테스트 실행</p>
+      </div>
+      <div class="uc-card">
+        <div class="uc-ico">📋</div>
+        <h4>프로세스 문서화</h4>
+        <p>소프트웨어 사용 절차를 스크린샷+설명으로 자동 문서화</p>
+      </div>
+      <div class="uc-card">
+        <div class="uc-ico">🔄</div>
+        <h4>반복 GUI 작업</h4>
+        <p>매일 반복되는 화면 조작 업무 자동화</p>
+      </div>
+      <div class="uc-card">
+        <div class="uc-ico">🐛</div>
+        <h4>시각적 디버깅</h4>
+        <p>Claude Code가 UI를 직접 열어 빌드한 앱의 버그 탐지</p>
+      </div>
+    </div>
+
+    <!-- SAFETY OVERVIEW -->
+    <p style="margin:24px 0 12px;"><strong>안전한 사용을 위한 핵심 원칙</strong></p>
+    <div class="safety-grid">
+      <div class="safety-box sb-do">
+        <div class="sb-ttl">✓ 해야 할 것</div>
+        <ul>
+          <li>샌드박스(가상 환경)에서 먼저 테스트</li>
+          <li>중요 파일 사전 백업</li>
+          <li>작업 범위를 명확히 제한해서 지시</li>
+          <li>실행 중 화면 모니터링</li>
+          <li>민감 정보(비번·카드번호) 입력 지양</li>
+          <li>필요한 권한만 최소로 부여</li>
+        </ul>
+      </div>
+      <div class="safety-box sb-dont">
+        <div class="sb-ttl">✗ 피해야 할 것</div>
+        <ul>
+          <li>무인 상태로 장시간 실행</li>
+          <li>시스템 파일·설정에 접근 허용</li>
+          <li>금융 거래·결제 자동화 (검토 없이)</li>
+          <li>여러 앱 동시 제어 요청</li>
+          <li>목적이 불명확한 광범위한 지시</li>
+          <li>프롬프트 인젝션 가능성 있는 환경</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="info">
+      <strong>💡 "제한된 자율성(Bounded Autonomy)" 원칙</strong>
+      Anthropic이 설계한 Computer Use의 핵심 안전 철학입니다.
+      클로드는 <strong>사용자가 승인한 범위 안에서만</strong> 자율적으로 작동합니다.
+      그 범위를 벗어나는 작업이 필요하면 반드시 추가 승인을 요청합니다.
+      명확한 경계를 설정할수록 더 안전하고 예측 가능한 자동화가 가능합니다.
+    </div>
+  </section>
+
+  <hr class="div">
+
+  <!-- ══════════════════════════════════ -->
+  <!-- LEVEL 1 -->
+  <!-- ══════════════════════════════════ -->
+  <section class="level lv1" id="lv1">
+    <div class="lvhd">
+      <div class="lnum">L1</div>
+      <div class="lttl">
+        <h2>Claude Cowork — 비개발자를 위한 컴퓨터 제어</h2>
+        <p>⏱ 예상 시간 25분 &nbsp;|&nbsp; 코딩 불필요 · GUI 기반</p>
+      </div>
+    </div>
+
+    <p style="margin-bottom:18px; font-size:15.5px; color:#334155; line-height:1.9;">
+      <strong>Claude Cowork</strong>는 2026년 1월 출시된 비개발자용 데스크탑 에이전트입니다.
+      터미널 없이 GUI 인터페이스에서 폴더를 지정하고 자연어로 지시하면,
+      클로드가 파일 시스템과 브라우저, 앱을 직접 조작합니다.
+      Computer Use 기술의 가장 접근하기 쉬운 형태입니다.
+    </p>
+
+    <!-- METHOD -->
+    <div class="mblock">
+      <div class="mttl"><span class="mbar"></span>적용 방법 | Claude Cowork에서 컴퓨터 제어 활용</div>
+      <ol class="slist">
+        <li class="si">
+          <div class="snum">1</div>
+          <div class="sbody">
+            <strong>Cowork 실행 및 작업 폴더 지정</strong>
+            <span>Claude Desktop 앱 → Cowork 탭 실행. "세션 시작" 클릭 후 작업할 로컬 폴더를 선택합니다. 이 폴더가 클로드가 접근할 수 있는 범위가 됩니다.</span>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">2</div>
+          <div class="sbody">
+            <strong>작업 목표를 결과 중심으로 설명</strong>
+            <span>"어떻게 해줘"가 아니라 "이런 결과가 필요해" 방식으로 지시합니다. 클로드가 화면을 보면서 스스로 방법을 찾습니다. "~/Downloads 폴더의 PDF 파일들을 날짜별로 정리해줘"처럼요.</span>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">3</div>
+          <div class="sbody">
+            <strong>진행 상황 모니터링 및 개입</strong>
+            <span>Cowork는 작업 로그를 실시간으로 보여줍니다. 예상과 다른 방향으로 진행되면 언제든 "잠깐, 이 파일은 건드리지 마"처럼 즉시 개입할 수 있습니다. 완전히 눈을 떼지 마세요.</span>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">4</div>
+          <div class="sbody">
+            <strong>Chrome 확장으로 웹 자동화 추가</strong>
+            <span>Claude Chrome Extension을 설치하면 브라우저 조작도 가능해집니다. "네이버에서 검색하고 결과를 정리해줘" 같은 웹 포함 워크플로우를 실행할 수 있습니다.</span>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <!-- SCENARIO 1 -->
+    <div class="scene">
+      <div class="slbl">🎬 실습 시나리오 01</div>
+      <div class="sttl">다운로드 폴더 영수증 사진을 자동으로 분류·정리하기</div>
+      <div class="sdesc">
+        스마트폰으로 찍어 저장된 영수증 사진들이 Downloads 폴더에 뒤섞여 있습니다. Cowork에게 자동 분류를 맡겨봅니다. 이것이 Computer Use의 가장 기초적이고 실용적인 첫 경험입니다.
+      </div>
+      <ul class="ssteps">
+        <li>Claude Desktop → Cowork 탭 → 세션 시작 → Downloads 폴더 선택</li>
+        <li>아래 프롬프트 #1을 입력하고 실행 → 클로드가 파일을 분석하는 것을 지켜봄</li>
+        <li>진행 로그 확인 — "어떤 파일을 어디로 옮기려고 하는지" 확인</li>
+        <li>결과 검토 후 만족스러우면 "계속 진행해줘", 수정 필요하면 즉시 피드백</li>
+      </ul>
+    </div>
+
+    <!-- PROMPT #1 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #1</h3>
+        <span class="ptag tred">Cowork — 파일 정리</span>
+      </div>
+      <div class="plbl">Claude Cowork 입력창에 붙여넣기</div>
+      <div class="ptxt"><span class="ph">Downloads 폴더를 분석해서 파일을 자동 정리해줘.</span>
+
+<span class="pc">== 정리 규칙 ==</span>
+<span class="pg">사진/이미지 파일 (.jpg, .png, .heic):</span>
+→ 파일명에 날짜가 있으면: 연도-월 폴더로 (예: 2025-06/)
+→ 날짜 없으면: "사진_미분류/" 폴더로
+
+<span class="pg">문서 파일 (.pdf, .docx, .xlsx):</span>
+→ 파일명에 "영수증" 또는 숫자만 있으면: "영수증/" 폴더로
+→ 계약, 견적, 제안: "계약서류/" 폴더로
+→ 나머지: "문서_기타/" 폴더로
+
+<span class="pg">압축파일 (.zip, .rar):</span>
+→ "압축파일/" 폴더로
+
+<span class="pc">== 주의사항 ==</span>
+- 파일을 삭제하지 말고 이동만 해줘
+- 이동 전에 반드시 어떤 파일을 어디로 옮길지 목록으로 보여줘
+- 내가 "진행해줘"라고 하면 그때 실행해줘
+- 최근 3일 이내 파일은 건드리지 마 (혹시 사용 중일 수 있으니)</div>
+    </div>
+
+    <!-- PROMPT #2 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #2</h3>
+        <span class="ptag tred">Cowork — 문서 일괄 처리</span>
+      </div>
+      <div class="plbl">여러 문서를 한 번에 처리하기</div>
+      <div class="ptxt"><span class="ph">Documents/monthly-reports 폴더에 있는 
+월간 보고서 엑셀 파일들을 분석하고 요약해줘.</span>
+
+<span class="pc">== 처리 방법 ==</span>
+1. 폴더 내 모든 .xlsx 파일 목록 확인
+2. 각 파일을 열어서 주요 지표(매출, 비용, 이익) 읽기
+3. 아래 형식으로 통합 요약 파일 작성:
+
+<span class="pg">파일명: 2025년_월별_성과_요약.xlsx
+내용:
+| 월 | 매출 | 비용 | 순이익 | 전월대비 |
+|---|-----|-----|------|--------|</span>
+
+4. 요약 파일을 같은 폴더에 저장
+
+<span class="pc">엑셀 파일 형식이 제각각일 수 있어.
+읽기 어려운 파일은 건너뛰고 "[파일명] — 형식 불일치"로 표시해줘.
+처리 전 파일 목록 먼저 보여주고 확인 후 진행해.</span></div>
+    </div>
+
+    <!-- PROMPT #3 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #3</h3>
+        <span class="ptag tred">Cowork — 브라우저 자동화 (Chrome 확장 필요)</span>
+      </div>
+      <div class="plbl">Chrome Extension 연결 후 — 웹 + 파일 통합 작업</div>
+      <div class="ptxt"><span class="ph">아래 작업을 순서대로 수행해줘.</span>
+
+<span class="pg">1단계: 웹에서 정보 수집</span>
+네이버 뉴스에서 오늘 "AI 스타트업" 관련 기사 5개를 찾아줘.
+각 기사의 제목, URL, 요약 1줄을 수집해줘.
+
+<span class="pg">2단계: 파일에 저장</span>
+수집한 정보를 Desktop/뉴스클리핑/ 폴더에
+오늘 날짜로 마크다운 파일로 저장해줘.
+(파일명: YYYY-MM-DD_AI스타트업_뉴스.md)
+
+<span class="pg">파일 형식:</span>
+# AI 스타트업 뉴스 클리핑 — [날짜]
+
+## [기사 제목]
+- 출처: 네이버 뉴스
+- URL: [링크]
+- 요약: [1줄]
+
+---
+
+<span class="pc">폴더가 없으면 만들어줘.
+기사가 5개 미만이면 최대한 수집하고 "X개 수집 완료"로 보고해줘.</span></div>
+    </div>
+
+  </section>
+
+  <hr class="div">
+
+  <!-- ══════════════════════════════════ -->
+  <!-- LEVEL 2 -->
+  <!-- ══════════════════════════════════ -->
+  <section class="level lv2" id="lv2">
+    <div class="lvhd">
+      <div class="lnum">L2</div>
+      <div class="lttl">
+        <h2>Claude Code Computer Use — 개발자 데스크탑 자동화</h2>
+        <p>⏱ 예상 시간 30분 &nbsp;|&nbsp; Pro/Max · macOS 연구 프리뷰</p>
+      </div>
+    </div>
+
+    <p style="margin-bottom:18px; font-size:15.5px; color:#334155; line-height:1.9;">
+      2026년 3월 30일, Anthropic이 Claude Code에 Computer Use를 통합했습니다.
+      이제 Claude Code는 코드를 작성하는 것을 넘어,
+      <strong>실제로 앱을 열고, UI를 클릭하고, 빌드한 것을 직접 테스트</strong>합니다.
+      개발자의 완전한 자동화 루프가 완성됩니다.
+    </p>
+
+    <div class="warn">
+      <strong>⚠️ 현재 상태 (2026년 4월 기준)</strong>
+      Claude Code Computer Use는 <strong>macOS 연구 프리뷰</strong> 상태입니다.
+      Claude Code v2.1.85 이상이 필요하며, macOS 접근성(Accessibility)과 화면 녹화(Screen Recording) 권한을 허용해야 합니다.
+      Windows/Linux는 아직 지원되지 않습니다.
+    </div>
+
+    <!-- METHOD -->
+    <div class="mblock">
+      <div class="mttl"><span class="mbar"></span>적용 방법 | Claude Code에서 Computer Use 활성화</div>
+      <ol class="slist">
+        <li class="si">
+          <div class="snum">1</div>
+          <div class="sbody">
+            <strong>macOS 시스템 권한 부여</strong>
+            <span>시스템 설정 → 개인 정보 보호 및 보안 → <strong>접근성</strong>과 <strong>화면 녹화</strong>에서 Claude Code(터미널)를 허용합니다. 이 권한 없이는 화면 캡처와 UI 조작이 불가능합니다.</span>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">2</div>
+          <div class="sbody">
+            <strong>Claude Code 세션에서 /mcp 명령으로 활성화</strong>
+            <span>프로젝트 폴더에서 <code>claude</code> 실행 → <code>/mcp</code> 입력 → computer-use 서버 선택. 또는 settings.json에 MCP 서버로 등록하면 자동 활성화됩니다.</span>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">3</div>
+          <div class="sbody">
+            <strong>Claude Code Desktop의 미리보기 패널 활용</strong>
+            <span>Claude Code Desktop 앱에서는 내장 브라우저 미리보기 패널을 통해 빌드한 앱을 직접 테스트합니다. "Preview" 탭에서 클로드가 스스로 UI를 클릭하며 검증합니다.</span>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <!-- TERMINAL SETUP -->
+    <div class="term">
+      <div class="term-bar"><div class="td r"></div><div class="td y"></div><div class="td g"></div><div class="term-title">Terminal — Claude Code Computer Use 설정</div></div>
+      <div class="term-body">
+<span class="tc"># ── 1. 버전 확인 (v2.1.85+ 필요) ─────────────────</span>
+<span class="tg">$</span> claude --version
+<span class="tc"># Claude Code 2.1.xx 이상이어야 합니다</span>
+
+<span class="tc"># ── 2. macOS 권한 확인 ────────────────────────────</span>
+<span class="tc"># 시스템 설정 → 개인 정보 보호 → 접근성에서</span>
+<span class="tc"># "터미널" 또는 실행 중인 터미널 앱에 체크</span>
+<span class="tc"># 화면 녹화도 동일하게 허용</span>
+
+<span class="tc"># ── 3. Claude Code 실행 ──────────────────────────</span>
+<span class="tg">$</span> cd my-project
+<span class="tg">$</span> claude
+
+<span class="tc"># ── 4. MCP로 computer-use 활성화 ─────────────────</span>
+<span class="tw">> /mcp</span>
+<span class="tc"># 목록에서 computer-use 선택</span>
+
+<span class="tc"># ── 또는 settings.json에 영구 등록 ───────────────</span>
+<span class="tc"># ~/.claude/settings.json에 추가:</span>
+{
+  <span class="tb">"mcpServers"</span>: {
+    <span class="tb">"computer-use"</span>: {
+      <span class="tb">"command"</span>: <span class="tg">"claude"</span>,
+      <span class="tb">"args"</span>: [<span class="tg">"mcp"</span>, <span class="tg">"serve"</span>, <span class="tg">"computer-use"</span>]
+    }
+  }
+}
+      </div>
+    </div>
+
+    <!-- SCENARIO 2 -->
+    <div class="scene">
+      <div class="slbl">🎬 실습 시나리오 02</div>
+      <div class="sttl">Claude Code가 빌드 → 앱 열기 → 버그 찾기 → 수정까지 자동 완성</div>
+      <div class="sdesc">
+        전통적으로 개발자가 코드 작성 → 직접 실행 → UI 확인 → 버그 메모 → 코드 수정을 반복해야 했습니다.
+        Claude Code Computer Use로 이 전체 루프가 자동화됩니다.
+      </div>
+      <ul class="ssteps">
+        <li>프로젝트 폴더에서 claude 실행 → /mcp로 computer-use 활성화</li>
+        <li>프롬프트 #4 입력: "이 기능을 실제로 열어서 테스트해줘"</li>
+        <li>클로드가 dev 서버 시작 → 브라우저 열기 → UI 클릭 테스트를 자동 수행하는 것 관찰</li>
+        <li>발견된 버그를 자동으로 수정하는지 확인</li>
+      </ul>
+    </div>
+
+    <!-- PROMPT #4 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #4</h3>
+        <span class="ptag tora">Claude Code — 자동 UI 테스트</span>
+      </div>
+      <div class="plbl">Claude Code 세션 안에서 입력 (computer-use 활성화 후)</div>
+      <div class="ptxt"><span class="ph">이 웹앱의 로그인 기능을 직접 테스트해줘.</span>
+
+<span class="pc">== 테스트 시나리오 ==</span>
+
+<span class="pg">1. 개발 서버 시작</span>
+   npm run dev (또는 프로젝트 실행 명령)
+   서버가 준비되면 브라우저에서 열어줘
+
+<span class="pg">2. 정상 로그인 테스트</span>
+   - 이메일: test@example.com
+   - 비밀번호: Test123!
+   - 로그인 버튼 클릭
+   - 결과: 대시보드로 이동하는지 확인
+
+<span class="pg">3. 실패 케이스 테스트</span>
+   - 잘못된 비밀번호 입력 (Wrong123!)
+   - 에러 메시지가 제대로 표시되는지 확인
+   - 빈 이메일로 제출 → 유효성 검사 확인
+
+<span class="pg">4. 발견한 문제 처리</span>
+   각 테스트 결과를 스크린샷과 함께 기록해줘.
+   UI 버그 발견 시 즉시 수정하고 재테스트.
+
+<span class="pc">테스트 중 예상치 못한 화면이 나오면
+멈추고 나에게 물어봐.
+프로덕션 DB나 실제 이메일은 건드리지 마.</span></div>
+    </div>
+
+    <!-- PROMPT #5 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #5</h3>
+        <span class="ptag tora">Claude Code — 크로스 앱 작업</span>
+      </div>
+      <div class="plbl">여러 앱을 넘나드는 작업 자동화</div>
+      <div class="ptxt"><span class="ph">다음 작업을 순서대로 수행해줘.</span>
+
+<span class="pc">== 작업 목표 ==</span>
+Figma 디자인을 React 컴포넌트로 변환하고 
+실제 작동하는지 브라우저에서 검증하기
+
+<span class="pg">1단계: Figma에서 디자인 확인</span>
+   Figma 앱을 열어줘 (이미 로그인되어 있어)
+   파일명: "MindFlow-UI-v2"의 "Button" 컴포넌트 찾기
+   스타일 값(색상, 크기, 폰트)을 스크린샷으로 기록
+
+<span class="pg">2단계: React 컴포넌트 작성</span>
+   기록된 디자인 값을 바탕으로
+   src/components/Button.tsx 파일 생성
+   Tailwind CSS 사용
+
+<span class="pg">3단계: 브라우저 확인</span>
+   Storybook 실행 (npm run storybook)
+   브라우저에서 Button 컴포넌트가
+   Figma 디자인과 일치하는지 시각적으로 비교
+
+<span class="pc">Figma 파일이 없으면 "Figma 접근 불가"로 보고하고
+임시로 UI 가이드라인 문서에서 대신 찾아줘.</span></div>
+    </div>
+
+  </section>
+
+  <hr class="div">
+
+  <!-- ══════════════════════════════════ -->
+  <!-- LEVEL 3 -->
+  <!-- ══════════════════════════════════ -->
+  <section class="level lv3" id="lv3">
+    <div class="lvhd">
+      <div class="lnum">L3</div>
+      <div class="lttl">
+        <h2>API 기반 Computer Use — 커스텀 자동화 시스템 구축</h2>
+        <p>⏱ 예상 시간 30분 &nbsp;|&nbsp; 개발자 전용 · 완전한 제어</p>
+      </div>
+    </div>
+
+    <p style="margin-bottom:18px; font-size:15.5px; color:#334155; line-height:1.9;">
+      API를 통한 Computer Use는 가장 강력하고 유연합니다.
+      Docker 컨테이너 안에 가상 데스크탑을 구성하고,
+      Python 코드로 클로드에게 GUI 작업을 지시합니다.
+      기업 내부 시스템 자동화, 테스트 파이프라인 구축에 활용됩니다.
+    </p>
+
+    <div class="tip">
+      <strong>💡 왜 Docker 컨테이너에서 실행하는가?</strong>
+      API 기반 Computer Use는 실제 데스크탑이 아니라 격리된 가상 환경(Docker)에서 실행하는 것이 안전합니다.
+      Anthropic의 공식 레퍼런스 구현(claude-quickstarts)을 사용하면
+      격리된 환경, 웹 UI, 도구 구현이 모두 준비된 상태로 시작할 수 있습니다.
+    </div>
+
+    <!-- METHOD -->
+    <div class="mblock">
+      <div class="mttl"><span class="mbar"></span>적용 방법 | API Computer Use 아키텍처 이해</div>
+      <ol class="slist">
+        <li class="si">
+          <div class="snum">1</div>
+          <div class="sbody">
+            <strong>3개 도구가 협력하는 구조</strong>
+            <span><strong>computer 도구</strong>: 화면 캡처 + 마우스/키보드 제어. <strong>bash 도구</strong>: 터미널 명령 실행. <strong>text_editor 도구</strong>: 파일 직접 편집. 이 셋을 함께 사용하면 GUI 조작 + 파일 처리 + 명령 실행을 통합한 완전한 자동화가 가능합니다.</span>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">2</div>
+          <div class="sbody">
+            <strong>에이전트 루프 패턴 이해</strong>
+            <span>단순 API 호출이 아닙니다. 클로드의 응답에 "tool_use" 블록이 오면 해당 액션을 실행하고, 결과를 다시 API로 전송하는 루프를 완료까지 반복합니다. 이 루프를 직접 구현하거나 공식 레퍼런스 코드를 활용합니다.</span>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">3</div>
+          <div class="sbody">
+            <strong>프롬프트에서 안전 제약 명시</strong>
+            <span>API 호출 시 시스템 프롬프트에 "이 환경은 테스트 환경입니다. 외부 서비스에 실제 요청을 보내지 마세요"처럼 명확한 제약을 포함해야 합니다. 특히 웹 접근이 가능한 환경에서는 더욱 중요합니다.</span>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <!-- SCENARIO 3 -->
+    <div class="scene">
+      <div class="slbl">🎬 실습 시나리오 03</div>
+      <div class="sttl">API로 레거시 사내 시스템에서 데이터 자동 추출하기</div>
+      <div class="sdesc">
+        API가 없는 구형 사내 시스템 화면을 Computer Use로 직접 조작합니다. 화면을 보고, 데이터를 찾고, 추출하고, 정리된 보고서로 만드는 전체 파이프라인을 설계합니다.
+      </div>
+      <ul class="ssteps">
+        <li>Anthropic API 키 준비 + Docker 환경 설정 (공식 레퍼런스 활용)</li>
+        <li>프롬프트 #6으로 시스템 프롬프트 설계 (안전 제약 포함)</li>
+        <li>프롬프트 #7로 실제 데이터 추출 작업 지시</li>
+        <li>결과물 검증 및 에러 처리 패턴 확인</li>
+      </ul>
+    </div>
+
+    <!-- PROMPT #6 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #6</h3>
+        <span class="ptag tind">API — 시스템 프롬프트 템플릿</span>
+      </div>
+      <div class="plbl">API 호출 시 system 파라미터에 포함</div>
+      <div class="ptxt"><span class="pc"># API 호출 예시 구조 (Python)</span>
+
+<span class="pb">import</span> anthropic
+client = anthropic.Anthropic()
+
+<span class="pc"># 시스템 프롬프트 — 반드시 안전 제약 포함</span>
+SYSTEM_PROMPT = <span class="pg">"""
+당신은 GUI 자동화 전문 에이전트입니다.
+
+== 역할 ==
+화면을 보고 지시된 작업을 수행합니다.
+스크린샷으로 현재 상태를 파악하고,
+가장 효율적인 방법으로 작업을 완수합니다.
+
+== 안전 규칙 (반드시 준수) ==
+1. 이 환경은 격리된 테스트 환경입니다
+2. 실제 계정 정보나 금융 거래를 처리하지 마세요
+3. 파일 삭제 전 반드시 확인 요청하세요
+4. 예상치 못한 화면이 나타나면 멈추고 보고하세요
+5. 비밀번호나 민감 정보를 추론하거나 입력하지 마세요
+
+== 작업 스타일 ==
+- 단계별로 진행하고 각 단계 완료 후 확인
+- 불명확한 지시는 진행 전 물어보세요
+- 실패 시 대안을 찾지 말고 문제를 보고하세요
+"""</span>
+
+<span class="pc"># Computer Use 도구 정의</span>
+tools = [
+    {<span class="pb">"type"</span>: <span class="pg">"computer_20251124"</span>,   <span class="pc"># 최신 버전 사용</span>
+     <span class="pb">"name"</span>: <span class="pg">"computer"</span>,
+     <span class="pb">"display_width_px"</span>: <span class="po">1024</span>,
+     <span class="pb">"display_height_px"</span>: <span class="po">768</span>},
+    {<span class="pb">"type"</span>: <span class="pg">"bash_20250124"</span>, <span class="pb">"name"</span>: <span class="pg">"bash"</span>},
+    {<span class="pb">"type"</span>: <span class="pg">"text_editor_20250728"</span>, <span class="pb">"name"</span>: <span class="pg">"str_replace_based_edit_tool"</span>}
+]
+
+<span class="pc"># 이후 에이전트 루프에서 tool_use 응답을 처리하며 반복</span></div>
+    </div>
+
+    <!-- PROMPT #7 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #7</h3>
+        <span class="ptag tind">API — 데이터 추출 작업 지시</span>
+      </div>
+      <div class="plbl">실제 작업 지시 — messages의 user content</div>
+      <div class="ptxt"><span class="ph">화면에 보이는 사내 시스템에서 
+이번 달 주문 데이터를 추출해줘.</span>
+
+<span class="pc">== 현재 상황 ==</span>
+화면에 ERP 시스템 로그인 페이지가 열려 있어.
+(이미 로그인된 상태라고 가정)
+
+<span class="pg">== 수행할 작업 ==</span>
+1. 메뉴에서 "주문관리" → "주문 조회" 찾기
+2. 기간을 이번 달 1일 ~ 오늘로 설정
+3. "조회" 버튼 클릭
+4. 결과 테이블에서 아래 항목 추출:
+   - 주문번호, 고객명, 주문금액, 상태
+5. 데이터를 /output/orders_YYYYMM.csv로 저장
+
+<span class="pc">== 주의사항 ==</span>
+- 페이지네이션이 있으면 모든 페이지 수집
+- "다운로드" 버튼이 있으면 그 버튼 먼저 활용
+- 버튼이나 메뉴를 찾지 못하면 스크린샷과 함께 보고
+- 개인정보(주민번호, 연락처)는 수집하지 마세요
+
+<span class="py"># 예상 결과물:
+# orders_202506.csv (주문번호, 고객명, 금액, 상태)
+# 추출 실패 시: error_log.txt에 원인 기록</span></div>
+    </div>
+
+    <!-- PROMPT #8 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #8</h3>
+        <span class="ptag tgrn">효과적인 Computer Use 프롬프트 패턴</span>
+      </div>
+      <div class="plbl">모든 접근법에서 공통으로 사용하는 프롬프트 작성 원칙</div>
+      <div class="ptxt"><span class="pc">━━━ 패턴 1: 결과 중심 지시 ━━━</span>
+<span class="ph">❌ 나쁜 예: "크롬을 열고, 주소창에 google.com을 입력하고, 검색창을 클릭하고..."</span>
+<span class="pg">✅ 좋은 예: "구글에서 '클로드 AI 최신 기능'을 검색하고 상위 3개 결과의 요약을 알려줘."</span>
+<span class="pc">→ 방법보다 목표를 말하면 클로드가 최적 경로를 찾는다</span>
+
+<span class="pc">━━━ 패턴 2: 실패 처리 명시 ━━━</span>
+<span class="ph">❌ 실패 처리 없음: "로그인 후 데이터 추출해줘"</span>
+<span class="pg">✅ 실패 처리 포함: "로그인 시도 → 실패 시 '로그인 불가' 보고. 성공 시 데이터 추출."</span>
+<span class="pc">→ 예외 상황을 명시하면 중간에 멈추지 않는다</span>
+
+<span class="pc">━━━ 패턴 3: 체크포인트 설정 ━━━</span>
+<span class="pg">✅ "각 단계가 완료될 때마다 스크린샷과 함께 진행 상황을 알려줘.
+    내가 '계속'이라고 할 때만 다음 단계로 넘어가."</span>
+<span class="pc">→ 중요한 작업은 단계별 승인으로 안전하게</span>
+
+<span class="pc">━━━ 패턴 4: 범위 제한 ━━━</span>
+<span class="pg">✅ "Documents/project 폴더만 접근 가능. 다른 폴더는 건드리지 마."
+    "이 페이지에서만 작업. 다른 탭이나 사이트로 이동하지 마."</span>
+<span class="pc">→ 명확한 경계가 안전한 자동화의 핵심</span>
+
+<span class="pc">━━━ 패턴 5: 확인 요청 ━━━</span>
+<span class="pg">✅ "삭제, 전송, 결제 등 되돌릴 수 없는 작업 전에는 반드시 확인 요청."</span>
+<span class="pc">→ 되돌릴 수 없는 액션은 항상 인간 검토</span></div>
+    </div>
+
+    <!-- LIMITATIONS -->
+    <div class="mblock" style="margin-top:10px;">
+      <div class="mttl"><span class="mbar"></span>현실적인 한계 — 알고 쓰면 더 잘 쓴다</div>
+      <ol class="slist">
+        <li class="si">
+          <div class="snum">1</div>
+          <div class="sbody">
+            <strong>속도 — API 왕복 시간</strong>
+            <span>각 화면 캡처마다 API 호출이 발생합니다. 사람이 직접 하는 것보다 3~10배 느릴 수 있습니다. 빠른 반복 작업보다 <strong>복잡하지만 속도가 중요하지 않은</strong> 작업에 적합합니다.</span>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">2</div>
+          <div class="sbody">
+            <strong>좌표 정확도 — 작은 UI 요소</strong>
+            <span>매우 작거나 겹쳐있는 버튼을 정확히 클릭하기 어려울 수 있습니다. 해결: 화면 해상도를 높이거나, 줌 기능 사용, 또는 요소를 텍스트로 명확히 지시합니다.</span>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">3</div>
+          <div class="sbody">
+            <strong>동적 UI — 로딩·애니메이션</strong>
+            <span>로딩 중인 화면이나 애니메이션 중인 UI를 오인할 수 있습니다. 중요한 단계에는 "X초 기다린 후 진행" 또는 "로딩 완료를 확인 후 진행"을 명시합니다.</span>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">4</div>
+          <div class="sbody">
+            <strong>비용 — 이미지 처리 토큰</strong>
+            <span>스크린샷마다 이미지 처리 비용이 발생합니다. 긴 자동화 세션은 상당한 토큰을 소비합니다. 개발/테스트 환경에서 먼저 검증하고 프로덕션에 적용하세요.</span>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+  </section>
+
+  <!-- ─── SUMMARY ─── -->
+  <div class="summary">
+    <h2>📌 25일차 핵심 정리</h2>
+    <div class="sgrid">
+      <div class="sitem">
+        <h4>Computer Use란?</h4>
+        <p>클로드가 스크린샷으로 화면을 보고, 마우스/키보드로 직접 조작하는 기능. 2024년 10월 출시. RPA보다 유연하고 자연어로 지시 가능.</p>
+      </div>
+      <div class="sitem">
+        <h4>비전-액션 루프</h4>
+        <p>스크린샷 → 분석·판단 → 액션 실행 → 결과 확인의 4단계가 완료까지 반복. 이 루프가 Computer Use의 핵심 원리.</p>
+      </div>
+      <div class="sitem">
+        <h4>3가지 접근법</h4>
+        <p>Cowork(비개발자·GUI), Claude Code Desktop(개발자·터미널), API+Docker(완전 제어·기업용). 목적에 맞게 선택.</p>
+      </div>
+      <div class="sitem">
+        <h4>안전 원칙</h4>
+        <p>샌드박스 먼저, 범위 명시, 되돌릴 수 없는 액션은 승인 요청, 중요 파일 백업. "제한된 자율성" 원칙 준수.</p>
+      </div>
+      <div class="sitem">
+        <h4>효과적인 프롬프트</h4>
+        <p>방법보다 목표 중심, 실패 처리 명시, 단계별 체크포인트, 접근 범위 제한, 되돌릴 수 없는 작업 승인 요청.</p>
+      </div>
+      <div class="sitem">
+        <h4>내일 예고</h4>
+        <p>26일차: 실전 컴퓨터 제어 — 브라우저 검색부터 앱 조작까지 다단계 자동화를 직접 실행합니다.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── CHECKLIST ─── -->
+  <div class="ckbox">
+    <h3>✅ 오늘 실습 체크리스트</h3>
+    <ol class="slist">
+      <li class="si">
+        <div class="snum" style="background:#dcfce7;color:#166534;">1</div>
+        <div class="sbody">
+          <strong>비전-액션 루프 이해 완료</strong>
+          <p>클로드가 화면을 보고 판단하고 실행하는 4단계 루프를 설명할 수 있나요? 기존 RPA와의 차이도 말할 수 있나요?</p>
+        </div>
+      </li>
+      <li class="si">
+        <div class="snum" style="background:#dcfce7;color:#166534;">2</div>
+        <div class="sbody">
+          <strong>Claude Cowork 파일 정리 실습</strong>
+          <p>프롬프트 #1을 Cowork에서 실행해서 파일 분류를 시도해봤나요? 실행 전 "목록 보여줘" 단계가 작동하는지 확인했나요?</p>
+        </div>
+      </li>
+      <li class="si">
+        <div class="snum" style="background:#dcfce7;color:#166534;">3</div>
+        <div class="sbody">
+          <strong>안전 원칙 5가지 암기</strong>
+          <p>프롬프트 작성 5가지 패턴(결과 중심, 실패 처리, 체크포인트, 범위 제한, 확인 요청)을 이해했나요?</p>
+        </div>
+      </li>
+      <li class="si">
+        <div class="snum" style="background:#dcfce7;color:#166534;">4</div>
+        <div class="sbody">
+          <strong>내 업무에서 Computer Use 활용 시나리오 설계</strong>
+          <p>내 일상 업무 중 Computer Use로 자동화할 수 있는 GUI 작업을 2~3개 찾아 메모해봤나요?</p>
+        </div>
+      </li>
+    </ol>
+  </div>
+
+</div><!-- /wrap -->
+
+<footer>
+  <p>클로드(Claude) 활용 및 교육 통합 가이드 · 4주차 25일차 · 컴퓨터 제어(Computer Use) 원리 이해</p>
+  <p style="margin-top:8px;">
+    <a href="https://platform.claude.com/docs/en/agents-and-tools/tool-use/computer-use-tool">Computer Use 공식 문서</a> &nbsp;·&nbsp;
+    <a href="https://github.com/anthropics/anthropic-quickstarts">공식 레퍼런스 구현</a> &nbsp;·&nbsp;
+    <a href="https://code.claude.com/docs/en/desktop">Claude Code Desktop 문서</a>
+  </p>
+</footer>
+
+</body>
+</html>

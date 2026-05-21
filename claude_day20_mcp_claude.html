@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>20일차: MCP(Model Context Protocol) | Claude 활용 가이드</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;500;600&family=Bebas+Neue&display=swap');
+
+  :root {
+    --ink:      #0b0f19;
+    --paper:    #f5f6fa;
+    --accent:   #0f62fe;
+    --a-light:  #dbeafe;
+    --accent2:  #7c3aed;
+    --accent3:  #059669;
+    --gold:     #d97706;
+    --red:      #dc2626;
+    --soft:     #eef1f8;
+    --mid:      #64748b;
+    --border:   #e2e8f0;
+    --code-bg:  #0d1117;
+    --code-txt: #e6edf3;
+    --win-bg:   #1c1c1e;
+    --mac-bg:   #1e1e1e;
+    --tab-act:  #0f62fe;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Noto Sans KR', sans-serif; background: var(--paper); color: var(--ink); line-height: 1.8; font-size: 16px; }
+
+  /* ─── HERO ─── */
+  .hero {
+    background: var(--ink);
+    padding: 62px 40px 54px;
+    position: relative; overflow: hidden;
+    color: white;
+  }
+  .hero::before {
+    content: 'MCP';
+    position: absolute; right: -10px; top: 50%;
+    transform: translateY(-50%);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 220px; color: rgba(15,98,254,0.06);
+    pointer-events: none; letter-spacing: -6px;
+    line-height: 1;
+  }
+  .hero::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 60% 50%, rgba(15,98,254,0.10) 0%, transparent 65%);
+    pointer-events: none;
+  }
+  .hero-inner { max-width: 900px; margin: 0 auto; position: relative; z-index: 1; }
+  .hero-week {
+    font-size: 11px; font-weight: 700; letter-spacing: 4px;
+    text-transform: uppercase; color: #60a5fa;
+    margin-bottom: 14px; display: flex; align-items: center; gap: 10px;
+  }
+  .hero-week::before { content:''; display:inline-block; width:28px; height:2px; background:#60a5fa; }
+  .hero h1 { font-family:'Bebas Neue',sans-serif; font-size:clamp(38px,6vw,70px); letter-spacing:2px; line-height:1.05; margin-bottom:20px; }
+  .hero h1 span { color:#60a5fa; }
+  .hero-sub { font-size:17px; color:rgba(255,255,255,0.65); max-width:640px; font-weight:300; line-height:1.75; }
+  .hero-meta { margin-top:30px; display:flex; gap:12px; flex-wrap:wrap; }
+  .hero-badge { background:rgba(15,98,254,0.18); border:1px solid rgba(15,98,254,0.35); padding:7px 16px; border-radius:100px; font-size:12px; font-weight:600; color:#93c5fd; }
+
+  /* ─── STICKY NAV ─── */
+  .snav { background:white; border-bottom:1px solid var(--border); padding:13px 0; position:sticky; top:0; z-index:200; box-shadow:0 1px 8px rgba(0,0,0,0.05); }
+  .snav-inner { max-width:900px; margin:0 auto; padding:0 30px; display:flex; align-items:center; justify-content:space-between; gap:8px; }
+  .snav-brand { font-size:13px; font-weight:700; color:var(--accent); white-space:nowrap; }
+  .snav-links { display:flex; gap:6px; }
+  .snav-links a { padding:5px 13px; border-radius:100px; font-size:12px; font-weight:600; border:1px solid var(--border); background:white; color:var(--mid); text-decoration:none; transition:all .18s; }
+  .snav-links a:hover,.snav-links a.act { background:var(--accent); color:white; border-color:var(--accent); }
+
+  /* ─── LAYOUT ─── */
+  .wrap { max-width:900px; margin:0 auto; padding:0 30px; }
+
+  /* ─── OBJECTIVE ─── */
+  .obj-box { background:var(--a-light); border-left:5px solid var(--accent); border-radius:0 14px 14px 0; padding:28px 32px; margin:40px 0; }
+  .obj-box h2 { font-size:11px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:var(--accent); margin-bottom:14px; }
+  .obj-box ul { list-style:none; display:flex; flex-direction:column; gap:9px; }
+  .obj-box li { display:flex; align-items:flex-start; gap:10px; font-size:15px; }
+  .obj-box li::before { content:'▸'; color:var(--accent); font-weight:700; flex-shrink:0; margin-top:2px; }
+
+  /* ─── CONCEPT ─── */
+  .concept { padding:48px 0 18px; }
+  .sec-label { font-size:11px; font-weight:700; letter-spacing:4px; text-transform:uppercase; color:var(--mid); margin-bottom:8px; }
+  .concept h2 { font-size:27px; font-weight:900; margin-bottom:20px; line-height:1.3; }
+  .concept p { font-size:15.5px; color:#334155; margin-bottom:16px; line-height:1.9; }
+
+  /* ─── ANALOGY CARD ─── */
+  .analogy {
+    display:grid; grid-template-columns:1fr 1fr 1fr; gap:0;
+    border-radius:16px; overflow:hidden;
+    border:1px solid var(--border); margin:28px 0;
+    box-shadow:0 2px 16px rgba(0,0,0,0.06);
+  }
+  .an-col { padding:24px 22px; }
+  .an-col:not(:last-child) { border-right:1px solid var(--border); }
+  .an-col.dark { background:var(--ink); color:white; }
+  .an-col.blue { background:var(--accent); color:white; }
+  .an-icon { font-size:32px; margin-bottom:10px; }
+  .an-title { font-size:13px; font-weight:700; letter-spacing:1px; text-transform:uppercase; margin-bottom:8px; opacity:.7; }
+  .an-col.dark .an-title, .an-col.blue .an-title { opacity:.65; }
+  .an-desc { font-size:14px; line-height:1.7; }
+  .an-col.dark .an-desc { color:rgba(255,255,255,.75); }
+  .an-col.blue .an-desc { color:rgba(255,255,255,.85); }
+
+  /* ─── ARCH DIAGRAM ─── */
+  .arch { background:var(--code-bg); border-radius:18px; padding:32px; margin:28px 0; }
+  .arch-title { font-size:11px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:#60a5fa; margin-bottom:24px; }
+  .arch-row { display:flex; align-items:center; gap:10px; margin-bottom:12px; flex-wrap:wrap; }
+  .arch-box {
+    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1);
+    border-radius:10px; padding:12px 18px;
+    font-size:13px; font-weight:600; color:white;
+    display:flex; align-items:center; gap:8px;
+  }
+  .arch-box.hi { background:rgba(15,98,254,.2); border-color:rgba(15,98,254,.4); }
+  .arch-box .badge { font-size:10px; background:rgba(255,255,255,.12); padding:2px 7px; border-radius:4px; color:rgba(255,255,255,.6); }
+  .arch-arr { color:#4b5563; font-size:18px; padding:0 2px; }
+  .arch-note { font-size:12px; color:rgba(255,255,255,.35); margin-top:10px; font-family:'JetBrains Mono',monospace; }
+
+  /* ─── OS TABS ─── */
+  .os-tabs { margin:22px 0; }
+  .tab-btns { display:flex; gap:0; border-bottom:2px solid var(--border); margin-bottom:0; }
+  .tab-btn {
+    padding:10px 20px; font-size:13px; font-weight:600;
+    border:none; background:none; cursor:pointer;
+    color:var(--mid); border-bottom:2px solid transparent;
+    margin-bottom:-2px; font-family:'Noto Sans KR',sans-serif;
+    transition:all .15s;
+  }
+  .tab-btn.act { color:var(--accent); border-bottom-color:var(--accent); }
+  .tab-content { display:none; }
+  .tab-content.act { display:block; }
+  .tab-content .code-block { border-radius:0 0 12px 12px; }
+
+  /* ─── CODE BLOCK ─── */
+  .code-block {
+    background:var(--code-bg); border-radius:12px;
+    padding:22px 24px; font-family:'JetBrains Mono',monospace;
+    font-size:13px; line-height:1.8; color:var(--code-txt);
+    overflow-x:auto; margin:16px 0;
+    border:1px solid rgba(255,255,255,.06);
+  }
+  .code-block .c-comment { color:#6b8aad; }
+  .code-block .c-key { color:#79c0ff; }
+  .code-block .c-str { color:#a5d6ff; }
+  .code-block .c-val { color:#7ee787; }
+  .code-block .c-path { color:#ffa657; }
+  .code-block .c-cmd { color:#ff7b72; }
+  .code-block .c-hl { color:#f8f8f2; font-weight:600; }
+
+  /* ─── LEVEL SECTIONS ─── */
+  .level { padding:48px 0; }
+  .level-hd { display:flex; align-items:center; gap:18px; margin-bottom:32px; padding-bottom:20px; border-bottom:2px solid var(--border); }
+  .lnum { width:64px; height:64px; border-radius:16px; display:flex; align-items:center; justify-content:center; font-family:'Bebas Neue',sans-serif; font-size:26px; flex-shrink:0; }
+  .lv1 .lnum { background:var(--a-light); color:var(--accent); border:2px solid var(--accent); }
+  .lv2 .lnum { background:#ede9fe; color:var(--accent2); border:2px solid var(--accent2); }
+  .lv3 .lnum { background:#d1fae5; color:var(--accent3); border:2px solid var(--accent3); }
+  .lttl h2 { font-size:22px; font-weight:900; margin-bottom:4px; }
+  .lttl p { font-size:13px; color:var(--mid); font-weight:500; }
+
+  /* ─── METHOD BLOCK ─── */
+  .mblock { background:white; border:1px solid var(--border); border-radius:16px; padding:28px 32px; margin-bottom:22px; box-shadow:0 1px 8px rgba(0,0,0,.04); }
+  .mtitle { font-size:12px; font-weight:700; letter-spacing:2px; text-transform:uppercase; margin-bottom:20px; padding-bottom:14px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px; }
+  .lv1 .mtitle { color:var(--accent); }
+  .lv2 .mtitle { color:var(--accent2); }
+  .lv3 .mtitle { color:var(--accent3); }
+  .mbar { width:4px; height:16px; border-radius:2px; display:inline-block; flex-shrink:0; }
+  .lv1 .mbar { background:var(--accent); }
+  .lv2 .mbar { background:var(--accent2); }
+  .lv3 .mbar { background:var(--accent3); }
+
+  .slist { list-style:none; display:flex; flex-direction:column; gap:18px; }
+  .si { display:flex; align-items:flex-start; gap:14px; }
+  .snum { width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; flex-shrink:0; margin-top:1px; }
+  .lv1 .snum { background:var(--a-light); color:var(--accent); }
+  .lv2 .snum { background:#ede9fe; color:var(--accent2); }
+  .lv3 .snum { background:#d1fae5; color:var(--accent3); }
+  .sbody strong { display:block; font-weight:700; font-size:15px; margin-bottom:4px; }
+  .sbody p, .sbody span { font-size:14px; color:#475569; line-height:1.8; }
+
+  /* ─── SCENARIO ─── */
+  .scene { background:linear-gradient(135deg,#0b0f19 0%,#0f1b35 100%); border-radius:16px; padding:28px 32px; margin-bottom:22px; color:white; position:relative; overflow:hidden; }
+  .scene::after { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at 85% 25%, rgba(15,98,254,.15) 0%, transparent 55%); pointer-events:none; }
+  .scene-lbl { font-size:11px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:#60a5fa; margin-bottom:10px; position:relative; z-index:1; }
+  .scene-ttl { font-size:19px; font-weight:700; margin-bottom:10px; position:relative; z-index:1; }
+  .scene-desc { font-size:14px; color:rgba(255,255,255,.6); line-height:1.8; margin-bottom:18px; position:relative; z-index:1; }
+  .scene-steps { list-style:none; display:flex; flex-direction:column; gap:8px; position:relative; z-index:1; }
+  .scene-steps li { display:flex; align-items:flex-start; gap:10px; font-size:14px; color:rgba(255,255,255,.78); }
+  .scene-steps li::before { content:'→'; color:#60a5fa; flex-shrink:0; font-weight:700; margin-top:2px; }
+
+  /* ─── PROMPT BLOCK ─── */
+  .pblock { background:#0b0f19; border-radius:16px; padding:28px 32px; margin-bottom:22px; border:1px solid rgba(15,98,254,.2); }
+  .phd { display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; padding-bottom:14px; border-bottom:1px solid rgba(255,255,255,.06); }
+  .phd h3 { font-size:12px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#60a5fa; display:flex; align-items:center; gap:7px; }
+  .ptag { font-size:11px; font-weight:600; letter-spacing:.5px; padding:4px 11px; border-radius:100px; text-transform:uppercase; }
+  .tblue { background:rgba(15,98,254,.2); color:#93c5fd; }
+  .tpurple { background:rgba(124,58,237,.2); color:#c4b5fd; }
+  .tgreen { background:rgba(5,150,105,.18); color:#6ee7b7; }
+  .torange { background:rgba(217,119,6,.18); color:#fcd34d; }
+
+  .plbl { font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,.3); margin:14px 0 8px; }
+  .plbl:first-of-type { margin-top:0; }
+  .ptxt { font-family:'JetBrains Mono',monospace; font-size:13px; line-height:1.8; color:#c9d6e0; background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.06); border-radius:10px; padding:18px 20px; white-space:pre-wrap; word-break:break-word; }
+  .ph { color:#79c0ff; }
+  .pg { color:#7ee787; }
+  .py { color:#ffa657; }
+  .pc { color:#6b8aad; }
+  .pp { color:#c084fc; }
+
+  /* ─── TIP / WARN ─── */
+  .tip { background:var(--a-light); border-left:4px solid var(--accent); border-radius:0 12px 12px 0; padding:16px 20px; margin:18px 0; font-size:14px; line-height:1.75; }
+  .tip strong { color:var(--accent); display:block; margin-bottom:4px; font-size:13px; letter-spacing:.3px; }
+  .warn { background:#fff7ed; border-left:4px solid var(--gold); border-radius:0 12px 12px 0; padding:16px 20px; margin:18px 0; font-size:14px; line-height:1.75; }
+  .warn strong { color:#92400e; display:block; margin-bottom:4px; }
+  .danger { background:#fef2f2; border-left:4px solid var(--red); border-radius:0 12px 12px 0; padding:16px 20px; margin:18px 0; font-size:14px; line-height:1.75; }
+  .danger strong { color:#991b1b; display:block; margin-bottom:4px; }
+  .ok { background:#ecfdf5; border-left:4px solid var(--accent3); border-radius:0 12px 12px 0; padding:16px 20px; margin:18px 0; font-size:14px; line-height:1.75; }
+  .ok strong { color:#065f46; display:block; margin-bottom:4px; }
+
+  /* ─── MCP SERVER GRID ─── */
+  .mcp-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:12px; margin:20px 0; }
+  .mcp-card { background:white; border:1px solid var(--border); border-radius:13px; padding:18px 20px; transition:transform .2s, box-shadow .2s; }
+  .mcp-card:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,.08); }
+  .mcp-card .mc-icon { font-size:26px; margin-bottom:8px; }
+  .mcp-card h4 { font-size:14px; font-weight:700; margin-bottom:5px; }
+  .mcp-card .mc-tag { font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--accent); background:var(--a-light); padding:2px 8px; border-radius:4px; display:inline-block; margin-bottom:7px; }
+  .mcp-card p { font-size:12.5px; color:var(--mid); line-height:1.6; }
+
+  /* ─── COMPARE TABLE ─── */
+  .ctable { width:100%; border-collapse:collapse; border-radius:12px; overflow:hidden; margin:22px 0; box-shadow:0 2px 12px rgba(0,0,0,.05); }
+  .ctable th { background:var(--ink); color:white; padding:13px 18px; text-align:left; font-size:13px; font-weight:700; }
+  .ctable td { padding:12px 18px; font-size:14px; border-bottom:1px solid var(--border); }
+  .ctable tr:nth-child(even) td { background:var(--soft); }
+  .ctable tr:last-child td { border-bottom:none; }
+  .ck { color:var(--accent3); font-weight:700; }
+  .cx { color:var(--red); }
+
+  /* ─── DIVIDER ─── */
+  hr.div { border:none; border-top:1px solid var(--border); margin:46px 0; }
+
+  /* ─── SUMMARY ─── */
+  .summary { background:var(--ink); color:white; border-radius:20px; padding:44px; margin:50px 0; }
+  .summary h2 { font-family:'Bebas Neue',sans-serif; font-size:30px; letter-spacing:2px; color:#60a5fa; margin-bottom:26px; }
+  .sgrid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .sitem { background:rgba(255,255,255,.04); border:1px solid rgba(15,98,254,.2); border-radius:12px; padding:18px 22px; }
+  .sitem h4 { font-size:12px; font-weight:700; letter-spacing:1px; color:#60a5fa; text-transform:uppercase; margin-bottom:8px; }
+  .sitem p { font-size:14px; color:rgba(255,255,255,.75); line-height:1.7; }
+
+  /* ─── CHECKLIST ─── */
+  .ckbox { background:white; border:1px solid var(--border); border-radius:16px; padding:28px 32px; margin-bottom:40px; box-shadow:0 1px 8px rgba(0,0,0,.04); }
+  .ckbox h3 { font-size:13px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--accent3); margin-bottom:18px; }
+
+  /* ─── FOOTER ─── */
+  footer { background:var(--ink); padding:32px 40px; text-align:center; color:rgba(255,255,255,.3); font-size:13px; }
+  footer a { color:#60a5fa; text-decoration:none; }
+
+  code { font-family:'JetBrains Mono',monospace; font-size:13px; background:var(--soft); padding:2px 7px; border-radius:5px; color:var(--accent); }
+
+  @media(max-width:640px){
+    .hero,.wrap { padding-left:18px; padding-right:18px; }
+    .analogy { grid-template-columns:1fr; }
+    .arch-row { gap:6px; }
+    .sgrid { grid-template-columns:1fr; }
+    .snav-links { display:none; }
+    .mblock,.scene,.pblock { padding:20px 18px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ─── HERO ─── -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-week">3주차 · 업무 자동화 &nbsp;/&nbsp; DAY 20</div>
+    <h1>MCP<br><span>Model Context Protocol</span></h1>
+    <p class="hero-sub">
+      클로드를 인터넷 밖으로 꺼내세요.<br>
+      내 컴퓨터의 파일, 로컬 데이터, 그리고 모든 도구에 직접 연결합니다.
+    </p>
+    <div class="hero-meta">
+      <span class="hero-badge">🎯 난이도: 중급 (설정 필요)</span>
+      <span class="hero-badge">⏱ 학습 시간: 90~120분</span>
+      <span class="hero-badge">💻 필요: Claude Desktop 앱</span>
+      <span class="hero-badge">🔧 필요: Node.js 설치</span>
+    </div>
+  </div>
+</header>
+
+<!-- ─── STICKY NAV ─── -->
+<nav class="snav">
+  <div class="snav-inner">
+    <span class="snav-brand">🔌 MCP 완전 정복</span>
+    <div class="snav-links">
+      <a href="#concept" class="act">개념</a>
+      <a href="#lv1">L1 설치</a>
+      <a href="#lv2">L2 파일 연결</a>
+      <a href="#lv3">L3 확장</a>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <!-- ─── OBJECTIVES ─── -->
+  <div class="obj-box">
+    <h2>▸ 오늘의 학습 목표</h2>
+    <ul>
+      <li>MCP가 무엇인지, 왜 기존 AI와 다른지 정확히 이해한다.</li>
+      <li>Claude Desktop에 파일시스템 MCP 서버를 설치하고 로컬 파일에 접근한다.</li>
+      <li>클로드가 내 컴퓨터 파일을 읽고, 쓰고, 검색하는 것을 직접 경험한다.</li>
+      <li>추가 MCP 서버(Google Drive, Slack, 메모 앱 등)를 연결하는 방법을 배운다.</li>
+    </ul>
+  </div>
+
+  <!-- ─── CONCEPT ─── -->
+  <section class="concept" id="concept">
+    <div class="sec-label">📖 핵심 개념</div>
+    <h2>MCP란? — "클로드의 USB-C 포트"</h2>
+
+    <p>
+      지금까지 클로드는 <strong>인터넷과 단절된 섬</strong>이었습니다.
+      여러분이 직접 텍스트를 복사해서 붙여넣지 않는 한, 클로드는 여러분의 파일, 데이터베이스, 업무 도구를 전혀 알 수 없었죠.
+    </p>
+    <p>
+      <strong>MCP(Model Context Protocol)</strong>는 Anthropic이 2024년 공개한 오픈 표준으로,
+      AI를 외부 데이터 소스와 도구에 연결하는 <strong>USB-C 같은 범용 인터페이스</strong>입니다.
+      MCP가 있으면 클로드는 여러분의 하드 드라이브, 클라우드 스토리지, 데이터베이스, 업무 앱에 직접 접근할 수 있습니다.
+    </p>
+
+    <div class="analogy">
+      <div class="an-col">
+        <div class="an-icon">😓</div>
+        <div class="an-title">MCP 없을 때</div>
+        <div class="an-desc">
+          파일 내용을 일일이 복사해서 붙여넣어야 함. 파일 10개를 분석하려면 10번 반복. 데이터가 변경되면 다시 붙여넣기 필요.
+        </div>
+      </div>
+      <div class="an-col blue">
+        <div class="an-icon">🔌</div>
+        <div class="an-title">MCP 연결 후</div>
+        <div class="an-desc">
+          "다운로드 폴더의 PDF 파일들을 모두 분석해줘"라고 말하면 클로드가 직접 접근. 실시간 데이터 반영.
+        </div>
+      </div>
+      <div class="an-col dark">
+        <div class="an-icon">🚀</div>
+        <div class="an-title">미래의 가능성</div>
+        <div class="an-desc">
+          파일시스템 + 이메일 + 캘린더 + DB를 동시에 연결하면 진정한 AI 비서 시스템 완성.
+        </div>
+      </div>
+    </div>
+
+    <!-- ARCHITECTURE -->
+    <p style="margin:8px 0 14px;"><strong>MCP의 구조: 호스트 → 클라이언트 → 서버</strong></p>
+    <div class="arch">
+      <div class="arch-title">🏗️ MCP 아키텍처 이해하기</div>
+      <div class="arch-row">
+        <div class="arch-box hi">🖥️ 호스트 <span class="badge">Claude Desktop</span></div>
+        <div class="arch-arr">⟷</div>
+        <div class="arch-box">📡 MCP 클라이언트 <span class="badge">내장</span></div>
+        <div class="arch-arr">⟷</div>
+        <div class="arch-box hi">⚙️ MCP 서버 <span class="badge">filesystem / github / slack…</span></div>
+        <div class="arch-arr">⟷</div>
+        <div class="arch-box">📂 실제 데이터 <span class="badge">파일·DB·API</span></div>
+      </div>
+      <div class="arch-note">
+        Claude Desktop(호스트)이 MCP 클라이언트를 내장 → 각 MCP 서버가 특정 데이터에 접근 → 클로드가 자연어로 데이터를 조작
+      </div>
+    </div>
+
+    <!-- COMPARE: Skills vs MCP -->
+    <p style="margin:24px 0 12px;"><strong>스킬 vs MCP — 무엇이 다른가?</strong></p>
+    <table class="ctable">
+      <thead><tr><th>구분</th><th>스킬 (Skills)</th><th>MCP</th></tr></thead>
+      <tbody>
+        <tr><td>역할</td><td>클로드에게 <em>어떻게 할지</em> 가르침</td><td>클로드에게 <em>새로운 능력</em> 부여</td></tr>
+        <tr><td>접근 데이터</td><td>대화 중 입력된 텍스트만</td><td>외부 파일·DB·API 실시간 접근</td></tr>
+        <tr><td>필요 설정</td><td>SKILL.md 파일 작성</td><td>서버 설치 + JSON 설정 파일</td></tr>
+        <tr><td>기술 난이도</td><td>낮음 (마크다운만)</td><td>중간 (Node.js, JSON 설정)</td></tr>
+        <tr><td>비유</td><td>업무 매뉴얼</td><td>새로운 감각 기관</td></tr>
+        <tr><td>함께 사용</td><td class="ck">✓ 가능 — 더 강력해짐</td><td class="ck">✓ 스킬과 조합 추천</td></tr>
+      </tbody>
+    </table>
+
+    <div class="tip">
+      <strong>💡 오늘 실습의 전제 조건 체크</strong>
+      MCP를 사용하려면 <strong>Claude Desktop 앱</strong>(데스크톱 버전)이 필요합니다. 웹 브라우저의 Claude.ai에서는 현재 로컬 MCP를 직접 사용할 수 없습니다. Claude Desktop은 <a href="https://claude.ai/download" style="color:var(--accent);">claude.ai/download</a>에서 무료 다운로드 가능합니다.
+    </div>
+  </section>
+
+  <hr class="div">
+
+  <!-- ══════════════════════════════════════════ -->
+  <!-- LEVEL 1 -->
+  <!-- ══════════════════════════════════════════ -->
+  <section class="level lv1" id="lv1">
+    <div class="level-hd">
+      <div class="lnum">L1</div>
+      <div class="lttl">
+        <h2>환경 설정 — Claude Desktop + Node.js 준비</h2>
+        <p>⏱ 예상 시간 20분 &nbsp;|&nbsp; 설치 한 번으로 끝</p>
+      </div>
+    </div>
+
+    <p style="margin-bottom:20px; font-size:15.5px; color:#334155; line-height:1.9;">
+      MCP를 쓰기 위한 두 가지 준비물: <strong>Claude Desktop 앱</strong>과 <strong>Node.js</strong>입니다.
+      Claude Desktop은 MCP 서버를 실행하는 호스트 역할을 하고,
+      Node.js는 MCP 서버 패키지(npx 명령어)를 실행하는 데 필요합니다.
+    </p>
+
+    <!-- METHOD: 설치 -->
+    <div class="mblock">
+      <div class="mtitle"><span class="mbar"></span>적용 방법 | 필수 환경 설치 (단계별)</div>
+      <ol class="slist">
+        <li class="si">
+          <div class="snum">1</div>
+          <div class="sbody">
+            <strong>Claude Desktop 다운로드 및 설치</strong>
+            <p><a href="https://claude.ai/download" style="color:var(--accent);">claude.ai/download</a> 접속 → 운영체제에 맞는 버전 다운로드 → 설치 후 로그인. 이미 설치된 경우 최신 버전인지 확인 (메뉴 → Help → Check for Updates).</p>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">2</div>
+          <div class="sbody">
+            <strong>Node.js 설치 확인</strong>
+            <p>터미널(macOS) 또는 명령 프롬프트(Windows)를 열고 아래 명령어를 실행합니다. 버전 번호가 나타나면 이미 설치된 것입니다. 없으면 <a href="https://nodejs.org" style="color:var(--accent);">nodejs.org</a>에서 LTS 버전을 설치하세요.</p>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">3</div>
+          <div class="sbody">
+            <strong>설정 파일 위치 파악</strong>
+            <p>MCP 서버 설정은 <code>claude_desktop_config.json</code> 파일에서 관리합니다. 아래 경로에 있습니다.</p>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">4</div>
+          <div class="sbody">
+            <strong>Desktop Extensions 활용 (쉬운 방법)</strong>
+            <p>Claude Desktop → Settings → Extensions → "Browse extensions" 클릭. Anthropic이 검토한 공식 확장들을 클릭 한 번으로 설치 가능합니다. JSON 설정 파일 편집 없이도 많은 MCP를 설치할 수 있는 새로운 방법입니다.</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <!-- NODE 확인 코드 -->
+    <div class="os-tabs">
+      <div class="tab-btns">
+        <button class="tab-btn act" onclick="switchTab(event,'node','mac')">🍎 macOS</button>
+        <button class="tab-btn" onclick="switchTab(event,'node','win')">🪟 Windows</button>
+      </div>
+      <div id="node-mac" class="tab-content act">
+        <div class="code-block">
+<span class="c-comment"># 터미널 열기: Cmd + Space → "Terminal" 검색</span>
+<span class="c-comment"># Node.js 버전 확인</span>
+<span class="c-cmd">node</span> <span class="c-key">--version</span>
+<span class="c-val"># v20.xx.x 이상 나오면 OK</span>
+
+<span class="c-comment"># npm 확인</span>
+<span class="c-cmd">npm</span> <span class="c-key">--version</span>
+<span class="c-val"># 버전 번호 나오면 OK</span>
+
+<span class="c-comment"># Claude Desktop 설정 파일 위치</span>
+<span class="c-path">~/Library/Application Support/Claude/claude_desktop_config.json</span>
+
+<span class="c-comment"># 파일이 없으면 직접 생성</span>
+<span class="c-cmd">mkdir</span> -p <span class="c-path">~/Library/Application\ Support/Claude</span>
+<span class="c-cmd">touch</span> <span class="c-path">~/Library/Application\ Support/Claude/claude_desktop_config.json</span></div>
+      </div>
+      <div id="node-win" class="tab-content">
+        <div class="code-block">
+<span class="c-comment">:: 명령 프롬프트 열기: Win+R → "cmd" → Enter</span>
+<span class="c-comment">:: Node.js 버전 확인</span>
+<span class="c-cmd">node</span> <span class="c-key">--version</span>
+<span class="c-val">:: v20.xx.x 이상 나오면 OK</span>
+
+<span class="c-comment">:: Claude Desktop 설정 파일 위치</span>
+<span class="c-path">C:\Users\[사용자명]\AppData\Roaming\Claude\claude_desktop_config.json</span>
+
+<span class="c-comment">:: 파일 탐색기에서 직접 열기</span>
+<span class="c-comment">:: Win+R → %APPDATA%\Claude 입력</span></div>
+      </div>
+    </div>
+
+    <div class="warn">
+      <strong>⚠️ Node.js가 없을 때</strong>
+      <a href="https://nodejs.org" style="color:var(--gold);">nodejs.org</a>에서 LTS(Long-Term Support) 버전을 다운로드해서 설치하세요. 설치 후 터미널/명령 프롬프트를 <strong>완전히 닫고 다시 열어야</strong> node 명령이 인식됩니다.
+    </div>
+
+    <!-- SCENARIO: 첫 확인 -->
+    <div class="scene">
+      <div class="scene-lbl">🎬 실습 시나리오 01</div>
+      <div class="scene-ttl">내 컴퓨터에 Claude Desktop이 MCP 준비가 됐는지 확인</div>
+      <div class="scene-desc">설치를 마친 후, Claude Desktop이 정상적으로 MCP를 인식하는지 확인하는 기본 테스트입니다.</div>
+      <ul class="scene-steps">
+        <li>Claude Desktop 앱을 열고 새 대화를 시작합니다.</li>
+        <li>입력창 오른쪽 하단에 🔨 망치 아이콘이 보이면 MCP 준비 완료입니다.</li>
+        <li>망치 아이콘 클릭 → 연결된 MCP 서버와 사용 가능한 도구 목록 확인.</li>
+        <li>아직 MCP 서버를 설치하지 않았다면 목록이 비어있을 수 있습니다 (정상).</li>
+      </ul>
+    </div>
+
+  </section>
+
+  <hr class="div">
+
+  <!-- ══════════════════════════════════════════ -->
+  <!-- LEVEL 2 -->
+  <!-- ══════════════════════════════════════════ -->
+  <section class="level lv2" id="lv2">
+    <div class="level-hd">
+      <div class="lnum">L2</div>
+      <div class="lttl">
+        <h2>파일시스템 MCP 연결 — 내 컴퓨터 파일에 접근하기</h2>
+        <p>⏱ 예상 시간 30분 &nbsp;|&nbsp; 핵심 실습</p>
+      </div>
+    </div>
+
+    <p style="margin-bottom:20px; font-size:15.5px; color:#334155; line-height:1.9;">
+      MCP의 가장 기본이자 가장 강력한 기능: <strong>파일시스템 접근</strong>.
+      설정 파일에 몇 줄만 추가하면 클로드가 내 컴퓨터 폴더를 직접 읽고 쓸 수 있습니다.
+      설정은 단 한 번, 이후로는 자연어로 파일을 다룹니다.
+    </p>
+
+    <!-- METHOD: 파일시스템 설정 -->
+    <div class="mblock">
+      <div class="mtitle"><span class="mbar"></span>적용 방법 | 파일시스템 MCP 서버 설치 (3단계)</div>
+      <ol class="slist">
+        <li class="si">
+          <div class="snum">1</div>
+          <div class="sbody">
+            <strong>claude_desktop_config.json 파일 열기</strong>
+            <p>앞서 확인한 경로의 설정 파일을 텍스트 에디터(메모장, VS Code 등)로 엽니다. 파일이 없으면 빈 파일을 생성합니다.</p>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">2</div>
+          <div class="sbody">
+            <strong>아래 JSON 설정 복사해서 붙여넣기</strong>
+            <p>기존 파일 내용을 모두 지우고, 아래 설정으로 교체합니다. <code>username</code>과 경로를 실제 내 컴퓨터 경로로 수정해야 합니다.</p>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">3</div>
+          <div class="sbody">
+            <strong>Claude Desktop 완전 재시작</strong>
+            <p>파일 저장 후 Claude Desktop을 완전히 종료(트레이에서도 종료) 후 다시 시작합니다. 🔨 아이콘이 나타나면 성공입니다.</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <!-- CONFIG JSON (macOS / Windows) -->
+    <div class="os-tabs">
+      <div class="tab-btns">
+        <button class="tab-btn act" onclick="switchTab(event,'cfg','mac')">🍎 macOS 설정</button>
+        <button class="tab-btn" onclick="switchTab(event,'cfg','win')">🪟 Windows 설정</button>
+      </div>
+      <div id="cfg-mac" class="tab-content act">
+        <div class="plbl">파일 경로: ~/Library/Application Support/Claude/claude_desktop_config.json</div>
+        <div class="code-block">
+{
+  <span class="c-key">"mcpServers"</span>: {
+    <span class="c-key">"filesystem"</span>: {
+      <span class="c-key">"command"</span>: <span class="c-str">"npx"</span>,
+      <span class="c-key">"args"</span>: [
+        <span class="c-str">"-y"</span>,
+        <span class="c-str">"@modelcontextprotocol/server-filesystem"</span>,
+        <span class="c-path">"/Users/여기에_사용자명/Desktop"</span>,      <span class="c-comment">← 바탕화면</span>
+        <span class="c-path">"/Users/여기에_사용자명/Downloads"</span>,     <span class="c-comment">← 다운로드</span>
+        <span class="c-path">"/Users/여기에_사용자명/Documents"</span>      <span class="c-comment">← 문서 폴더</span>
+      ]
+    }
+  }
+}
+
+<span class="c-comment">━━━ 내 사용자명 확인 방법 ━━━</span>
+<span class="c-comment"># 터미널에서 실행:</span>
+<span class="c-cmd">echo</span> $HOME
+<span class="c-val"># /Users/johndoe 처럼 나오면 johndoe가 사용자명</span></div>
+      </div>
+      <div id="cfg-win" class="tab-content">
+        <div class="plbl">파일 경로: C:\Users\[사용자명]\AppData\Roaming\Claude\claude_desktop_config.json</div>
+        <div class="code-block">
+{
+  <span class="c-key">"mcpServers"</span>: {
+    <span class="c-key">"filesystem"</span>: {
+      <span class="c-key">"command"</span>: <span class="c-str">"npx"</span>,
+      <span class="c-key">"args"</span>: [
+        <span class="c-str">"-y"</span>,
+        <span class="c-str">"@modelcontextprotocol/server-filesystem"</span>,
+        <span class="c-path">"C:\\Users\\여기에_사용자명\\Desktop"</span>,
+        <span class="c-path">"C:\\Users\\여기에_사용자명\\Downloads"</span>,
+        <span class="c-path">"C:\\Users\\여기에_사용자명\\Documents"</span>
+      ]
+    }
+  }
+}
+
+<span class="c-comment">주의: Windows 경로는 역슬래시를 두 번(\\) 써야 합니다</span>
+<span class="c-comment">내 사용자명 확인: Win+R → cmd → echo %USERNAME%</span></div>
+      </div>
+    </div>
+
+    <div class="tip">
+      <strong>💡 접근 허용 폴더를 신중하게 선택하세요</strong>
+      처음에는 <strong>Desktop, Downloads, Documents</strong> 정도만 추가하는 것이 안전합니다. 필요에 따라 특정 프로젝트 폴더를 추가할 수 있습니다. 전체 드라이브(C:\\ 또는 /)는 보안상 추가하지 않는 것을 권장합니다.
+    </div>
+
+    <!-- SCENARIO: 파일 분석 -->
+    <div class="scene">
+      <div class="scene-lbl">🎬 실습 시나리오 02</div>
+      <div class="scene-ttl">클로드로 내 다운로드 폴더 정리하기</div>
+      <div class="scene-desc">
+        파일시스템 MCP 연결 후 첫 번째 실습. 다운로드 폴더의 파일 목록을 보고, 분류 기준을 제시해달라고 요청합니다. 실제 파일에 접근하는 클로드를 처음으로 경험합니다.
+      </div>
+      <ul class="scene-steps">
+        <li>Claude Desktop 재시작 후 🔨 아이콘 클릭 → "filesystem" 서버와 도구들 확인</li>
+        <li>새 대화 시작 → 프롬프트 #1을 입력해 다운로드 폴더 스캔 요청</li>
+        <li>클로드가 실제 파일 목록을 읽어서 보여주는 것 확인</li>
+        <li>이어서 프롬프트 #2로 파일 분류 작업 진행</li>
+      </ul>
+    </div>
+
+    <!-- PROMPT #1 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #1</h3>
+        <span class="ptag tblue">파일 탐색</span>
+      </div>
+      <div class="plbl">MCP 연결 첫 테스트 — 폴더 스캔</div>
+      <div class="ptxt"><span class="ph">내 다운로드 폴더를 살펴봐줘.</span>
+
+<span class="pc">아래 내용을 알려줘:
+1. 파일이 총 몇 개 있는지
+2. 파일 유형별(PDF, 이미지, 문서, 압축파일 등) 분류
+3. 가장 최근에 추가된 파일 5개
+4. 용량이 큰 파일 상위 3개 (알 수 있다면)
+5. 오래된 파일(3개월 이상) 중 정리가 필요해 보이는 것</span></div>
+    </div>
+
+    <!-- PROMPT #2 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #2</h3>
+        <span class="ptag tblue">파일 내용 분석</span>
+      </div>
+      <div class="plbl">특정 파일 내용 읽고 요약하기</div>
+      <div class="ptxt"><span class="ph">내 문서 폴더에서 PDF 파일을 찾아줘.</span>
+
+<span class="pc">발견한 PDF 파일들에 대해:
+1. 파일명과 대략적인 내용 유형 (계약서, 보고서, 강의자료 등)
+2. 가장 최근 파일을 하나 골라 핵심 내용을 3줄로 요약해줘
+3. 내가 빠르게 찾을 수 있도록 파일별 1줄 설명을 만들어줘</span>
+
+<span class="pc"># 특정 파일만 보고 싶다면:
+# "문서 폴더의 [파일명.pdf]를 읽고 핵심 내용을 정리해줘"</span></div>
+    </div>
+
+    <!-- PROMPT #3: 파일 생성 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #3</h3>
+        <span class="ptag tpurple">파일 생성·저장</span>
+      </div>
+      <div class="plbl">클로드가 직접 내 컴퓨터에 파일 저장하기</div>
+      <div class="ptxt"><span class="ph">내 바탕화면에 오늘 날짜로 회의록 파일을 만들어줘.</span>
+
+파일명: <span class="py">2025_06_XX_주간팀회의.md</span>
+
+아래 내용을 담은 마크다운 파일로 저장해줘:
+
+<span class="pc">## 주간 팀 회의록
+- 일시: 2025년 6월 X일
+- 참석자: [이름1, 이름2, 이름3]
+- 진행: [이름1]
+
+## 주요 안건
+1. Q2 성과 리뷰
+2. 다음 분기 계획
+3. 팀 이슈 공유
+
+## 결정 사항
+- 
+
+## 액션 아이템
+| 담당자 | 내용 | 기한 |
+|--------|------|------|
+|        |      |      |
+
+## 다음 회의
+- 일시: 다음 주 같은 시간</span>
+
+<span class="py">바탕화면에 저장 완료되면 파일 경로를 알려줘.</span></div>
+    </div>
+
+    <!-- PROMPT #4: 파일 검색 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #4</h3>
+        <span class="ptag tgreen">파일 검색</span>
+      </div>
+      <div class="plbl">자연어로 파일 검색하기</div>
+      <div class="ptxt"><span class="ph">내 문서와 다운로드 폴더에서 "계약" 관련 파일을 모두 찾아줘.</span>
+
+<span class="pc">찾은 파일들에 대해:
+- 파일명과 경로
+- 마지막 수정 날짜
+- 파일 크기
+
+그리고 가장 최근 계약 관련 파일의 내용을 간단히 요약해줘.
+
+추가로, 2025년에 생성/수정된 파일만 필터링해서 보여줘.</span></div>
+    </div>
+
+    <!-- PROMPT #5: 여러 파일 비교 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #5</h3>
+        <span class="ptag tpurple">여러 파일 분석</span>
+      </div>
+      <div class="plbl">여러 파일을 한 번에 분석·비교하기 (MCP의 핵심 강점)</div>
+      <div class="ptxt"><span class="ph">내 Documents/reports 폴더에 있는 월간 보고서들을 비교 분석해줘.</span>
+
+<span class="pc">분석 내용:
+1. 각 보고서의 핵심 지표 수치를 표로 정리
+2. 월별 트렌드 변화 (증가/감소/유지)
+3. 눈에 띄는 이슈나 특이사항
+4. 다음 보고서에 반영해야 할 시사점
+
+※ 폴더에 파일이 없다면, Documents 폴더에서
+   비슷한 이름의 파일들을 찾아서 분석해줘.</span></div>
+    </div>
+
+    <div class="ok">
+      <strong>✅ 파일시스템 MCP 정상 작동 확인 방법</strong>
+      클로드가 "저는 파일에 직접 접근할 수 없습니다"가 아니라 실제 파일 목록을 보여주거나, 파일 내용을 요약해주면 MCP가 정상 작동 중입니다. 입력창 오른쪽 하단의 🔨 아이콘을 클릭하면 현재 사용 가능한 도구 목록을 확인할 수 있습니다.
+    </div>
+
+  </section>
+
+  <hr class="div">
+
+  <!-- ══════════════════════════════════════════ -->
+  <!-- LEVEL 3 -->
+  <!-- ══════════════════════════════════════════ -->
+  <section class="level lv3" id="lv3">
+    <div class="level-hd">
+      <div class="lnum">L3</div>
+      <div class="lttl">
+        <h2>MCP 확장 — 추가 서버 연결과 실전 워크플로우</h2>
+        <p>⏱ 예상 시간 35분 &nbsp;|&nbsp; 실전 활용 극대화</p>
+      </div>
+    </div>
+
+    <p style="margin-bottom:20px; font-size:15.5px; color:#334155; line-height:1.9;">
+      파일시스템은 시작일 뿐입니다. MCP 생태계에는 수백 개의 서버가 있습니다.
+      구글 드라이브, Slack, GitHub, 노션, 데이터베이스…
+      지금부터 여러분의 실제 업무 도구를 클로드에 연결합니다.
+    </p>
+
+    <!-- MCP 서버 갤러리 -->
+    <p style="margin-bottom:14px;"><strong>인기 MCP 서버 — 지금 당장 연결 가능한 것들</strong></p>
+    <div class="mcp-grid">
+      <div class="mcp-card">
+        <div class="mc-icon">📁</div>
+        <h4>Google Drive</h4>
+        <span class="mc-tag">@modelcontextprotocol/server-gdrive</span>
+        <p>구글 드라이브 파일 읽기·검색·생성. Docs, Sheets, Slides 접근.</p>
+      </div>
+      <div class="mcp-card">
+        <div class="mc-icon">💬</div>
+        <h4>Slack</h4>
+        <span class="mc-tag">@modelcontextprotocol/server-slack</span>
+        <p>채널 메시지 읽기, 메시지 전송, 사용자 정보 확인.</p>
+      </div>
+      <div class="mcp-card">
+        <div class="mc-icon">🐙</div>
+        <h4>GitHub</h4>
+        <span class="mc-tag">@modelcontextprotocol/server-github</span>
+        <p>저장소 탐색, 이슈 관리, PR 생성, 코드 읽기·수정.</p>
+      </div>
+      <div class="mcp-card">
+        <div class="mc-icon">🐘</div>
+        <h4>PostgreSQL</h4>
+        <span class="mc-tag">@modelcontextprotocol/server-postgres</span>
+        <p>DB 스키마 탐색, SQL 쿼리 실행, 데이터 분석.</p>
+      </div>
+      <div class="mcp-card">
+        <div class="mc-icon">🌐</div>
+        <h4>Puppeteer</h4>
+        <span class="mc-tag">@modelcontextprotocol/server-puppeteer</span>
+        <p>웹 브라우저 자동화, 스크린샷 캡처, 웹 스크래핑.</p>
+      </div>
+      <div class="mcp-card">
+        <div class="mc-icon">🗃️</div>
+        <h4>SQLite</h4>
+        <span class="mc-tag">@modelcontextprotocol/server-sqlite</span>
+        <p>로컬 SQLite DB 파일에 직접 쿼리. 코드 없이 데이터 분석.</p>
+      </div>
+    </div>
+
+    <!-- METHOD: 여러 서버 추가 -->
+    <div class="mblock">
+      <div class="mtitle"><span class="mbar"></span>적용 방법 | 여러 MCP 서버 동시 연결</div>
+      <ol class="slist">
+        <li class="si">
+          <div class="snum">1</div>
+          <div class="sbody">
+            <strong>설정 파일에 서버를 추가하는 방법</strong>
+            <p><code>mcpServers</code> 객체 안에 서버를 이름:설정 형식으로 계속 추가하면 됩니다. 아래 예시는 filesystem + GitHub + SQLite를 동시에 추가합니다.</p>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">2</div>
+          <div class="sbody">
+            <strong>API 키가 필요한 서버 처리</strong>
+            <p>GitHub, Slack 등 API 키가 필요한 서버는 <code>env</code> 필드에 환경 변수로 추가합니다. 토큰 값은 절대 다른 사람과 공유하면 안 됩니다.</p>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">3</div>
+          <div class="sbody">
+            <strong>Desktop Extensions 활용 (권장)</strong>
+            <p>JSON 설정이 어렵다면 Claude Desktop → Settings → Extensions에서 그래픽 인터페이스로 쉽게 추가할 수 있습니다. 점점 더 많은 MCP 서버가 Extensions 형태로 제공되고 있습니다.</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <!-- 멀티 서버 설정 예시 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 설정 #6</h3>
+        <span class="ptag tblue">다중 MCP 서버 설정</span>
+      </div>
+      <div class="plbl">claude_desktop_config.json — filesystem + GitHub + SQLite 동시 설정 (macOS 기준)</div>
+      <div class="ptxt">{
+  <span class="ph">"mcpServers"</span>: {
+
+    <span class="pg">"filesystem"</span>: {
+      <span class="pc">// 로컬 파일 접근</span>
+      <span class="ph">"command"</span>: <span class="pg">"npx"</span>,
+      <span class="ph">"args"</span>: [
+        <span class="pg">"-y"</span>,
+        <span class="pg">"@modelcontextprotocol/server-filesystem"</span>,
+        <span class="py">"/Users/username/Desktop"</span>,
+        <span class="py">"/Users/username/Documents"</span>,
+        <span class="py">"/Users/username/Downloads"</span>
+      ]
+    },
+
+    <span class="pg">"github"</span>: {
+      <span class="pc">// GitHub 저장소 접근 (Personal Access Token 필요)</span>
+      <span class="ph">"command"</span>: <span class="pg">"npx"</span>,
+      <span class="ph">"args"</span>: [
+        <span class="pg">"-y"</span>,
+        <span class="pg">"@modelcontextprotocol/server-github"</span>
+      ],
+      <span class="ph">"env"</span>: {
+        <span class="py">"GITHUB_PERSONAL_ACCESS_TOKEN"</span>: <span class="py">"여기에_GitHub_토큰_입력"</span>
+      }
+    },
+
+    <span class="pg">"sqlite"</span>: {
+      <span class="pc">// 로컬 SQLite DB 파일 접근</span>
+      <span class="ph">"command"</span>: <span class="pg">"npx"</span>,
+      <span class="ph">"args"</span>: [
+        <span class="pg">"-y"</span>,
+        <span class="pg">"@modelcontextprotocol/server-sqlite"</span>,
+        <span class="py">"/Users/username/Documents/mydata.db"</span>
+      ]
+    }
+
+  }
+}</div>
+    </div>
+
+    <!-- SCENARIO: 실전 워크플로우 -->
+    <div class="scene">
+      <div class="scene-lbl">🎬 실습 시나리오 03</div>
+      <div class="scene-ttl">파일시스템 MCP로 월간 보고서 반자동 작성하기</div>
+      <div class="scene-desc">
+        매달 반복되는 보고서 작성 업무를 MCP로 자동화합니다. 데이터 파일들이 Documents/data 폴더에 있다고 가정하고, 클로드가 직접 파일을 읽어 보고서를 작성합니다.
+      </div>
+      <ul class="scene-steps">
+        <li>Documents/monthly-data 폴더에 이번 달 CSV 또는 엑셀 파일 저장</li>
+        <li>프롬프트 #7로 클로드에게 해당 폴더를 분석하도록 요청</li>
+        <li>클로드가 데이터를 읽고 분석 결과와 보고서 초안을 생성</li>
+        <li>프롬프트 #8로 완성된 보고서를 지정된 파일로 저장</li>
+      </ul>
+    </div>
+
+    <!-- PROMPT #7 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #7</h3>
+        <span class="ptag tgreen">데이터 분석 자동화</span>
+      </div>
+      <div class="plbl">MCP로 실제 데이터 파일 분석 → 보고서 생성</div>
+      <div class="ptxt"><span class="ph">내 Documents 폴더에서 이번 달(6월) 관련 데이터 파일을 찾아줘.</span>
+
+<span class="pc">발견한 파일들을 분석해서 다음을 알려줘:
+
+1. 핵심 수치 요약
+   - 주요 지표들의 이번 달 값
+   - 지난 달 대비 변화율 (같은 폴더에 5월 파일이 있다면 비교)
+
+2. 주목할 이슈
+   - 예상보다 크게 증가하거나 감소한 항목
+   - 목표치 대비 달성률
+
+3. 보고서 핵심 문장
+   - 임원에게 보고할 때 쓸 수 있는 1-2문장 요약
+
+4. 다음 달 제언
+   - 데이터 기반으로 다음 달에 집중해야 할 사항</span>
+
+<span class="py">분석 완료 후 보고서 초안을 작성해줄 준비가 됐으면 알려줘.</span></div>
+    </div>
+
+    <!-- PROMPT #8 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #8</h3>
+        <span class="ptag tpurple">분석 결과를 파일로 저장</span>
+      </div>
+      <div class="plbl">보고서를 내 컴퓨터에 직접 저장하기</div>
+      <div class="ptxt"><span class="ph">방금 분석한 내용을 바탕으로 월간 보고서를 작성하고 저장해줘.</span>
+
+저장 위치: <span class="py">Documents/reports/2025년_6월_월간보고서.md</span>
+
+보고서 형식:
+<span class="pc"># 2025년 6월 월간 보고서
+
+## 1. 이번 달 요약
+(한 문단, 3~5문장)
+
+## 2. 핵심 지표
+| 지표 | 이번 달 | 지난 달 | 변화 |
+|------|--------|--------|------|
+
+## 3. 주요 성과
+- 
+
+## 4. 이슈 및 대응
+- 
+
+## 5. 다음 달 계획
+- 
+
+---
+작성일: [오늘 날짜]
+작성자: [작성자 이름 입력 필요]</span>
+
+<span class="py">파일 저장 완료 후 경로와 파일 내용 미리보기를 보여줘.</span></div>
+    </div>
+
+    <!-- PROMPT #9: 실전 조합 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #9</h3>
+        <span class="ptag torange">실전 조합 (MCP + 스킬)</span>
+      </div>
+      <div class="plbl">파일시스템 MCP + 어제 만든 비서 스킬 조합하기</div>
+      <div class="ptxt"><span class="ph">내 Documents/meeting-notes 폴더에서 이번 주 회의록 파일들을 찾아줘.</span>
+
+<span class="pc">찾은 파일들을 읽고:
+1. 각 회의에서 결정된 사항들을 모아 하나의 목록으로 정리
+2. 담당자별로 할당된 액션 아이템을 표로 통합 정리
+3. 내가 직접 처리해야 할 항목만 별도로 강조 표시
+
+그리고 이 내용을 바탕으로
+Documents/weekly-summary/2025_W23_주간요약.md 파일로 저장해줘.</span>
+
+<span class="py">저장 완료 후, 이 내용을 팀에 공유할 Slack 메시지 초안도 작성해줘.
+(Slack MCP가 연결되어 있다면 #팀채널에 바로 전송해줘도 돼)</span></div>
+    </div>
+
+    <!-- 보안 섹션 -->
+    <div class="mblock" style="margin-top:10px;">
+      <div class="mtitle"><span class="mbar"></span>보안 가이드 | MCP를 안전하게 사용하는 5가지 원칙</div>
+      <ol class="slist">
+        <li class="si">
+          <div class="snum">1</div>
+          <div class="sbody">
+            <strong>필요한 폴더만 허용하라</strong>
+            <p>전체 홈 디렉토리나 시스템 폴더를 추가하지 마세요. 업무에 필요한 특정 폴더만 정확히 지정하세요. 언제든지 설정 파일에서 폴더를 추가/제거할 수 있습니다.</p>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">2</div>
+          <div class="sbody">
+            <strong>신뢰할 수 있는 MCP 서버만 설치하라</strong>
+            <p>공식 Anthropic 서버(<code>@modelcontextprotocol/</code>), Desktop Extensions 디렉토리, 잘 알려진 오픈소스만 사용하세요. 출처 불명의 MCP 서버는 악성 코드를 포함할 수 있습니다.</p>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">3</div>
+          <div class="sbody">
+            <strong>API 토큰·비밀번호를 설정 파일에 직접 입력하지 마라</strong>
+            <p>가능하면 환경 변수를 사용하거나, 최소 권한(Read-only)의 토큰을 사용하세요. 설정 파일을 Git에 올리지 마세요.</p>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">4</div>
+          <div class="sbody">
+            <strong>파일 삭제는 항상 확인하라</strong>
+            <p>클로드에게 파일 삭제를 요청할 때는 "삭제 전에 반드시 목록을 보여주고 확인을 받아라"고 명시하세요. 실수로 중요한 파일이 삭제될 수 있습니다.</p>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">5</div>
+          <div class="sbody">
+            <strong>민감 정보가 있는 폴더는 제외하라</strong>
+            <p>금융 정보, 개인 식별 정보, 비밀번호 관련 파일이 있는 폴더는 MCP 접근 경로에서 제외하세요.</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <!-- PROMPT #10: 트러블슈팅 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #10</h3>
+        <span class="ptag tblue">문제 해결 / 디버깅</span>
+      </div>
+      <div class="plbl">MCP가 작동하지 않을 때 — 트러블슈팅 체크리스트</div>
+      <div class="ptxt"><span class="pc">━━━ 문제 현상별 해결법 ━━━</span>
+
+<span class="ph">문제 1: 🔨 아이콘이 안 보임</span>
+<span class="pc">→ Claude Desktop 완전 종료 (트레이 아이콘 우클릭 → 종료) 후 재시작
+→ 설정 파일 JSON 문법 오류 확인 (jsonlint.com에서 검사)</span>
+
+<span class="ph">문제 2: 아이콘은 있는데 파일 접근 안 됨</span>
+<span class="pc">→ 설정 파일의 경로가 실제 존재하는지 확인
+→ macOS: 경로에 한글이나 특수문자 없는지 확인
+→ Node.js가 최신 버전인지 확인 (node --version)</span>
+
+<span class="ph">문제 3: "Permission denied" 오류</span>
+<span class="pc">→ macOS: 시스템 환경설정 → 개인 정보 보호 → 전체 디스크 접근
+   → Claude Desktop에 권한 부여
+→ Windows: 관리자 권한으로 Claude Desktop 실행</span>
+
+<span class="ph">문제 4: 로그 확인 방법</span>
+<span class="pc">macOS 터미널:
+  tail -f ~/Library/Logs/Claude/mcp*.log
+
+Windows 명령 프롬프트:
+  type "%APPDATA%\Claude\logs\mcp*.log"</span>
+
+<span class="py">위 방법으로도 해결 안 된다면 로그 내용을 클로드에게 보여주면서
+"이 MCP 오류를 해결하는 방법을 알려줘"라고 질문하세요.</span></div>
+    </div>
+
+  </section>
+
+  <!-- ─── SUMMARY ─── -->
+  <div class="summary">
+    <h2>📌 20일차 핵심 정리</h2>
+    <div class="sgrid">
+      <div class="sitem">
+        <h4>MCP란?</h4>
+        <p>클로드와 외부 데이터·도구를 연결하는 USB-C 같은 오픈 표준. 파일, DB, API 등에 실시간 접근 가능.</p>
+      </div>
+      <div class="sitem">
+        <h4>필수 준비물</h4>
+        <p>Claude Desktop 앱 + Node.js. claude_desktop_config.json에 서버 설정 추가 후 재시작.</p>
+      </div>
+      <div class="sitem">
+        <h4>파일시스템 MCP</h4>
+        <p>@modelcontextprotocol/server-filesystem 패키지. 허용 폴더를 지정하면 클로드가 파일을 직접 읽기·쓰기·검색.</p>
+      </div>
+      <div class="sitem">
+        <h4>MCP vs 스킬</h4>
+        <p>스킬 = 클로드에게 방법을 가르침. MCP = 클로드에게 새 능력 부여. 둘을 함께 쓰면 최강.</p>
+      </div>
+      <div class="sitem">
+        <h4>보안 핵심</h4>
+        <p>필요한 폴더만 허용 + 신뢰된 서버만 + 민감 폴더 제외 + 파일 삭제 시 항상 확인 요청.</p>
+      </div>
+      <div class="sitem">
+        <h4>내일 예고</h4>
+        <p>21일차: 시각 지능 활용 — 차트 분석, 다이어그램 해석, 손글씨 메모 디지털화.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── CHECKLIST ─── -->
+  <div class="ckbox">
+    <h3>✅ 오늘 실습 체크리스트</h3>
+    <ol class="slist">
+      <li class="si">
+        <div class="snum" style="background:#d1fae5;color:var(--accent3);">1</div>
+        <div class="sbody">
+          <strong>Claude Desktop 설치 및 Node.js 확인</strong>
+          <p>터미널에서 <code>node --version</code>이 정상 출력되나요? Claude Desktop 설치 후 로그인했나요?</p>
+        </div>
+      </li>
+      <li class="si">
+        <div class="snum" style="background:#d1fae5;color:var(--accent3);">2</div>
+        <div class="sbody">
+          <strong>파일시스템 MCP 서버 연결 성공</strong>
+          <p>🔨 아이콘이 보이고, filesystem 서버와 도구들이 목록에 표시되나요?</p>
+        </div>
+      </li>
+      <li class="si">
+        <div class="snum" style="background:#d1fae5;color:var(--accent3);">3</div>
+        <div class="sbody">
+          <strong>실제 파일 접근 테스트 완료</strong>
+          <p>프롬프트 #1로 다운로드 폴더 내용을 클로드가 실제로 읽어왔나요?</p>
+        </div>
+      </li>
+      <li class="si">
+        <div class="snum" style="background:#d1fae5;color:var(--accent3);">4</div>
+        <div class="sbody">
+          <strong>파일 생성·저장 테스트 완료</strong>
+          <p>프롬프트 #3으로 클로드가 내 컴퓨터에 직접 파일을 저장했나요? 해당 파일을 열어봤나요?</p>
+        </div>
+      </li>
+    </ol>
+  </div>
+
+</div><!-- /wrap -->
+
+<footer>
+  <p>클로드(Claude) 활용 및 교육 통합 가이드 · 3주차 20일차 · MCP — Model Context Protocol</p>
+  <p style="margin-top:8px;">
+    <a href="https://modelcontextprotocol.io">modelcontextprotocol.io</a> &nbsp;·&nbsp;
+    <a href="https://support.claude.com/en/articles/10949351-getting-started-with-local-mcp-servers-on-claude-desktop">Claude 공식 MCP 가이드</a> &nbsp;·&nbsp;
+    <a href="https://github.com/modelcontextprotocol/servers">MCP 서버 목록 (GitHub)</a>
+  </p>
+</footer>
+
+<script>
+function switchTab(e, group, id) {
+  const parent = e.target.closest('.os-tabs');
+  parent.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('act'));
+  parent.querySelectorAll('.tab-content').forEach(c => c.classList.remove('act'));
+  e.target.classList.add('act');
+  document.getElementById(group + '-' + id).classList.add('act');
+}
+</script>
+</body>
+</html>

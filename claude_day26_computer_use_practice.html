@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>26일차: 실전 컴퓨터 제어 | Claude 활용 가이드</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;500;600&family=Bebas+Neue&display=swap');
+
+  :root {
+    --ink:   #070b12;
+    --paper: #f4f6fc;
+    --a1:    #0f766e;   /* teal — execution/action */
+    --a1l:   #ccfbf1;
+    --a2:    #7c3aed;   /* violet */
+    --a2l:   #ede9fe;
+    --a3:    #ea580c;   /* orange — warning/power */
+    --a3l:   #ffedd5;
+    --blue:  #2563eb;
+    --green: #16a34a;
+    --red:   #dc2626;
+    --soft:  #edf0f8;
+    --mid:   #64748b;
+    --brd:   #dde5f0;
+    --dark:  #070b12;
+    --code:  #0d1117;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{font-family:'Noto Sans KR',sans-serif;background:var(--paper);color:var(--ink);line-height:1.8;font-size:16px;}
+
+  /* ─── HERO ─── */
+  .hero{background:var(--dark);padding:64px 40px 54px;position:relative;overflow:hidden;color:white;}
+  .hero::before{
+    content:'';position:absolute;inset:0;
+    background:
+      radial-gradient(ellipse at 15% 50%,rgba(15,118,110,.18) 0%,transparent 55%),
+      radial-gradient(ellipse at 85% 20%,rgba(124,58,237,.12) 0%,transparent 45%);
+  }
+  /* animated pipeline decoration */
+  .pipeline-deco{
+    position:absolute;right:40px;top:50%;transform:translateY(-50%);
+    display:flex;flex-direction:column;gap:10px;opacity:.5;
+  }
+  .pd-step{
+    display:flex;align-items:center;gap:8px;
+    font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(255,255,255,.5);
+  }
+  .pd-dot{
+    width:8px;height:8px;border-radius:50%;background:rgba(15,118,110,.7);flex-shrink:0;
+    animation:pulse-dot 2s ease-in-out infinite;
+  }
+  .pd-step:nth-child(2) .pd-dot{animation-delay:.4s;background:rgba(124,58,237,.7);}
+  .pd-step:nth-child(3) .pd-dot{animation-delay:.8s;background:rgba(234,88,12,.7);}
+  .pd-step:nth-child(4) .pd-dot{animation-delay:1.2s;background:rgba(37,99,235,.7);}
+  .pd-step:nth-child(5) .pd-dot{animation-delay:1.6s;background:rgba(15,118,110,.7);}
+  @keyframes pulse-dot{0%,100%{opacity:.4;transform:scale(1);}50%{opacity:1;transform:scale(1.4);}}
+
+  .hi{max-width:900px;margin:0 auto;position:relative;z-index:1;}
+  .h-week{font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:#5eead4;margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+  .h-week::before{content:'';display:inline-block;width:28px;height:2px;background:#5eead4;}
+  .hero h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,6.5vw,72px);letter-spacing:2px;line-height:1.05;margin-bottom:20px;}
+  .hero h1 span{color:#5eead4;}
+  .hero-sub{font-size:17px;color:rgba(255,255,255,.62);max-width:580px;font-weight:300;line-height:1.75;}
+  .hero-meta{margin-top:28px;display:flex;gap:12px;flex-wrap:wrap;}
+  .h-badge{background:rgba(15,118,110,.2);border:1px solid rgba(15,118,110,.4);padding:7px 16px;border-radius:100px;font-size:12px;font-weight:600;color:#99f6e4;}
+
+  /* ─── NAV ─── */
+  .snav{background:white;border-bottom:1px solid var(--brd);padding:13px 0;position:sticky;top:0;z-index:200;box-shadow:0 1px 8px rgba(0,0,0,.05);}
+  .snav-i{max-width:900px;margin:0 auto;padding:0 30px;display:flex;align-items:center;justify-content:space-between;}
+  .snav-b{font-size:13px;font-weight:700;color:var(--a1);}
+  .snav-links{display:flex;gap:6px;}
+  .snav-links a{padding:5px 13px;border-radius:100px;font-size:12px;font-weight:600;border:1px solid var(--brd);background:white;color:var(--mid);text-decoration:none;transition:all .15s;}
+  .snav-links a:hover,.snav-links a.act{background:var(--a1);color:white;border-color:var(--a1);}
+
+  /* ─── WRAP ─── */
+  .wrap{max-width:900px;margin:0 auto;padding:0 30px;}
+
+  /* ─── OBJ ─── */
+  .obj{background:var(--a1l);border-left:5px solid var(--a1);border-radius:0 14px 14px 0;padding:28px 32px;margin:40px 0;}
+  .obj h2{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--a1);margin-bottom:14px;}
+  .obj ul{list-style:none;display:flex;flex-direction:column;gap:9px;}
+  .obj li{display:flex;align-items:flex-start;gap:10px;font-size:15px;}
+  .obj li::before{content:'▶';color:var(--a1);font-size:10px;flex-shrink:0;margin-top:5px;}
+
+  /* ─── CONCEPT ─── */
+  .concept{padding:48px 0 20px;}
+  .sec-lbl{font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--mid);margin-bottom:8px;}
+  .concept h2{font-size:27px;font-weight:900;margin-bottom:18px;line-height:1.3;}
+  .concept p{font-size:15.5px;color:#334155;margin-bottom:16px;line-height:1.9;}
+
+  /* ─── PIPELINE VISUAL ─── */
+  .pipeline{background:var(--code);border-radius:18px;padding:32px;margin:26px 0;overflow:hidden;position:relative;}
+  .pipeline::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(15,118,110,.08) 0%,transparent 60%);pointer-events:none;}
+  .pip-title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#5eead4;margin-bottom:26px;}
+  .pip-row{display:flex;align-items:center;gap:0;margin-bottom:14px;flex-wrap:wrap;}
+  .pip-box{
+    flex:1;min-width:110px;
+    background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);
+    border-radius:10px;padding:14px 12px;text-align:center;
+  }
+  .pip-box.act{background:rgba(15,118,110,.18);border-color:rgba(15,118,110,.4);}
+  .pip-box.warn{background:rgba(234,88,12,.12);border-color:rgba(234,88,12,.3);}
+  .pip-ico{font-size:22px;margin-bottom:6px;}
+  .pip-nm{font-size:12px;font-weight:700;color:white;margin-bottom:3px;}
+  .pip-box.act .pip-nm{color:#5eead4;}
+  .pip-box.warn .pip-nm{color:#fb923c;}
+  .pip-desc{font-size:11px;color:rgba(255,255,255,.4);line-height:1.4;}
+  .pip-arr{color:#374151;font-size:20px;padding:0 6px;flex-shrink:0;}
+
+  /* ─── LEVEL SECTIONS ─── */
+  .level{padding:48px 0;}
+  .lvhd{display:flex;align-items:center;gap:18px;margin-bottom:32px;padding-bottom:20px;border-bottom:2px solid var(--brd);}
+  .lnum{width:64px;height:64px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:26px;flex-shrink:0;}
+  .lv1 .lnum{background:var(--a1l);color:var(--a1);border:2px solid var(--a1);}
+  .lv2 .lnum{background:var(--a2l);color:var(--a2);border:2px solid var(--a2);}
+  .lv3 .lnum{background:var(--a3l);color:var(--a3);border:2px solid var(--a3);}
+  .lttl h2{font-size:22px;font-weight:900;margin-bottom:4px;}
+  .lttl p{font-size:13px;color:var(--mid);font-weight:500;}
+
+  /* ─── METHOD BLOCK ─── */
+  .mblock{background:white;border:1px solid var(--brd);border-radius:16px;padding:28px 32px;margin-bottom:22px;box-shadow:0 1px 8px rgba(0,0,0,.04);}
+  .mttl{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--brd);display:flex;align-items:center;gap:10px;}
+  .lv1 .mttl{color:var(--a1);}
+  .lv2 .mttl{color:var(--a2);}
+  .lv3 .mttl{color:var(--a3);}
+  .mbar{width:4px;height:16px;border-radius:2px;display:inline-block;flex-shrink:0;}
+  .lv1 .mbar{background:var(--a1);}
+  .lv2 .mbar{background:var(--a2);}
+  .lv3 .mbar{background:var(--a3);}
+
+  .slist{list-style:none;display:flex;flex-direction:column;gap:18px;}
+  .si{display:flex;align-items:flex-start;gap:14px;}
+  .snum{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;margin-top:1px;}
+  .lv1 .snum{background:var(--a1l);color:var(--a1);}
+  .lv2 .snum{background:var(--a2l);color:var(--a2);}
+  .lv3 .snum{background:var(--a3l);color:var(--a3);}
+  .sbody strong{display:block;font-weight:700;font-size:15px;margin-bottom:4px;}
+  .sbody p,.sbody span{font-size:14px;color:#475569;line-height:1.8;}
+
+  /* ─── SCENARIO ─── */
+  .scene{background:linear-gradient(135deg,#070b12 0%,#091a16 100%);border-radius:16px;padding:28px 32px;margin-bottom:22px;color:white;position:relative;overflow:hidden;}
+  .scene::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 85% 25%,rgba(15,118,110,.12) 0%,transparent 55%);pointer-events:none;}
+  .slbl{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#5eead4;margin-bottom:10px;position:relative;z-index:1;}
+  .sttl{font-size:19px;font-weight:700;margin-bottom:10px;position:relative;z-index:1;}
+  .sdesc{font-size:14px;color:rgba(255,255,255,.6);line-height:1.8;margin-bottom:18px;position:relative;z-index:1;}
+  .ssteps{list-style:none;display:flex;flex-direction:column;gap:8px;position:relative;z-index:1;}
+  .ssteps li{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:rgba(255,255,255,.78);}
+  .ssteps li::before{content:'→';color:#5eead4;flex-shrink:0;font-weight:700;margin-top:2px;}
+
+  /* ─── PROMPT BLOCK ─── */
+  .pblock{background:var(--code);border-radius:16px;padding:28px 32px;margin-bottom:22px;border:1px solid rgba(15,118,110,.2);}
+  .phd{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.06);}
+  .phd h3{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#5eead4;display:flex;align-items:center;gap:7px;}
+  .ptag{font-size:11px;font-weight:600;padding:4px 11px;border-radius:100px;text-transform:uppercase;}
+  .tt{background:rgba(15,118,110,.2);color:#99f6e4;}
+  .tv{background:rgba(124,58,237,.2);color:#c4b5fd;}
+  .to{background:rgba(234,88,12,.18);color:#fda172;}
+  .tb{background:rgba(37,99,235,.18);color:#93c5fd;}
+  .tg{background:rgba(22,163,74,.18);color:#86efac;}
+
+  .plbl{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);margin:14px 0 8px;}
+  .plbl:first-of-type{margin-top:0;}
+  .ptxt{font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.85;color:#c9d6e0;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:18px 20px;white-space:pre-wrap;word-break:break-word;}
+  .ph{color:#5eead4;}   /* teal */
+  .pg{color:#86efac;}   /* green */
+  .py{color:#fda172;}   /* orange */
+  .pc{color:#6b8aad;}   /* comment */
+  .pp{color:#c4b5fd;}   /* purple */
+  .pb{color:#93c5fd;}   /* blue */
+  .po{color:#fbbf24;}   /* gold */
+  .pw{color:white;font-weight:600;}
+
+  /* ─── WORKFLOW STEPS (numbered visual) ─── */
+  .wf-steps{display:flex;flex-direction:column;gap:0;margin:24px 0;}
+  .wf-item{display:flex;align-items:stretch;gap:0;}
+  .wf-left{display:flex;flex-direction:column;align-items:center;width:50px;flex-shrink:0;}
+  .wf-circle{
+    width:36px;height:36px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Bebas Neue',sans-serif;font-size:18px;
+    flex-shrink:0;margin-top:6px;
+  }
+  .wf-line{flex:1;width:2px;background:var(--brd);margin:4px auto;}
+  .wf-item:last-child .wf-line{display:none;}
+  .wf-body{flex:1;background:white;border:1px solid var(--brd);border-radius:12px;padding:16px 20px;margin-bottom:12px;margin-left:12px;}
+  .wf-body h4{font-size:14px;font-weight:700;margin-bottom:5px;}
+  .wf-body p{font-size:13px;color:var(--mid);line-height:1.7;}
+  .wf-body .wf-tag{font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--soft);padding:2px 7px;border-radius:4px;color:var(--a2);margin-right:4px;}
+
+  /* ─── TIPS ─── */
+  .tip{background:var(--a1l);border-left:4px solid var(--a1);border-radius:0 12px 12px 0;padding:16px 20px;margin:18px 0;font-size:14px;line-height:1.75;}
+  .tip strong{color:var(--a1);display:block;margin-bottom:4px;font-size:13px;}
+  .warn{background:var(--a3l);border-left:4px solid var(--a3);border-radius:0 12px 12px 0;padding:16px 20px;margin:18px 0;font-size:14px;line-height:1.75;}
+  .warn strong{color:#9a3412;display:block;margin-bottom:4px;}
+  .info{background:var(--a2l);border-left:4px solid var(--a2);border-radius:0 12px 12px 0;padding:16px 20px;margin:18px 0;font-size:14px;line-height:1.75;}
+  .info strong{color:#4c1d95;display:block;margin-bottom:4px;}
+
+  /* ─── DIVIDER ─── */
+  hr.div{border:none;border-top:1px solid var(--brd);margin:46px 0;}
+
+  /* ─── SUMMARY ─── */
+  .summary{background:var(--dark);color:white;border-radius:20px;padding:44px;margin:50px 0;}
+  .summary h2{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:2px;color:#5eead4;margin-bottom:26px;}
+  .sgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .sitem{background:rgba(255,255,255,.04);border:1px solid rgba(15,118,110,.2);border-radius:12px;padding:18px 22px;}
+  .sitem h4{font-size:12px;font-weight:700;letter-spacing:1px;color:#5eead4;text-transform:uppercase;margin-bottom:8px;}
+  .sitem p{font-size:14px;color:rgba(255,255,255,.75);line-height:1.7;}
+
+  /* ─── CHECKLIST ─── */
+  .ckbox{background:white;border:1px solid var(--brd);border-radius:16px;padding:28px 32px;margin-bottom:40px;box-shadow:0 1px 8px rgba(0,0,0,.04);}
+  .ckbox h3{font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--green);margin-bottom:18px;}
+
+  /* ─── FOOTER ─── */
+  footer{background:var(--dark);padding:32px 40px;text-align:center;color:rgba(255,255,255,.3);font-size:13px;}
+  footer a{color:#5eead4;text-decoration:none;}
+
+  code{font-family:'JetBrains Mono',monospace;font-size:13px;background:var(--soft);padding:2px 7px;border-radius:5px;color:var(--a2);}
+
+  @media(max-width:640px){
+    .hero,.wrap{padding-left:18px;padding-right:18px;}
+    .pipeline-deco{display:none;}
+    .pip-row{flex-direction:column;gap:8px;}
+    .pip-arr{transform:rotate(90deg);display:block;text-align:center;}
+    .sgrid{grid-template-columns:1fr;}
+    .snav-links{display:none;}
+    .mblock,.scene,.pblock{padding:20px 18px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ─── HERO ─── -->
+<header class="hero">
+  <div class="hi">
+    <div class="h-week">4주차 · AI 에이전트와 미래 &nbsp;/&nbsp; DAY 26</div>
+    <h1>실전 컴퓨터 <span>제어</span></h1>
+    <p class="hero-sub">
+      브라우저 검색, 앱 조작, 파일 처리—<br>
+      여러 단계를 이어가는 진짜 자동화 파이프라인을 직접 실행합니다.
+    </p>
+    <div class="hero-meta">
+      <span class="h-badge">🎯 난이도: 중급 (실전 중심)</span>
+      <span class="h-badge">⏱ 학습 시간: 90~120분</span>
+      <span class="h-badge">📋 25일차 이어서</span>
+      <span class="h-badge">🔧 Claude Cowork / Code</span>
+    </div>
+  </div>
+  <div class="pipeline-deco">
+    <div class="pd-step"><div class="pd-dot"></div>브라우저 열기</div>
+    <div class="pd-step"><div class="pd-dot"></div>데이터 검색</div>
+    <div class="pd-step"><div class="pd-dot"></div>결과 추출</div>
+    <div class="pd-step"><div class="pd-dot"></div>앱에 입력</div>
+    <div class="pd-step"><div class="pd-dot"></div>보고서 저장</div>
+  </div>
+</header>
+
+<!-- ─── NAV ─── -->
+<nav class="snav">
+  <div class="snav-i">
+    <span class="snav-b">⚡ 실전 컴퓨터 제어 파이프라인</span>
+    <div class="snav-links">
+      <a href="#concept" class="act">파이프라인 설계</a>
+      <a href="#lv1">L1 브라우저</a>
+      <a href="#lv2">L2 앱 조작</a>
+      <a href="#lv3">L3 다단계</a>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <!-- ─── OBJ ─── -->
+  <div class="obj">
+    <h2>▶ 오늘의 학습 목표</h2>
+    <ul>
+      <li>단일 액션이 아닌 <strong>여러 단계로 이어지는 자동화 파이프라인</strong>을 설계하고 실행한다.</li>
+      <li>브라우저 검색 → 데이터 추출 → 앱 입력의 크로스 앱 워크플로우를 완성한다.</li>
+      <li>에러 처리와 체크포인트를 포함한 안전한 다단계 자동화 프롬프트를 작성한다.</li>
+      <li>업무 유형별 실전 파이프라인 템플릿을 익혀 즉시 업무에 적용한다.</li>
+      <li>자동화 실패 시 디버깅과 수동 개입 방법을 익힌다.</li>
+    </ul>
+  </div>
+
+  <!-- ─── CONCEPT ─── -->
+  <section class="concept" id="concept">
+    <div class="sec-lbl">📖 핵심 개념</div>
+    <h2>다단계 파이프라인 — "한 명령으로 여러 앱을 넘나들다"</h2>
+
+    <p>
+      25일차에서 Computer Use의 원리(비전-액션 루프)를 이해했다면,
+      오늘은 그것을 <strong>실제 업무 자동화에 직접 적용</strong>합니다.
+      진짜 자동화의 힘은 단일 앱 조작이 아니라,
+      <strong>여러 앱과 서비스를 이어가는 파이프라인</strong>에서 나옵니다.
+    </p>
+    <p>
+      예를 들어 — "경쟁사 3곳의 신제품 가격을 웹에서 조사하고, 
+      엑셀에 정리하고, 슬라이드에 차트로 넣어줘."
+      이것을 <strong>한 번의 지시로</strong> 실행하는 것이 오늘의 목표입니다.
+    </p>
+
+    <!-- PIPELINE VISUAL -->
+    <div class="pipeline">
+      <div class="pip-title">⚡ 다단계 자동화 파이프라인 예시 — "경쟁사 가격 조사 → 보고서"</div>
+      <div class="pip-row">
+        <div class="pip-box act">
+          <div class="pip-ico">🌐</div>
+          <div class="pip-nm">1. 브라우저 열기</div>
+          <div class="pip-desc">구글 검색창 접근</div>
+        </div>
+        <div class="pip-arr">→</div>
+        <div class="pip-box">
+          <div class="pip-ico">🔍</div>
+          <div class="pip-nm">2. 검색 & 탐색</div>
+          <div class="pip-desc">각 사이트 방문, 가격 확인</div>
+        </div>
+        <div class="pip-arr">→</div>
+        <div class="pip-box act">
+          <div class="pip-ico">📋</div>
+          <div class="pip-nm">3. 데이터 추출</div>
+          <div class="pip-desc">가격·스펙 스크린샷 저장</div>
+        </div>
+        <div class="pip-arr">→</div>
+        <div class="pip-box">
+          <div class="pip-ico">📊</div>
+          <div class="pip-nm">4. 엑셀 정리</div>
+          <div class="pip-desc">비교표 작성 & 저장</div>
+        </div>
+        <div class="pip-arr">→</div>
+        <div class="pip-box act">
+          <div class="pip-ico">📑</div>
+          <div class="pip-nm">5. 보고서 완성</div>
+          <div class="pip-desc">PPT/Word 자동 생성</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DESIGN PRINCIPLES -->
+    <p style="margin:24px 0 14px;"><strong>좋은 다단계 프롬프트의 5가지 설계 원칙</strong></p>
+    <div class="wf-steps">
+      <div class="wf-item">
+        <div class="wf-left">
+          <div class="wf-circle" style="background:var(--a1l);color:var(--a1);">1</div>
+          <div class="wf-line"></div>
+        </div>
+        <div class="wf-body">
+          <h4>단계를 명시적으로 번호 매기기</h4>
+          <p>"다음을 순서대로 해줘: 1단계... 2단계..."처럼 순서를 명확히 하면 중간에 길을 잃지 않습니다. 단계 완료 보고도 요청하세요.</p>
+        </div>
+      </div>
+      <div class="wf-item">
+        <div class="wf-left">
+          <div class="wf-circle" style="background:var(--a1l);color:var(--a1);">2</div>
+          <div class="wf-line"></div>
+        </div>
+        <div class="wf-body">
+          <h4>각 단계의 성공 조건 정의</h4>
+          <p>"로그인이 완료된 것은 대시보드 화면이 보일 때"처럼 각 단계가 언제 완료됐는지 클로드가 알 수 있도록 합니다.</p>
+        </div>
+      </div>
+      <div class="wf-item">
+        <div class="wf-left">
+          <div class="wf-circle" style="background:var(--a1l);color:var(--a1);">3</div>
+          <div class="wf-line"></div>
+        </div>
+        <div class="wf-body">
+          <h4>실패 시 처리 방법 명시</h4>
+          <p>"페이지를 찾지 못하면 다음 사이트로 넘어가줘", "오류가 나면 스크린샷과 함께 나에게 보고해줘"처럼 예외 상황을 미리 정의합니다.</p>
+        </div>
+      </div>
+      <div class="wf-item">
+        <div class="wf-left">
+          <div class="wf-circle" style="background:var(--a1l);color:var(--a1);">4</div>
+          <div class="wf-line"></div>
+        </div>
+        <div class="wf-body">
+          <h4>핵심 체크포인트 설정</h4>
+          <p>되돌릴 수 없는 액션(파일 저장, 전송, 삭제) 전에는 반드시 확인을 받도록 설계합니다. "저장 전 최종 결과물을 보여주고 확인 후 저장해줘."</p>
+        </div>
+      </div>
+      <div class="wf-item">
+        <div class="wf-left">
+          <div class="wf-circle" style="background:var(--a1l);color:var(--a1);">5</div>
+        </div>
+        <div class="wf-body">
+          <h4>중간 결과물 저장 요청</h4>
+          <p>긴 파이프라인에서 중간 데이터를 임시 파일로 저장해두면, 후반부에 실패해도 처음부터 다시 하지 않아도 됩니다.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="tip">
+      <strong>💡 오늘 실습 환경 선택</strong>
+      <strong>Claude Cowork 사용자</strong>: L1, L2의 프롬프트를 그대로 사용. Claude Cowork 세션에서 실행하면 됩니다.<br>
+      <strong>Claude Code Desktop 사용자</strong>: L3의 Claude Code 전용 프롬프트를 사용. computer-use MCP가 활성화된 상태에서 실행.<br>
+      두 환경이 없다면 프롬프트 구조와 패턴을 익히고, 직접 적용 가능한 상황을 파악하는 데 집중하세요.
+    </div>
+  </section>
+
+  <hr class="div">
+
+  <!-- ════════════════════════════════════ -->
+  <!-- LEVEL 1 -->
+  <!-- ════════════════════════════════════ -->
+  <section class="level lv1" id="lv1">
+    <div class="lvhd">
+      <div class="lnum">L1</div>
+      <div class="lttl">
+        <h2>브라우저 자동화 — 검색·수집·정리를 한 번에</h2>
+        <p>⏱ 예상 시간 30분 &nbsp;|&nbsp; Claude Cowork + Chrome 확장</p>
+      </div>
+    </div>
+
+    <p style="margin-bottom:18px; font-size:15.5px; color:#334155; line-height:1.9;">
+      업무 시간의 상당 부분은 <em>검색하고, 읽고, 정리하는 반복</em>입니다.
+      클로드가 브라우저를 조작해 이 과정을 자동화하면,
+      여러분은 수집된 인사이트에만 집중할 수 있습니다.
+    </p>
+
+    <!-- METHOD -->
+    <div class="mblock">
+      <div class="mttl"><span class="mbar"></span>적용 방법 | 브라우저 자동화 워크플로우 설계</div>
+      <ol class="slist">
+        <li class="si">
+          <div class="snum">1</div>
+          <div class="sbody">
+            <strong>목표 사이트와 수집 항목을 명확히 정의하라</strong>
+            <span>"웹에서 찾아줘"보다 "네이버 쇼핑에서 [제품명]을 검색하고, 가격·별점·리뷰 수를 상위 5개 제품에서 추출해줘"처럼 구체적으로 지정합니다. 클로드가 헤매지 않습니다.</span>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">2</div>
+          <div class="sbody">
+            <strong>페이지네이션과 로딩 시간을 고려하라</strong>
+            <span>"여러 페이지가 있으면 최대 3페이지까지 수집해줘", "동적 콘텐츠가 로딩될 때까지 기다려줘"처럼 페이지 구조를 안내합니다. 특히 자바스크립트 렌더링 사이트는 로딩 대기가 필요합니다.</span>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">3</div>
+          <div class="sbody">
+            <strong>수집 완료 후 즉시 파일로 저장 요청</strong>
+            <span>브라우저 탭이 닫히거나 세션이 끊기면 수집한 데이터가 사라질 수 있습니다. 수집과 동시에 로컬 파일로 저장하도록 지시합니다.</span>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <!-- SCENARIO 1 -->
+    <div class="scene">
+      <div class="slbl">🎬 실습 시나리오 01</div>
+      <div class="sttl">경쟁사 3곳의 가격 및 리뷰를 조사해서 비교표 자동 완성</div>
+      <div class="sdesc">
+        마케팅/기획팀에서 주기적으로 하는 경쟁사 조사 업무. 직접 하면 1~2시간인 이 작업을 Claude Cowork + Chrome 확장으로 15~20분 안에 자동화합니다.
+      </div>
+      <ul class="ssteps">
+        <li>Claude Cowork 실행 → Desktop/research 폴더 선택 (또는 새로 생성)</li>
+        <li>Chrome 확장이 설치되어 있는지 확인 (브라우저 접근 필요)</li>
+        <li>아래 프롬프트 #1 복사 → 제품명과 경쟁사를 실제 정보로 수정 후 실행</li>
+        <li>클로드가 여러 사이트를 방문하는 것을 지켜보며 이상이 있으면 즉시 개입</li>
+        <li>수집 완료 후 생성된 파일을 열어 데이터 정확도 검증</li>
+      </ul>
+    </div>
+
+    <!-- PROMPT #1 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #1</h3>
+        <span class="ptag tt">Cowork — 경쟁사 가격 조사</span>
+      </div>
+      <div class="plbl">Claude Cowork 입력창에 붙여넣기 (Chrome 확장 필요)</div>
+      <div class="ptxt"><span class="ph">경쟁사 가격 조사를 수행하고 비교 보고서를 만들어줘.</span>
+
+<span class="po">== 조사 대상 ==</span>
+제품 카테고리: <span class="py">[예: 무선 이어폰]</span>
+조사할 브랜드:
+- 브랜드A: <span class="py">[예: 삼성 갤럭시 버즈3]</span>
+- 브랜드B: <span class="py">[예: 애플 에어팟 4세대]</span>
+- 브랜드C: <span class="py">[예: 소니 WF-1000XM6]</span>
+
+<span class="po">== 1단계: 브라우저 데이터 수집 ==</span>
+각 제품에 대해 아래 사이트에서 정보 수집:
+<span class="pg">① 네이버 쇼핑</span> → 최저가, 판매처 수, 별점, 리뷰 수
+<span class="pg">② 쿠팡</span> → 현재 판매가, 로켓배송 여부, 구매 후기 요약
+<span class="pg">③ 제조사 공식 사이트</span> → 공식 소비자가, 주요 스펙
+
+각 사이트 방문 후 해당 화면을 스크린샷으로 저장:
+<span class="pc">/Desktop/research/screenshots/[브랜드명]_[사이트명].png</span>
+
+<span class="po">== 2단계: 비교표 파일 생성 ==</span>
+수집된 데이터를 엑셀 파일로 정리:
+파일명: <span class="py">/Desktop/research/경쟁사가격비교_[날짜].xlsx</span>
+
+표 형식:
+| 브랜드 | 공식가 | 네이버최저가 | 쿠팡가격 | 별점 | 리뷰수 | 특이사항 |
+|--------|-------|-----------|--------|-----|------|--------|
+
+<span class="po">== 오류 처리 ==</span>
+- 사이트 접근 불가 시: 해당 열에 "접근불가" 표시 후 계속 진행
+- 가격 정보가 없으면: "정보없음" 표시
+- 각 사이트 이동 전 현재 화면을 나에게 설명하고 진행
+
+<span class="pc">모든 수집 완료 후 파일 경로와 저장된 스크린샷 수를 알려줘.</span></div>
+    </div>
+
+    <!-- PROMPT #2 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #2</h3>
+        <span class="ptag tt">Cowork — 뉴스 모니터링 자동화</span>
+      </div>
+      <div class="plbl">매일 아침 실행하는 업계 뉴스 수집 파이프라인</div>
+      <div class="ptxt"><span class="ph">오늘 업계 뉴스를 수집하고 일일 브리핑 문서를 만들어줘.</span>
+
+<span class="po">== 수집 키워드 ==</span>
+<span class="py">[키워드1, 키워드2, 키워드3]</span>
+예: AI 스타트업, 생성형 AI, LLM 서비스
+
+<span class="po">== 1단계: 뉴스 수집 (3개 소스) ==</span>
+
+<span class="pg">소스 1: 네이버 뉴스</span>
+→ 각 키워드 검색 → "최신순" 정렬
+→ 오늘 날짜 기사만 수집 (어제 것은 제외)
+→ 각 키워드당 상위 3개 기사: 제목, URL, 첫 문단
+
+<span class="pg">소스 2: 구글 뉴스</span>
+→ news.google.com에서 검색
+→ "24시간 이내" 필터 설정
+→ 각 키워드당 상위 2개 기사: 제목, 출처, URL
+
+<span class="pg">소스 3: X (트위터) 검색</span> <span class="pc">(가능한 경우)</span>
+→ 키워드 검색 → "최신" 탭
+→ 영향력 있는 계정의 트윗 2~3개
+
+<span class="po">== 2단계: 중복 제거 & 중요도 분류 ==</span>
+동일한 뉴스가 여러 소스에서 나오면 하나만 유지.
+중요도 분류:
+- 🔥 핵심: 직접적으로 우리 업무에 영향
+- 📌 참고: 알아두면 좋은 트렌드
+- 💡 인사이트: 새로운 관점이나 아이디어
+
+<span class="po">== 3단계: 마크다운 브리핑 문서 저장 ==</span>
+파일: <span class="py">/Desktop/daily-briefing/[날짜]_뉴스.md</span>
+
+형식:
+# 일일 뉴스 브리핑 — [날짜]
+## 🔥 핵심 뉴스
+### [기사 제목]
+- 출처: [소스] | [날짜]
+- 요약: (2~3줄)
+- 왜 중요한가: (1줄 인사이트)
+- 링크: [URL]
+
+<span class="pc">수집 완료 후 총 기사 수와 파일 경로를 알려줘.</span></div>
+    </div>
+
+    <!-- PROMPT #3 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #3</h3>
+        <span class="ptag tt">Cowork — 폼 자동 작성</span>
+      </div>
+      <div class="plbl">반복적인 웹 폼 입력 자동화</div>
+      <div class="ptxt"><span class="ph">아래 정보로 웹사이트 문의 폼을 자동 작성해줘.</span>
+
+<span class="po">== 사이트 정보 ==</span>
+URL: <span class="py">[대상 사이트 URL]</span>
+폼 유형: <span class="py">[예: 제품 문의 / 견적 요청 / 뉴스레터 구독]</span>
+
+<span class="po">== 입력할 정보 ==</span>
+회사명: <span class="py">[회사명]</span>
+담당자: <span class="py">[이름]</span>
+이메일: <span class="py">[이메일]</span>
+전화번호: <span class="py">[전화번호]</span>
+문의 내용: <span class="py">[문의 내용 3~5줄]</span>
+
+<span class="po">== 실행 방법 ==</span>
+1. 위 URL을 브라우저에서 열어줘
+2. 폼의 각 필드를 찾아 정보를 입력해줘
+3. 입력 완료 후 전체 화면 스크린샷으로 내용 확인 요청
+4. <span class="pw">제출 버튼은 누르지 말고 나에게 확인 요청</span>
+
+<span class="pc">오류 처리:
+- 폼을 찾지 못하면 현재 화면 스크린샷과 함께 보고
+- 필수 항목 오류 발생 시 어떤 필드인지 알려줘
+- 캡차(CAPTCHA)가 있으면 멈추고 나에게 알려줘</span>
+
+<span class="po">== 반복 처리 (여러 사이트일 경우) ==</span>
+<span class="py">여러 사이트 URL을 리스트로 제공하면
+각 사이트마다 위 과정을 반복해줘.
+각 사이트 완료 시 결과를 알려주고 다음으로 진행.</span></div>
+    </div>
+
+  </section>
+
+  <hr class="div">
+
+  <!-- ════════════════════════════════════ -->
+  <!-- LEVEL 2 -->
+  <!-- ════════════════════════════════════ -->
+  <section class="level lv2" id="lv2">
+    <div class="lvhd">
+      <div class="lnum">L2</div>
+      <div class="lttl">
+        <h2>데스크탑 앱 조작 — 코드 없이 앱을 제어하다</h2>
+        <p>⏱ 예상 시간 30분 &nbsp;|&nbsp; GUI 앱 직접 자동화</p>
+      </div>
+    </div>
+
+    <p style="margin-bottom:18px; font-size:15.5px; color:#334155; line-height:1.9;">
+      API가 없거나, GUI에서만 할 수 있는 작업들이 있습니다.
+      클로드는 화면을 보고 어떤 앱이든 인간처럼 조작할 수 있습니다.
+      엑셀, 파워포인트, 사내 전용 소프트웨어까지 포함해서요.
+    </p>
+
+    <div class="warn">
+      <strong>⚠️ 앱 자동화 시 주의사항</strong>
+      앱을 직접 조작하므로 예상치 못한 변경이 생길 수 있습니다.
+      중요한 파일은 미리 복사본(백업)을 만들고 시작하세요.
+      특히 저장, 전송, 삭제 작업은 반드시 확인 단계를 넣으세요.
+    </div>
+
+    <!-- METHOD -->
+    <div class="mblock">
+      <div class="mttl"><span class="mbar"></span>적용 방법 | 데스크탑 앱 자동화 핵심 패턴</div>
+      <ol class="slist">
+        <li class="si">
+          <div class="snum">1</div>
+          <div class="sbody">
+            <strong>앱 이름과 버전을 명시하라</strong>
+            <span>"엑셀로 만들어줘"보다 "Microsoft Excel을 열고"처럼 정확한 앱 이름을 쓰면 클로드가 올바른 앱을 찾습니다. 버전별로 UI가 다를 경우 버전도 명시하세요.</span>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">2</div>
+          <div class="sbody">
+            <strong>메뉴 경로를 구체적으로 설명하라</strong>
+            <span>"차트를 만들어줘"보다 "삽입 → 차트 → 막대형 → 클러스터형 막대 선택"처럼 메뉴 경로를 알고 있다면 명시합니다. 모른다면 "차트 삽입 방법을 찾아서 진행해줘"라고 해도 됩니다.</span>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">3</div>
+          <div class="sbody">
+            <strong>작업 전 파일 상태를 확인시켜라</strong>
+            <span>"현재 파일의 내용을 먼저 스크린샷으로 보여줘"라고 하면 클로드가 올바른 파일을 열었는지 확인할 수 있습니다. 엉뚱한 파일을 수정하는 실수를 방지합니다.</span>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <!-- SCENARIO 2 -->
+    <div class="scene">
+      <div class="slbl">🎬 실습 시나리오 02</div>
+      <div class="sttl">수집된 데이터로 엑셀 차트 & 파워포인트 자동 완성</div>
+      <div class="sdesc">
+        시나리오 01에서 수집한 경쟁사 가격 데이터를 바탕으로, 엑셀에서 차트를 만들고 파워포인트 보고서 슬라이드까지 자동으로 완성합니다.
+      </div>
+      <ul class="ssteps">
+        <li>L1에서 생성한 경쟁사가격비교.xlsx 파일이 있는지 확인</li>
+        <li>Cowork에서 프롬프트 #4 실행 → 엑셀 차트 자동 생성 확인</li>
+        <li>생성된 차트가 마음에 들면 프롬프트 #5로 PPT 보고서 자동 생성</li>
+        <li>최종 PPT를 열어서 검토 후 필요한 수정 사항 피드백</li>
+      </ul>
+    </div>
+
+    <!-- PROMPT #4 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #4</h3>
+        <span class="ptag tv">앱 조작 — Excel 차트 자동 생성</span>
+      </div>
+      <div class="plbl">수집된 데이터로 엑셀 차트 만들기</div>
+      <div class="ptxt"><span class="ph">엑셀 파일을 열어서 가격 비교 차트를 만들어줘.</span>
+
+<span class="po">== 대상 파일 ==</span>
+파일 경로: <span class="py">/Desktop/research/경쟁사가격비교_[날짜].xlsx</span>
+
+<span class="po">== 1단계: 파일 확인 ==</span>
+파일을 Excel로 열고 현재 데이터 구조를 스크린샷으로 보여줘.
+내가 "확인, 진행해줘"라고 하면 2단계 실행.
+
+<span class="po">== 2단계: 차트 생성 ==</span>
+<span class="pg">차트 1: 가격 비교 막대 차트</span>
+- 데이터 범위: 브랜드명 + 공식가 + 최저가 열
+- 차트 유형: 클러스터형 막대 (브랜드별 나란히)
+- 색상: 공식가(파랑), 최저가(초록)
+- 제목: "경쟁사 가격 비교 — [월]"
+- 데이터 레이블 표시 (원 단위)
+- 시트명: "가격차트"에 삽입
+
+<span class="pg">차트 2: 브랜드별 별점 분포 (별점 데이터 있을 경우)</span>
+- 막대 차트 + 별점 값 표시
+- 색상: 별점 높을수록 진한 초록
+
+<span class="po">== 3단계: 저장 ==</span>
+차트 완성 후 파일 저장 전 전체 화면을 보여줘.
+내가 승인하면 Ctrl+S로 저장.
+
+<span class="pc">오류 처리:
+- 파일이 없으면: 파일 경로 다시 확인 요청
+- 엑셀 수식 오류 발생 시: 오류 셀 스크린샷과 함께 보고</span></div>
+    </div>
+
+    <!-- PROMPT #5 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #5</h3>
+        <span class="ptag tv">앱 조작 — PowerPoint 보고서 자동 생성</span>
+      </div>
+      <div class="plbl">엑셀 데이터 → 파워포인트 보고서 완성</div>
+      <div class="ptxt"><span class="ph">엑셀 데이터를 바탕으로 경쟁사 분석 PPT를 만들어줘.</span>
+
+<span class="po">== 슬라이드 구성 (총 6장) ==</span>
+
+<span class="pg">슬라이드 1: 표지</span>
+- 제목: "경쟁사 가격 분석 보고서"
+- 부제: "[제품 카테고리] 시장 조사"
+- 날짜: [오늘 날짜]
+- 배경: 진한 네이비 + 흰 텍스트
+
+<span class="pg">슬라이드 2: 조사 개요</span>
+- 조사 목적 (2줄)
+- 조사 대상 브랜드 로고 자리 (텍스트로 대체)
+- 조사 일시 및 방법
+
+<span class="pg">슬라이드 3: 가격 비교표</span>
+- 엑셀에서 수집한 가격 비교 데이터를 표로
+- 최저가 행/열 강조 표시 (노란색 배경)
+
+<span class="pg">슬라이드 4: 가격 비교 차트</span>
+- 엑셀에서 만든 차트를 이미지로 캡처 후 삽입
+- 차트 아래 2줄 핵심 인사이트
+
+<span class="pg">슬라이드 5: 주요 발견 사항</span>
+- 3가지 핵심 인사이트 (불릿 포인트)
+- 각 인사이트에 관련 수치 포함
+
+<span class="pg">슬라이드 6: 제언 및 결론</span>
+- 데이터 기반 추천 사항 2~3개
+
+<span class="po">== 디자인 ==</span>
+테마: Office 내장 "메트로폴리탄" 또는 "슬라이스"
+폰트: 제목 28pt, 본문 18pt
+일관된 색상 팔레트 사용
+
+<span class="po">== 저장 ==</span>
+파일명: <span class="py">/Desktop/research/경쟁사분석보고서_[날짜].pptx</span>
+저장 전 슬라이드 미리보기 화면 보여줘.
+
+<span class="pc">슬라이드 작성 중 데이터가 부족하면
+"[데이터 필요]" 플레이스홀더로 표시해줘.</span></div>
+    </div>
+
+    <!-- PROMPT #6 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #6</h3>
+        <span class="ptag tv">앱 조작 — 이미지 일괄 처리</span>
+      </div>
+      <div class="plbl">폴더의 이미지들을 일괄 처리하기</div>
+      <div class="ptxt"><span class="ph">폴더의 이미지 파일들을 일괄 처리해줘.</span>
+
+<span class="po">== 대상 폴더 ==</span>
+<span class="py">/Desktop/product-photos/</span>
+
+<span class="po">== 처리 작업 ==</span>
+<span class="pg">이미지 편집 앱 (미리보기/사진 앱) 활용:</span>
+
+1. 각 이미지를 순서대로 열기
+2. 다음 처리 수행:
+   - 크기: 가로 1200px로 통일 (비율 유지)
+   - 파일 형식: JPEG로 변환 (품질 85%)
+   - 파일명: original_name_1200px.jpg
+
+3. 처리된 파일을 새 폴더에 저장:
+   <span class="py">/Desktop/product-photos/processed/</span>
+
+<span class="po">== 처리 기록 ==</span>
+처리 완료 후 아래 형식으로 요약:
+- 총 처리 파일 수: X개
+- 성공: X개
+- 실패: X개 (이유 포함)
+- 저장 위치: [경로]
+
+<span class="pc">처리 중 오류 발생 시 해당 파일은 건너뛰고 계속 진행.
+원본 파일은 절대 수정하지 말고
+processed/ 폴더에만 저장할 것.</span></div>
+    </div>
+
+  </section>
+
+  <hr class="div">
+
+  <!-- ════════════════════════════════════ -->
+  <!-- LEVEL 3 -->
+  <!-- ════════════════════════════════════ -->
+  <section class="level lv3" id="lv3">
+    <div class="lvhd">
+      <div class="lnum">L3</div>
+      <div class="lttl">
+        <h2>다단계 통합 파이프라인 — 완전 자동화 시나리오</h2>
+        <p>⏱ 예상 시간 40분 &nbsp;|&nbsp; 여러 앱을 이어가는 실전 워크플로우</p>
+      </div>
+    </div>
+
+    <p style="margin-bottom:18px; font-size:15.5px; color:#334155; line-height:1.9;">
+      이제 진짜 실력을 발휘할 시간입니다.
+      브라우저 → 로컬 앱 → 파일 저장 → 이메일 발송까지 이어지는
+      <strong>완전한 업무 자동화 파이프라인</strong>을 실행합니다.
+      이것이 Computer Use의 진정한 가치입니다.
+    </p>
+
+    <!-- METHOD -->
+    <div class="mblock">
+      <div class="mttl"><span class="mbar"></span>적용 방법 | 안전한 다단계 파이프라인 설계</div>
+      <ol class="slist">
+        <li class="si">
+          <div class="snum">1</div>
+          <div class="sbody">
+            <strong>단계별 중간 저장 포인트를 의무화하라</strong>
+            <span>10단계짜리 파이프라인에서 9단계에서 실패하면 처음부터 다시 해야 합니다. 3~4단계마다 중간 결과를 파일로 저장해두면 실패 지점부터 재시작이 가능합니다.</span>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">2</div>
+          <div class="sbody">
+            <strong>단계 간 데이터 전달 방식을 명시하라</strong>
+            <span>"1단계에서 수집한 URL 목록을 /tmp/urls.txt에 저장하고, 2단계에서 이 파일을 읽어서 진행해줘"처럼 단계 간 데이터 전달 경로를 명확히 합니다.</span>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">3</div>
+          <div class="sbody">
+            <strong>최종 결과물 전 사람의 확인을 넣어라</strong>
+            <span>이메일 발송, 파일 업로드, SNS 게시처럼 외부로 나가는 모든 액션은 반드시 사람이 검토한 후 실행합니다. 자동화된 실수는 되돌리기 어렵습니다.</span>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">4</div>
+          <div class="sbody">
+            <strong>실패 시 재시작 지점을 명시하라</strong>
+            <span>"2단계에서 실패하면 1단계 결과물(/tmp/urls.txt)을 유지하고 2단계만 다시 실행해줘"처럼 재시작 포인트를 정의하면 부분 재실행이 가능합니다.</span>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <!-- SCENARIO 3 -->
+    <div class="scene">
+      <div class="slbl">🎬 실습 시나리오 03</div>
+      <div class="sttl">주간 업계 보고서 완전 자동화 파이프라인</div>
+      <div class="sdesc">
+        매주 월요일 아침에 실행하는 5단계 파이프라인. ①뉴스 수집 → ②데이터 정리 → ③보고서 작성 → ④PPT 생성 → ⑤이메일 발송 준비까지 자동으로 완성됩니다.
+      </div>
+      <ul class="ssteps">
+        <li>Claude Cowork 실행 → /Desktop/weekly-report 폴더 선택</li>
+        <li>프롬프트 #7을 실행 — 단계별로 진행되는 것을 모니터링</li>
+        <li>각 단계 완료 알림이 오면 결과 확인 후 "계속"으로 다음 단계 진행</li>
+        <li>최종 이메일 초안이 생성되면 내용 검토 → "발송" 또는 "수정" 선택</li>
+      </ul>
+    </div>
+
+    <!-- PROMPT #7: 마스터 파이프라인 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #7</h3>
+        <span class="ptag to">다단계 — 주간 보고서 완전 자동화</span>
+      </div>
+      <div class="plbl">5단계 통합 파이프라인 — 매주 실행용</div>
+      <div class="ptxt"><span class="ph">주간 업계 동향 보고서를 완전 자동화로 생성해줘.
+5단계로 진행하며, 각 단계 완료 시 보고 후 승인을 받아 다음 단계로.</span>
+
+<span class="po">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1단계: 뉴스 수집 (약 10분)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+브라우저로 아래 소스에서 지난 7일간 뉴스 수집:
+- 키워드: <span class="py">[키워드1], [키워드2], [키워드3]</span>
+- 소스: 네이버 뉴스, 구글 뉴스, 테크크런치
+- 수집 항목: 제목, URL, 날짜, 첫 문단
+- 중간 저장: <span class="pc">/Desktop/weekly-report/raw_news.json</span>
+
+<span class="pg">✅ 완료 조건: raw_news.json 파일 생성, 최소 15개 기사</span>
+
+<span class="po">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2단계: 분류 & 요약 (약 5분)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+수집된 기사를 카테고리별로 분류:
+- 🔥 주요 사건 (산업에 직접 영향)
+- 📊 시장 동향 (통계·수치 포함)
+- 🚀 신기술·신제품 출시
+- 🏢 기업 동향 (인수합병·투자·인사)
+
+각 카테고리 최대 3개, 각 기사 2줄 요약
+중간 저장: <span class="pc">/Desktop/weekly-report/classified_news.md</span>
+
+<span class="pg">✅ 완료 조건: classified_news.md 생성</span>
+
+<span class="po">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+3단계: 보고서 문서 작성 (약 5분)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+Word 문서로 보고서 작성:
+파일명: <span class="py">/Desktop/weekly-report/주간동향_[날짜].docx</span>
+
+구성:
+- 커버 페이지 (제목, 날짜, 작성: AI Assistant)
+- 이번 주 핵심 요약 (3줄)
+- 카테고리별 상세 내용
+- 시사점 및 주목 이슈 (2~3줄)
+
+<span class="pg">✅ 완료 조건: docx 파일 생성, 페이지 수 3~5페이지</span>
+
+<span class="po">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+4단계: PPT 요약본 생성 (약 5분)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+보고서 핵심 내용으로 5슬라이드 PPT 생성:
+파일명: <span class="py">/Desktop/weekly-report/주간동향_[날짜].pptx</span>
+
+슬라이드 1: 표지
+슬라이드 2: 이번 주 TOP 3 뉴스
+슬라이드 3: 카테고리별 주요 사항 (4분할)
+슬라이드 4: 주목할 기업/기술
+슬라이드 5: 다음 주 관심 이슈
+
+<span class="pg">✅ 완료 조건: pptx 파일 생성</span>
+
+<span class="po">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+5단계: 이메일 초안 작성 (최종 확인 필요)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+팀 공유용 이메일 초안 작성 (발송은 하지 말 것):
+
+제목: "[주간동향] XX월 XX일 주간 업계 뉴스 요약"
+수신: <span class="py">[수신자 이메일]</span>
+
+본문:
+- 인사말
+- 이번 주 핵심 3가지 (불릿)
+- 첨부 파일 안내 (docx, pptx)
+- 맺음말
+
+<span class="pw">⚠️ 이메일 초안만 작성하고 발송하지 말 것.
+내가 검토 후 "발송해줘"라고 말하면 그때 실행.</span>
+
+<span class="pg">✅ 완료 조건: 이메일 초안 화면에 표시</span>
+
+<span class="po">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+<span class="pc">각 단계 완료 시:
+1. "[단계 N] 완료: [완료 내용 요약]" 보고
+2. 생성된 파일 경로 안내
+3. 다음 단계 시작 전 내 확인 대기
+
+전체 완료 후:
+- 생성된 파일 목록 정리
+- 총 소요 시간 보고</span></div>
+    </div>
+
+    <!-- PROMPT #8 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #8</h3>
+        <span class="ptag to">다단계 — 데이터 입력 크로스 앱 파이프라인</span>
+      </div>
+      <div class="plbl">여러 시스템 간 데이터 이동 자동화</div>
+      <div class="ptxt"><span class="ph">여러 시스템 사이의 데이터 이동을 자동화해줘.</span>
+
+<span class="pc">시나리오: 이메일에서 주문 정보 수집 → 구글 시트 입력 → 재고 시스템 확인</span>
+
+<span class="po">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1단계: 이메일에서 주문 정보 추출
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+메일 앱을 열고 아래 조건의 이메일 찾기:
+- 발신자 도메인: <span class="py">[예: @order.shop.com]</span>
+- 오늘 날짜 수신분
+- 제목에 "주문" 또는 "Order" 포함
+
+각 이메일에서 추출:
+주문번호, 고객명, 제품명, 수량, 금액
+
+중간 저장: <span class="pc">/tmp/orders_today.csv</span>
+
+<span class="po">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2단계: 구글 시트에 데이터 입력
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+브라우저로 구글 시트 열기:
+URL: <span class="py">[구글 시트 URL]</span>
+
+시트명 "주문현황"의 마지막 행부터 데이터 추가:
+| 주문번호 | 고객명 | 제품명 | 수량 | 금액 | 입력일 |
+
+<span class="pw">⚠️ 입력 전 마지막 3행을 스크린샷으로 보여주고 확인 요청</span>
+
+<span class="po">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+3단계: 재고 확인 및 플래그
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+같은 시트의 "재고현황" 탭에서:
+주문된 제품의 현재 재고 수량 확인
+→ 재고 < 주문 수량이면: 해당 행에 "⚠️재고부족" 표시
+
+<span class="po">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+4단계: 담당자에게 슬랙 알림 (선택)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+재고부족 항목이 있으면 슬랙 앱에서 메시지 작성:
+채널: <span class="py">#재고-알림</span>
+내용: "오늘 주문 처리 완료. 재고부족 [N]건 확인 필요."
+
+<span class="pw">슬랙 전송 전 반드시 내용을 먼저 보여주고 확인 요청.</span>
+
+<span class="pc">오류 처리:
+- 이메일에서 주문 정보를 찾지 못하면: 0건 처리로 종료
+- 구글 시트 접근 불가 시: CSV 파일로 대신 저장
+- 각 단계 완료 시 처리 건수를 보고해줘</span></div>
+    </div>
+
+    <!-- PROMPT #9 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #9</h3>
+        <span class="ptag tb">Claude Code — 개발 테스트 자동화 파이프라인</span>
+      </div>
+      <div class="plbl">Claude Code Desktop에서 실행 (computer-use 활성화 후)</div>
+      <div class="ptxt"><span class="ph">이 웹앱의 전체 사용자 여정을 테스트해줘.
+브라우저를 직접 조작해서 실제 사용자처럼.</span>
+
+<span class="po">== 테스트 시나리오: 신규 사용자 온보딩 ==</span>
+
+<span class="pg">시나리오 A: 정상 가입 플로우</span>
+1. http://localhost:3000 접속
+2. "회원가입" 버튼 찾아서 클릭
+3. 아래 정보로 폼 작성:
+   - 이름: 테스트유저
+   - 이메일: test_[timestamp]@test.com
+   - 비밀번호: Test123!@#
+4. "가입하기" 클릭
+5. 이메일 인증 화면이 나오는지 확인
+6. 성공/실패 여부와 화면 스크린샷 저장
+
+<span class="pg">시나리오 B: 유효성 검사 테스트</span>
+1. 회원가입 폼으로 이동
+2. 아래 케이스들을 하나씩 테스트:
+   - 이메일 형식 오류 (abc@없는형식)
+   - 비밀번호 너무 짧음 (123)
+   - 필수 항목 비워서 제출
+3. 각 케이스에서 올바른 오류 메시지가 나오는지 확인
+
+<span class="pg">시나리오 C: 로그인 & 로그아웃</span>
+1. 가입한 계정으로 로그인
+2. 대시보드 화면으로 이동 확인
+3. 프로필 → 로그아웃 클릭
+4. 로그인 페이지로 리다이렉트 확인
+
+<span class="po">== 테스트 보고서 생성 ==</span>
+테스트 완료 후 아래 파일 생성:
+<span class="py">/src/__tests__/e2e_report_[timestamp].md</span>
+
+형식:
+## E2E 테스트 리포트 — [날짜시간]
+### 시나리오 A: [통과/실패]
+- 스텝별 결과
+- 발견된 버그 (있을 경우)
+### 버그 목록
+| 심각도 | 설명 | 재현 방법 |
+
+<span class="pc">버그 발견 시 즉시 알려주되, 자동으로 코드를 수정하지 말 것.
+수정이 필요한지 내가 결정할게.
+테스트 중 앱이 다운되면 서버 재시작 후 계속 진행해도 돼.</span></div>
+    </div>
+
+    <!-- PROMPT #10: 에러 처리 & 재시작 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #10</h3>
+        <span class="ptag tg">디버깅 & 재시작 프롬프트</span>
+      </div>
+      <div class="plbl">자동화가 중간에 멈췄을 때 — 재시작 패턴</div>
+      <div class="ptxt"><span class="pc">━━━ 상황 A: 특정 단계에서 실패했을 때 ━━━</span>
+<span class="ph">이전 작업이 [N단계]에서 중단됐어.
+[N-1단계]까지의 결과물은 [경로]에 있어.
+[N단계]부터 다시 시작해줘.</span>
+
+<span class="pc">현재 상태:</span>
+- 완료된 것: <span class="py">[완료 항목 목록]</span>
+- 실패한 것: <span class="py">[실패 단계와 오류 내용]</span>
+- 남은 것: <span class="py">[남은 단계]</span>
+
+<span class="pc">━━━ 상황 B: 예상치 못한 화면이 나타났을 때 ━━━</span>
+<span class="ph">작업 중 예상치 못한 화면이 나타났어.
+현재 화면을 스크린샷으로 보여줘.
+이것이 무엇인지 설명하고 어떻게 처리해야 할지 제안해줘.</span>
+<span class="pc">직접 클릭하거나 닫지 말고 내 지시를 기다려.</span>
+
+<span class="pc">━━━ 상황 C: 느리거나 응답 없을 때 ━━━</span>
+<span class="ph">현재 페이지나 앱이 응답이 없거나 매우 느려.
+30초 기다려봐.
+그래도 안 되면 새로고침 또는 앱 재시작 시도.
+그것도 안 되면 이 단계는 건너뛰고 다음 단계로.</span>
+
+<span class="pc">━━━ 상황 D: 잘못된 데이터가 입력됐을 때 ━━━</span>
+<span class="ph">방금 입력한 데이터가 잘못된 것 같아.
+Ctrl+Z로 취소할 수 있으면 취소하고
+다시 올바른 데이터로 입력해줘:</span>
+<span class="py">[올바른 데이터 내용]</span>
+<span class="pc">저장/확정 버튼은 내가 확인하기 전까지 누르지 마.</span>
+
+<span class="pc">━━━ 완료 후 일일 자동화 로그 ━━━</span>
+<span class="ph">오늘 실행한 자동화 작업 전체를 정리해줘.</span>
+<span class="pg">파일: /Desktop/automation-log/[날짜]_자동화로그.md
+형식:
+## 자동화 실행 로그 — [날짜]
+| 시간 | 작업명 | 상태 | 처리건수 | 비고 |
+최종 성공률: X%
+다음 실행 시 주의사항: [있으면 기록]</span></div>
+    </div>
+
+    <!-- ADVANCED TIP: 자동화 습관 -->
+    <div class="mblock" style="margin-top:10px;">
+      <div class="mttl"><span class="mbar"></span>심화 | 지속 가능한 자동화를 위한 운영 전략</div>
+      <ol class="slist">
+        <li class="si">
+          <div class="snum">1</div>
+          <div class="sbody">
+            <strong>자주 쓰는 파이프라인은 프롬프트 파일로 저장</strong>
+            <span>매주 실행하는 파이프라인 프롬프트를 <code>~/automation-prompts/weekly-report.md</code>처럼 파일로 저장해두면, 복사해서 바로 쓸 수 있습니다. Claude Code 슬래시 커맨드(.claude/commands/)로 등록하면 더 편리합니다.</span>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">2</div>
+          <div class="sbody">
+            <strong>자동화 로그를 습관적으로 남겨라</strong>
+            <span>어떤 자동화가 언제 실행됐고, 결과가 어땠는지 기록하면 나중에 개선이 쉬워집니다. "오늘 경쟁사 조사 자동화: 15개 데이터 수집, 2개 접근 불가"처럼 간단하게라도 남기세요.</span>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">3</div>
+          <div class="sbody">
+            <strong>월 1회 프롬프트 정비 시간을 가져라</strong>
+            <span>사이트 UI가 바뀌거나, 업무 프로세스가 달라지면 기존 프롬프트가 작동하지 않을 수 있습니다. 월 1회 "이 파이프라인 테스트 실행" + "업데이트된 부분 수정"으로 자동화를 최신 상태로 유지하세요.</span>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+  </section>
+
+  <!-- ─── SUMMARY ─── -->
+  <div class="summary">
+    <h2>📌 26일차 핵심 정리</h2>
+    <div class="sgrid">
+      <div class="sitem">
+        <h4>다단계 파이프라인의 핵심</h4>
+        <p>단계 번호 매기기 + 성공 조건 정의 + 실패 처리 + 체크포인트 + 중간 저장. 이 5가지가 안전하고 완성도 높은 자동화를 만든다.</p>
+      </div>
+      <div class="sitem">
+        <h4>브라우저 자동화</h4>
+        <p>경쟁사 조사, 뉴스 수집, 폼 자동 작성. "결과 중심"으로 지시하고 데이터는 즉시 로컬 파일로 저장. 페이지네이션과 로딩 대기 명시.</p>
+      </div>
+      <div class="sitem">
+        <h4>앱 조작 자동화</h4>
+        <p>엑셀 차트 생성, PPT 보고서 완성, 이미지 일괄 처리. 작업 전 파일 상태 확인, 저장 전 반드시 미리보기 요청.</p>
+      </div>
+      <div class="sitem">
+        <h4>크로스 앱 파이프라인</h4>
+        <p>이메일 → 스프레드시트 → 슬랙처럼 여러 앱을 이어가는 워크플로우. 외부 전송(발송/업로드) 전 반드시 사람 확인.</p>
+      </div>
+      <div class="sitem">
+        <h4>재시작 & 디버깅</h4>
+        <p>중간 저장 파일로 실패 지점부터 재시작. 예상치 못한 화면이나 오류는 즉시 보고 후 대기. 클릭하지 말고 확인 먼저.</p>
+      </div>
+      <div class="sitem">
+        <h4>내일 예고</h4>
+        <p>27일차: 보안 및 데이터 정책 — 데이터 학습 제외 설정 및 안전한 AI 활용 가이드.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── CHECKLIST ─── -->
+  <div class="ckbox">
+    <h3>✅ 오늘 실습 체크리스트</h3>
+    <ol class="slist">
+      <li class="si">
+        <div class="snum" style="background:#ccfbf1;color:var(--a1);">1</div>
+        <div class="sbody">
+          <strong>브라우저 자동화 실행 완료</strong>
+          <p>프롬프트 #1 또는 #2로 실제 웹 데이터를 수집하고 로컬 파일로 저장했나요? 수집된 데이터의 정확도를 검증했나요?</p>
+        </div>
+      </li>
+      <li class="si">
+        <div class="snum" style="background:#ccfbf1;color:var(--a1);">2</div>
+        <div class="sbody">
+          <strong>앱 조작 자동화 완료</strong>
+          <p>엑셀 차트 또는 PPT가 자동으로 생성됐나요? 저장 전 확인 단계가 작동했나요?</p>
+        </div>
+      </li>
+      <li class="si">
+        <div class="snum" style="background:#ccfbf1;color:var(--a1);">3</div>
+        <div class="sbody">
+          <strong>다단계 파이프라인 설계 경험</strong>
+          <p>내 업무에서 3단계 이상의 자동화 파이프라인을 설계해보고 프롬프트를 작성해봤나요?</p>
+        </div>
+      </li>
+      <li class="si">
+        <div class="snum" style="background:#ccfbf1;color:var(--a1);">4</div>
+        <div class="sbody">
+          <strong>에러 처리 패턴 이해</strong>
+          <p>중간에 실패했을 때 재시작하는 방법(프롬프트 #10)을 이해하고, 본인의 파이프라인에 오류 처리를 추가했나요?</p>
+        </div>
+      </li>
+    </ol>
+  </div>
+
+</div><!-- /wrap -->
+
+<footer>
+  <p>클로드(Claude) 활용 및 교육 통합 가이드 · 4주차 26일차 · 실전 컴퓨터 제어</p>
+  <p style="margin-top:8px;">
+    <a href="https://platform.claude.com/docs/en/agents-and-tools/tool-use/computer-use-tool">Computer Use 공식 문서</a> &nbsp;·&nbsp;
+    <a href="https://code.claude.com/docs/en/desktop">Claude Code Desktop 문서</a>
+  </p>
+</footer>
+
+</body>
+</html>

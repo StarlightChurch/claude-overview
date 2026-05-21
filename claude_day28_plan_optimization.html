@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>28일차: 플랜 최적화 | Claude 활용 가이드</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;500;600&family=Bebas+Neue&display=swap');
+
+  :root {
+    --ink:   #06080f;
+    --paper: #f4f6fc;
+    --a1:    #7c3aed;   /* violet — premium */
+    --a1l:   #ede9fe;
+    --a2:    #0ea5e9;   /* sky — team/collab */
+    --a2l:   #e0f2fe;
+    --a3:    #059669;   /* emerald — value */
+    --a3l:   #d1fae5;
+    --gold:  #d97706;
+    --goldl: #fef3c7;
+    --red:   #dc2626;
+    --soft:  #edf0f9;
+    --mid:   #64748b;
+    --brd:   #dde3f0;
+    --dark:  #06080f;
+    --code:  #0d1117;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{font-family:'Noto Sans KR',sans-serif;background:var(--paper);color:var(--ink);line-height:1.8;font-size:16px;}
+
+  /* ─── HERO ─── */
+  .hero{background:var(--dark);padding:64px 40px 54px;position:relative;overflow:hidden;color:white;}
+  .hero::before{content:'';position:absolute;inset:0;
+    background:radial-gradient(ellipse at 15% 60%,rgba(124,58,237,.18) 0%,transparent 55%),
+               radial-gradient(ellipse at 85% 30%,rgba(14,165,233,.12) 0%,transparent 50%),
+               radial-gradient(ellipse at 50% 90%,rgba(5,150,105,.08) 0%,transparent 40%);}
+  .hi{max-width:900px;margin:0 auto;position:relative;z-index:1;}
+  .h-week{font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:#c4b5fd;margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+  .h-week::before{content:'';display:inline-block;width:28px;height:2px;background:#c4b5fd;}
+  .hero h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(38px,6vw,70px);letter-spacing:2px;line-height:1.05;margin-bottom:20px;}
+  .hero h1 span{color:#c4b5fd;}
+  .hero-sub{font-size:17px;color:rgba(255,255,255,.62);max-width:600px;font-weight:300;line-height:1.75;}
+  .hero-meta{margin-top:28px;display:flex;gap:12px;flex-wrap:wrap;}
+  .h-badge{background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.35);padding:7px 16px;border-radius:100px;font-size:12px;font-weight:600;color:#ddd6fe;}
+
+  /* ─── NAV ─── */
+  .snav{background:white;border-bottom:1px solid var(--brd);padding:13px 0;position:sticky;top:0;z-index:200;box-shadow:0 1px 8px rgba(0,0,0,.05);}
+  .snav-i{max-width:900px;margin:0 auto;padding:0 30px;display:flex;align-items:center;justify-content:space-between;}
+  .snav-b{font-size:13px;font-weight:700;color:var(--a1);}
+  .snav-links{display:flex;gap:6px;}
+  .snav-links a{padding:5px 13px;border-radius:100px;font-size:12px;font-weight:600;border:1px solid var(--brd);background:white;color:var(--mid);text-decoration:none;transition:all .15s;}
+  .snav-links a:hover,.snav-links a.act{background:var(--a1);color:white;border-color:var(--a1);}
+
+  /* ─── WRAP ─── */
+  .wrap{max-width:900px;margin:0 auto;padding:0 30px;}
+
+  /* ─── OBJ ─── */
+  .obj{background:var(--a1l);border-left:5px solid var(--a1);border-radius:0 14px 14px 0;padding:28px 32px;margin:40px 0;}
+  .obj h2{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--a1);margin-bottom:14px;}
+  .obj ul{list-style:none;display:flex;flex-direction:column;gap:9px;}
+  .obj li{display:flex;align-items:flex-start;gap:10px;font-size:15px;}
+  .obj li::before{content:'◆';color:var(--a1);font-size:10px;flex-shrink:0;margin-top:4px;}
+
+  /* ─── PLAN CARDS (big comparison) ─── */
+  .plan-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:0;border-radius:16px;overflow:hidden;border:1px solid var(--brd);margin:26px 0;box-shadow:0 2px 16px rgba(0,0,0,.07);}
+  .plan-col{display:flex;flex-direction:column;}
+  .pc-head{padding:20px 14px 16px;text-align:center;border-bottom:1px solid var(--brd);}
+  .pc-head.free{background:#f8f9fb;}
+  .pc-head.pro{background:var(--a3l);}
+  .pc-head.max{background:var(--goldl);}
+  .pc-head.team{background:var(--a2l);}
+  .pc-head.ent{background:var(--a1l);}
+  .plan-icon{font-size:26px;margin-bottom:6px;}
+  .plan-name{font-size:15px;font-weight:900;margin-bottom:4px;}
+  .plan-price{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;margin-bottom:2px;}
+  .free .plan-price{color:var(--mid);}
+  .pro .plan-price{color:var(--a3);}
+  .max .plan-price{color:var(--gold);}
+  .team .plan-price{color:var(--a2);}
+  .ent .plan-price{color:var(--a1);}
+  .plan-sub{font-size:11px;color:var(--mid);}
+  .pc-body{flex:1;padding:14px;background:white;border-right:1px solid var(--brd);}
+  .plan-col:last-child .pc-body{border-right:none;}
+  .pc-feat{list-style:none;display:flex;flex-direction:column;gap:6px;}
+  .pf{display:flex;align-items:flex-start;gap:6px;font-size:12.5px;color:#444;line-height:1.5;}
+  .pf::before{content:'·';color:var(--mid);flex-shrink:0;}
+  .pf.yes::before{content:'✓';color:var(--a3);font-weight:700;}
+  .pf.no::before{content:'✗';color:#ccc;}
+  .pf.warn::before{content:'△';color:var(--gold);}
+  .rec-badge{
+    display:inline-block;background:var(--gold);color:white;
+    font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;
+    letter-spacing:.5px;margin-top:6px;
+  }
+
+  /* ─── CONCEPT ─── */
+  .concept{padding:48px 0 20px;}
+  .sec-lbl{font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--mid);margin-bottom:8px;}
+  .concept h2{font-size:27px;font-weight:900;margin-bottom:18px;line-height:1.3;}
+  .concept p{font-size:15.5px;color:#334155;margin-bottom:16px;line-height:1.9;}
+
+  /* ─── DECISION TREE ─── */
+  .dtree{background:var(--dark);border-radius:18px;padding:32px;margin:26px 0;}
+  .dt-title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#c4b5fd;margin-bottom:24px;}
+  .dt-q{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:11px;padding:14px 18px;margin-bottom:10px;}
+  .dt-q-text{font-size:14px;font-weight:600;color:white;margin-bottom:8px;}
+  .dt-opts{display:flex;gap:10px;flex-wrap:wrap;}
+  .dt-opt{
+    padding:6px 14px;border-radius:7px;font-size:12.5px;font-weight:600;cursor:default;
+    display:flex;align-items:center;gap:6px;
+  }
+  .dt-opt.yes{background:rgba(5,150,105,.2);border:1px solid rgba(5,150,105,.4);color:#6ee7b7;}
+  .dt-opt.no{background:rgba(100,116,139,.15);border:1px solid rgba(100,116,139,.3);color:rgba(255,255,255,.55);}
+  .dt-opt.arr{color:rgba(255,255,255,.3);font-size:14px;}
+  .dt-ans{background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.35);border-radius:9px;padding:10px 14px;margin-top:6px;font-size:13px;color:#ddd6fe;display:flex;align-items:center;gap:8px;}
+  .dt-ans::before{content:'→';font-weight:700;}
+
+  /* ─── LEVEL SECTIONS ─── */
+  .level{padding:48px 0;}
+  .lvhd{display:flex;align-items:center;gap:18px;margin-bottom:32px;padding-bottom:20px;border-bottom:2px solid var(--brd);}
+  .lnum{width:64px;height:64px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:26px;flex-shrink:0;}
+  .lv1 .lnum{background:var(--a3l);color:var(--a3);border:2px solid var(--a3);}
+  .lv2 .lnum{background:var(--goldl);color:var(--gold);border:2px solid var(--gold);}
+  .lv3 .lnum{background:var(--a2l);color:var(--a2);border:2px solid var(--a2);}
+  .lttl h2{font-size:22px;font-weight:900;margin-bottom:4px;}
+  .lttl p{font-size:13px;color:var(--mid);font-weight:500;}
+
+  /* ─── METHOD BLOCK ─── */
+  .mblock{background:white;border:1px solid var(--brd);border-radius:16px;padding:28px 32px;margin-bottom:22px;box-shadow:0 1px 8px rgba(0,0,0,.04);}
+  .mttl{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--brd);display:flex;align-items:center;gap:10px;}
+  .lv1 .mttl{color:var(--a3);}
+  .lv2 .mttl{color:var(--gold);}
+  .lv3 .mttl{color:var(--a2);}
+  .mbar{width:4px;height:16px;border-radius:2px;display:inline-block;flex-shrink:0;}
+  .lv1 .mbar{background:var(--a3);}
+  .lv2 .mbar{background:var(--gold);}
+  .lv3 .mbar{background:var(--a2);}
+
+  .slist{list-style:none;display:flex;flex-direction:column;gap:18px;}
+  .si{display:flex;align-items:flex-start;gap:14px;}
+  .snum{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;margin-top:1px;}
+  .lv1 .snum{background:var(--a3l);color:var(--a3);}
+  .lv2 .snum{background:var(--goldl);color:var(--gold);}
+  .lv3 .snum{background:var(--a2l);color:var(--a2);}
+  .sbody strong{display:block;font-weight:700;font-size:15px;margin-bottom:4px;}
+  .sbody p,.sbody span{font-size:14px;color:#475569;line-height:1.8;}
+
+  /* ─── SCENARIO ─── */
+  .scene{background:linear-gradient(135deg,#06080f 0%,#140d26 100%);border-radius:16px;padding:28px 32px;margin-bottom:22px;color:white;position:relative;overflow:hidden;}
+  .scene::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 85% 25%,rgba(124,58,237,.12) 0%,transparent 55%);pointer-events:none;}
+  .slbl{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#c4b5fd;margin-bottom:10px;position:relative;z-index:1;}
+  .sttl{font-size:19px;font-weight:700;margin-bottom:10px;position:relative;z-index:1;}
+  .sdesc{font-size:14px;color:rgba(255,255,255,.6);line-height:1.8;margin-bottom:18px;position:relative;z-index:1;}
+  .ssteps{list-style:none;display:flex;flex-direction:column;gap:8px;position:relative;z-index:1;}
+  .ssteps li{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:rgba(255,255,255,.78);}
+  .ssteps li::before{content:'◆';color:#c4b5fd;font-size:9px;flex-shrink:0;margin-top:5px;}
+
+  /* ─── PROMPT BLOCK ─── */
+  .pblock{background:var(--code);border-radius:16px;padding:28px 32px;margin-bottom:22px;border:1px solid rgba(124,58,237,.2);}
+  .phd{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.06);}
+  .phd h3{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#c4b5fd;display:flex;align-items:center;gap:7px;}
+  .ptag{font-size:11px;font-weight:600;padding:4px 11px;border-radius:100px;text-transform:uppercase;}
+  .tv{background:rgba(124,58,237,.2);color:#c4b5fd;}
+  .tg{background:rgba(5,150,105,.18);color:#6ee7b7;}
+  .ts{background:rgba(14,165,233,.18);color:#7dd3fc;}
+  .to{background:rgba(217,119,6,.18);color:#fcd34d;}
+
+  .plbl{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);margin:14px 0 8px;}
+  .plbl:first-of-type{margin-top:0;}
+  .ptxt{font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.85;color:#c9d6e0;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:18px 20px;white-space:pre-wrap;word-break:break-word;}
+  .ph{color:#c4b5fd;}   /* violet */
+  .pg{color:#6ee7b7;}   /* green */
+  .py{color:#fda172;}   /* orange */
+  .pc{color:#6b8aad;}   /* comment */
+  .pb{color:#7dd3fc;}   /* blue */
+  .po{color:#fbbf24;}   /* gold */
+  .pw{color:white;font-weight:600;}
+
+  /* ─── COST CALCULATOR VISUAL ─── */
+  .calc-table{width:100%;border-collapse:collapse;border-radius:12px;overflow:hidden;margin:20px 0;box-shadow:0 2px 12px rgba(0,0,0,.05);}
+  .calc-table th{background:var(--dark);color:white;padding:12px 16px;text-align:left;font-size:13px;font-weight:700;}
+  .calc-table td{padding:11px 16px;font-size:14px;border-bottom:1px solid var(--brd);}
+  .calc-table tr:nth-child(even) td{background:var(--soft);}
+  .calc-table tr:last-child td{border-bottom:none;}
+  .calc-table .best{background:var(--a3l) !important;font-weight:700;}
+  .calc-table .best td:first-child::before{content:'★ ';color:var(--a3);}
+
+  /* ─── TIPS ─── */
+  .tip{background:var(--a1l);border-left:4px solid var(--a1);border-radius:0 12px 12px 0;padding:16px 20px;margin:18px 0;font-size:14px;line-height:1.75;}
+  .tip strong{color:#5b21b6;display:block;margin-bottom:4px;font-size:13px;}
+  .warn{background:var(--goldl);border-left:4px solid var(--gold);border-radius:0 12px 12px 0;padding:16px 20px;margin:18px 0;font-size:14px;line-height:1.75;}
+  .warn strong{color:#92400e;display:block;margin-bottom:4px;}
+  .ok{background:var(--a3l);border-left:4px solid var(--a3);border-radius:0 12px 12px 0;padding:16px 20px;margin:18px 0;font-size:14px;line-height:1.75;}
+  .ok strong{color:#065f46;display:block;margin-bottom:4px;}
+
+  /* ─── DIVIDER ─── */
+  hr.div{border:none;border-top:1px solid var(--brd);margin:46px 0;}
+
+  /* ─── PERSONA CARDS ─── */
+  .persona-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin:20px 0;}
+  .persona{background:white;border:1px solid var(--brd);border-radius:14px;padding:20px;transition:transform .2s,box-shadow .2s;}
+  .persona:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(124,58,237,.1);}
+  .p-ico{font-size:28px;margin-bottom:8px;}
+  .persona h4{font-size:14px;font-weight:700;margin-bottom:5px;}
+  .persona .p-tag{font-size:11px;font-weight:700;padding:3px 9px;border-radius:5px;display:inline-block;margin-bottom:8px;}
+  .p-free{background:var(--soft);color:var(--mid);}
+  .p-pro{background:var(--a3l);color:#065f46;}
+  .p-max{background:var(--goldl);color:#92400e;}
+  .p-team{background:var(--a2l);color:#075985;}
+  .persona p{font-size:13px;color:var(--mid);line-height:1.6;}
+
+  /* ─── SUMMARY ─── */
+  .summary{background:var(--dark);color:white;border-radius:20px;padding:44px;margin:50px 0;}
+  .summary h2{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:2px;color:#c4b5fd;margin-bottom:26px;}
+  .sgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .sitem{background:rgba(255,255,255,.04);border:1px solid rgba(124,58,237,.2);border-radius:12px;padding:18px 22px;}
+  .sitem h4{font-size:12px;font-weight:700;letter-spacing:1px;color:#c4b5fd;text-transform:uppercase;margin-bottom:8px;}
+  .sitem p{font-size:14px;color:rgba(255,255,255,.75);line-height:1.7;}
+
+  /* ─── CHECKLIST ─── */
+  .ckbox{background:white;border:1px solid var(--brd);border-radius:16px;padding:28px 32px;margin-bottom:40px;box-shadow:0 1px 8px rgba(0,0,0,.04);}
+  .ckbox h3{font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--a3);margin-bottom:18px;}
+
+  /* ─── FOOTER ─── */
+  footer{background:var(--dark);padding:32px 40px;text-align:center;color:rgba(255,255,255,.3);font-size:13px;}
+  footer a{color:#c4b5fd;text-decoration:none;}
+
+  code{font-family:'JetBrains Mono',monospace;font-size:13px;background:var(--soft);padding:2px 7px;border-radius:5px;color:var(--a1);}
+
+  @media(max-width:700px){
+    .plan-grid{grid-template-columns:1fr 1fr;overflow-x:auto;}
+    .hero,.wrap{padding-left:18px;padding-right:18px;}
+    .sgrid{grid-template-columns:1fr;}
+    .snav-links{display:none;}
+    .mblock,.scene,.pblock{padding:20px 18px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ─── HERO ─── -->
+<header class="hero">
+  <div class="hi">
+    <div class="h-week">4주차 · AI 에이전트와 미래 &nbsp;/&nbsp; DAY 28</div>
+    <h1>플랜 <span>최적화</span></h1>
+    <p class="hero-sub">
+      같은 돈으로 더 많이 쓰거나, 적은 돈으로 충분히 쓰거나—<br>
+      나의 사용 패턴에 딱 맞는 플랜을 찾아 지금 최적화합니다.
+    </p>
+    <div class="hero-meta">
+      <span class="h-badge">🎯 모든 사용자 해당</span>
+      <span class="h-badge">⏱ 학습 시간: 70~90분</span>
+      <span class="h-badge">💰 비용 절감 전략 포함</span>
+      <span class="h-badge">📊 2026년 4월 기준</span>
+    </div>
+  </div>
+</header>
+
+<!-- ─── NAV ─── -->
+<nav class="snav">
+  <div class="snav-i">
+    <span class="snav-b">💎 플랜 완전 정복 가이드</span>
+    <div class="snav-links">
+      <a href="#concept" class="act">플랜 비교</a>
+      <a href="#lv1">L1 Free→Pro</a>
+      <a href="#lv2">L2 Pro→Max</a>
+      <a href="#lv3">L3 팀 플랜</a>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <!-- ─── OBJ ─── -->
+  <div class="obj">
+    <h2>◆ 오늘의 학습 목표</h2>
+    <ul>
+      <li>Free / Pro / Max / Team / Enterprise 플랜의 핵심 차이를 정확히 파악한다.</li>
+      <li>나의 실제 사용 패턴을 분석해서 현재 플랜이 최적인지 진단한다.</li>
+      <li>사용량 한도에 걸렸을 때 비용 효율적으로 대처하는 방법을 익힌다.</li>
+      <li>팀 규모와 업무 유형에 따른 팀 플랜 도입 전략을 수립한다.</li>
+      <li>API 활용이 구독 플랜보다 유리한 시점을 판단할 수 있다.</li>
+    </ul>
+  </div>
+
+  <!-- ─── CONCEPT ─── -->
+  <section class="concept" id="concept">
+    <div class="sec-lbl">📖 핵심 개념 — 2026년 현재 플랜 구조</div>
+    <h2>5개 플랜, 어떻게 다른가</h2>
+    <p>
+      클로드는 개인용 4개 + 기업용 1개, 총 5개 플랜으로 운영됩니다.
+      단순히 "가격이 비쌀수록 좋다"가 아니라,
+      <strong>내 사용 패턴에 맞는 플랜을 찾는 것</strong>이 최적화의 핵심입니다.
+    </p>
+
+    <!-- PLAN CARDS -->
+    <div class="plan-grid">
+      <!-- FREE -->
+      <div class="plan-col">
+        <div class="pc-head free">
+          <div class="plan-icon">🆓</div>
+          <div class="plan-name">Free</div>
+          <div class="plan-price">$0</div>
+          <div class="plan-sub">무제한 기간</div>
+        </div>
+        <div class="pc-body">
+          <ul class="pc-feat">
+            <li class="pf yes">Claude Sonnet 4.6 기본 접근</li>
+            <li class="pf warn">메시지 제한 (하루 20~30회 수준)</li>
+            <li class="pf no">Claude Code 미지원</li>
+            <li class="pf no">Opus 4.6 미지원</li>
+            <li class="pf no">Cowork 미지원</li>
+            <li class="pf warn">데이터 학습 기본 ON (설정 필요)</li>
+            <li class="pf yes">모바일 앱 사용 가능</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- PRO -->
+      <div class="plan-col">
+        <div class="pc-head pro">
+          <div class="plan-icon">⭐</div>
+          <div class="plan-name">Pro</div>
+          <div class="plan-price">$20/월</div>
+          <div class="plan-sub">연간 약 $17/월</div>
+          <span class="rec-badge">개인 추천</span>
+        </div>
+        <div class="pc-body">
+          <ul class="pc-feat">
+            <li class="pf yes">Free 대비 5배 사용량</li>
+            <li class="pf yes">Opus 4.6 + Sonnet 4.6 전체 모델</li>
+            <li class="pf yes">Claude Code 사용 가능</li>
+            <li class="pf yes">Cowork 사용 가능</li>
+            <li class="pf yes">Google Workspace 연동</li>
+            <li class="pf yes">원격 MCP 커넥터</li>
+            <li class="pf yes">200K 컨텍스트 창</li>
+            <li class="pf warn">데이터 학습 기본 ON (설정 필요)</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- MAX -->
+      <div class="plan-col">
+        <div class="pc-head max">
+          <div class="plan-icon">🚀</div>
+          <div class="plan-name">Max</div>
+          <div class="plan-price">$100~200/월</div>
+          <div class="plan-sub">5× $100 / 20× $200</div>
+        </div>
+        <div class="pc-body">
+          <ul class="pc-feat">
+            <li class="pf yes">Pro 대비 5~20배 사용량</li>
+            <li class="pf yes">최우선 접속 (대기 없음)</li>
+            <li class="pf yes">신기능 최우선 접근</li>
+            <li class="pf yes">Pro 기능 모두 포함</li>
+            <li class="pf yes">Claude Code 1M 컨텍스트</li>
+            <li class="pf warn">개인 전용 (팀 공유 없음)</li>
+            <li class="pf warn">데이터 학습 기본 ON (설정 필요)</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- TEAM -->
+      <div class="plan-col">
+        <div class="pc-head team">
+          <div class="plan-icon">👥</div>
+          <div class="plan-name">Team</div>
+          <div class="plan-price">$25~150/석</div>
+          <div class="plan-sub">Standard~Premium / 최소 5명</div>
+        </div>
+        <div class="pc-body">
+          <ul class="pc-feat">
+            <li class="pf yes">데이터 학습 기본 OFF ★</li>
+            <li class="pf yes">공유 프로젝트 워크스페이스</li>
+            <li class="pf yes">중앙 관리·청구</li>
+            <li class="pf yes">Slack·M365 통합</li>
+            <li class="pf yes">SSO 지원</li>
+            <li class="pf yes">관리자 콘솔</li>
+            <li class="pf warn">Claude Code는 Premium 석만</li>
+            <li class="pf warn">최소 5명 필수</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ENTERPRISE -->
+      <div class="plan-col">
+        <div class="pc-head ent">
+          <div class="plan-icon">🏢</div>
+          <div class="plan-name">Enterprise</div>
+          <div class="plan-price">문의</div>
+          <div class="plan-sub">맞춤 계약</div>
+        </div>
+        <div class="pc-body">
+          <ul class="pc-feat">
+            <li class="pf yes">500K 컨텍스트 창</li>
+            <li class="pf yes">SCIM 프로비저닝</li>
+            <li class="pf yes">감사 로그 (Audit Log)</li>
+            <li class="pf yes">HIPAA 준수 옵션</li>
+            <li class="pf yes">전담 지원팀</li>
+            <li class="pf yes">ZDR (제로 데이터 보존)</li>
+            <li class="pf yes">Team 기능 전체 포함</li>
+            <li class="pf yes">Github 연동</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="warn">
+      <strong>⚠️ 가격은 변동될 수 있습니다</strong>
+      위 가격은 2026년 4월 기준입니다. Anthropic은 플랜 구조를 주기적으로 업데이트합니다.
+      구독 결정 전 <a href="https://claude.ai/upgrade" style="color:var(--gold);">claude.ai/upgrade</a>에서 최신 가격을 반드시 확인하세요.
+    </div>
+
+    <!-- DECISION TREE -->
+    <p style="margin:24px 0 14px;"><strong>나에게 맞는 플랜 결정 트리</strong></p>
+    <div class="dtree">
+      <div class="dt-title">🌲 플랜 선택 의사결정 트리</div>
+
+      <div class="dt-q">
+        <div class="dt-q-text">Q1. 지금 하루에 클로드를 몇 번이나 쓰나요?</div>
+        <div class="dt-opts">
+          <span class="dt-opt no">가끔 (주 1~3회)</span>
+          <span class="dt-opt arr">→</span>
+          <div class="dt-ans">Free 플랜으로 충분합니다. 한도에 걸리면 그때 업그레이드하세요.</div>
+        </div>
+        <div class="dt-opts" style="margin-top:8px;">
+          <span class="dt-opt yes">매일 20회 이상</span>
+          <span class="dt-opt arr">→</span>
+          <span class="dt-opt no" style="color:white;">Q2로 이동</span>
+        </div>
+      </div>
+
+      <div class="dt-q">
+        <div class="dt-q-text">Q2. 혼자 쓰나요, 팀이 함께 쓰나요? (5명 이상)</div>
+        <div class="dt-opts">
+          <span class="dt-opt no">혼자 (또는 2~4명)</span>
+          <span class="dt-opt arr">→</span>
+          <span class="dt-opt no" style="color:white;">Q3으로 이동</span>
+        </div>
+        <div class="dt-opts" style="margin-top:8px;">
+          <span class="dt-opt yes">팀 5명 이상</span>
+          <span class="dt-opt arr">→</span>
+          <div class="dt-ans">Team 플랜 고려. 데이터 보안 + 공유 워크스페이스 필요하면 Team이 최적.</div>
+        </div>
+      </div>
+
+      <div class="dt-q">
+        <div class="dt-q-text">Q3. 하루에 한도에 걸려서 막히는 일이 자주 있나요?</div>
+        <div class="dt-opts">
+          <span class="dt-opt no">Pro인데 가끔 막힘</span>
+          <span class="dt-opt arr">→</span>
+          <div class="dt-ans">Pro 유지 + 아래 사용량 최적화 팁 적용. Max는 아직 이릅니다.</div>
+        </div>
+        <div class="dt-opts" style="margin-top:8px;">
+          <span class="dt-opt yes">Pro인데 매일 막힘</span>
+          <span class="dt-opt arr">→</span>
+          <span class="dt-opt no" style="color:white;">Q4로 이동</span>
+        </div>
+      </div>
+
+      <div class="dt-q">
+        <div class="dt-q-text">Q4. Claude Code나 장시간 코딩/개발 작업이 주된 용도인가요?</div>
+        <div class="dt-opts">
+          <span class="dt-opt yes">코딩/개발이 주 용도</span>
+          <span class="dt-opt arr">→</span>
+          <div class="dt-ans">Max 5×($100) 또는 Max 20×($200) 권장. 1M 컨텍스트 창 + 우선 접속 가치 큼.</div>
+        </div>
+        <div class="dt-opts" style="margin-top:8px;">
+          <span class="dt-opt no">글쓰기/분석/일반 업무</span>
+          <span class="dt-opt arr">→</span>
+          <div class="dt-ans">Max 5×($100)로 시작해서 충분한지 1개월 후 평가하세요.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="div">
+
+  <!-- ════════════════════════════ -->
+  <!-- LEVEL 1: FREE → PRO -->
+  <!-- ════════════════════════════ -->
+  <section class="level lv1" id="lv1">
+    <div class="lvhd">
+      <div class="lnum">L1</div>
+      <div class="lttl">
+        <h2>Free → Pro 업그레이드 판단 & 사용량 최대화</h2>
+        <p>⏱ 예상 시간 20분 &nbsp;|&nbsp; Free 또는 Pro 사용자</p>
+      </div>
+    </div>
+
+    <p style="margin-bottom:18px; font-size:15.5px; color:#334155; line-height:1.9;">
+      Free 플랜은 생각보다 많은 것을 할 수 있습니다.
+      하지만 일일 한도에 자주 걸린다면, Pro 월 $20이 충분히 가치 있습니다.
+      그리고 Pro를 쓰고 있다면, 한도를 최대한 효율적으로 쓰는 방법이 있습니다.
+    </p>
+
+    <!-- PERSONAS: Free vs Pro -->
+    <p style="margin-bottom:14px;"><strong>나는 어떤 유형인가? — Free로 충분 vs Pro가 필요한 상황</strong></p>
+    <div class="persona-grid">
+      <div class="persona">
+        <div class="p-ico">📚</div>
+        <h4>가끔 사용자</h4>
+        <span class="p-tag p-free">Free 충분</span>
+        <p>주 2~3회, 짧은 질문 위주. 개인 학습, 간단한 문서 작성.</p>
+      </div>
+      <div class="persona">
+        <div class="p-ico">✍️</div>
+        <h4>콘텐츠 크리에이터</h4>
+        <span class="p-tag p-pro">Pro 권장</span>
+        <p>매일 블로그·SNS 콘텐츠 작성. 긴 문서 초안 자주 필요.</p>
+      </div>
+      <div class="persona">
+        <div class="p-ico">💼</div>
+        <h4>직장인 파워유저</h4>
+        <span class="p-tag p-pro">Pro 권장</span>
+        <p>이메일 작성, 보고서 분석, 회의록 정리 등 하루 20회+.</p>
+      </div>
+      <div class="persona">
+        <div class="p-ico">👨‍💻</div>
+        <h4>개인 개발자</h4>
+        <span class="p-tag p-pro">Pro 필수</span>
+        <p>Claude Code 사용 필요. Cowork, 파일 시스템 자동화 활용.</p>
+      </div>
+    </div>
+
+    <!-- METHOD -->
+    <div class="mblock">
+      <div class="mttl"><span class="mbar"></span>적용 방법 | Pro 플랜 사용량을 최대한 효율적으로 쓰는 법</div>
+      <ol class="slist">
+        <li class="si">
+          <div class="snum">1</div>
+          <div class="sbody">
+            <strong>컨텍스트를 짧게 유지하라 — /compact 습관화</strong>
+            <span>긴 대화는 토큰을 빠르게 소모합니다. Claude Code에서 새 작업마다 <code>/clear</code>로 대화를 초기화하고, 긴 세션에서는 <code>/compact</code>로 압축합니다. Claude.ai 웹에서도 불필요하게 긴 대화는 새 채팅으로 시작하세요.</span>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">2</div>
+          <div class="sbody">
+            <strong>Projects(프로젝트)로 컨텍스트 재사용하라</strong>
+            <span>같은 배경 정보를 매번 입력하지 마세요. Claude.ai의 Projects 기능에 시스템 프롬프트와 배경 문서를 한 번만 설정하면, 해당 프로젝트의 모든 대화에 자동 적용됩니다. 반복 입력 없이 바로 본론으로.</span>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">3</div>
+          <div class="sbody">
+            <strong>Haiku 대신 Sonnet, Sonnet 대신 Opus — 용도에 맞게</strong>
+            <span>모든 작업에 Opus 4.6을 쓸 필요 없습니다. 간단한 요약이나 번역은 Sonnet으로 충분하고 더 빠릅니다. Opus는 복잡한 추론, 창의적 글쓰기, 어려운 코딩 문제에만 사용합니다.</span>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">4</div>
+          <div class="sbody">
+            <strong>5시간 리셋 사이클 이해하기</strong>
+            <span>Pro 플랜의 사용량 한도는 5시간마다 리셋됩니다. 한도에 걸렸다면 강제로 업그레이드하기 전에, 잠깐 기다리면 다시 쓸 수 있습니다. 급하지 않은 작업은 다음 리셋 후로 미루세요.</span>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <!-- SCENARIO 1 -->
+    <div class="scene">
+      <div class="slbl">🎬 실습 시나리오 01</div>
+      <div class="sttl">내 사용 패턴 분석 → 최적 플랜 자가 진단</div>
+      <div class="sdesc">
+        나의 실제 클로드 사용 내역을 분석해서 현재 플랜이 최적인지 진단합니다. 아래 프롬프트를 사용하면 클로드가 직접 분석을 도와줍니다.
+      </div>
+      <ul class="ssteps">
+        <li>지난 한 달간 클로드를 어떻게 썼는지 간략히 정리 (주요 용도, 빈도)</li>
+        <li>프롬프트 #1 실행 → 맞춤형 플랜 추천 받기</li>
+        <li>추천받은 플랜으로 변경 여부 결정 → claude.ai/upgrade에서 확인</li>
+        <li>Free → Pro 전환 시 처음 한 달간 Pro 기능 활용 극대화 계획 수립</li>
+      </ul>
+    </div>
+
+    <!-- PROMPT #1 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #1</h3>
+        <span class="ptag tg">사용 패턴 자가 진단</span>
+      </div>
+      <div class="plbl">내 AI 사용 패턴을 분석해서 최적 플랜 추천받기</div>
+      <div class="ptxt"><span class="ph">내 Claude 사용 패턴을 분석해서 최적 플랜을 추천해줘.</span>
+
+<span class="pc">== 내 사용 현황 ==</span>
+현재 플랜: <span class="py">[Free / Pro / Max 5x / Max 20x / Team]</span>
+월 사용 빈도: <span class="py">[예: 거의 매일 / 주 3~4회 / 가끔]</span>
+
+주요 사용 용도 (해당하는 것 모두 체크):
+□ 이메일·문서 작성
+□ 코딩·개발 (Claude Code 포함)
+□ 데이터 분석·보고서
+□ 아이디어 브레인스토밍
+□ 리서치·정보 수집
+□ 이미지 분석·시각 처리
+□ 자동화 워크플로우 (MCP, 스킬 등)
+□ 기타: <span class="py">[직접 입력]</span>
+
+사용량 관련 경험:
+□ 일일 한도에 걸린 적이 없다
+□ 가끔 한도에 걸린다 (월 1~4회)
+□ 자주 한도에 걸린다 (주 1회 이상)
+□ 거의 매일 한도에 걸린다
+
+업무 환경:
+□ 개인 (혼자 사용)
+□ 소규모 팀 (2~4명)
+□ 팀 (5명 이상)
+
+민감 데이터 처리 여부:
+□ 고객 개인정보 / 계약서 등 기밀 데이터 다룸
+□ 일반 업무 데이터만 다룸
+
+<span class="pb">위 정보로:
+1. 현재 플랜이 최적인지 평가
+2. 최적 플랜 추천 (이유 포함)
+3. 월간 예상 비용 절감 또는 투자 대비 효과
+4. 업그레이드하면 바로 쓸 수 있는 기능 TOP 3</span></div>
+    </div>
+
+    <!-- PROMPT #2 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #2</h3>
+        <span class="ptag tg">Pro 사용량 효율화</span>
+      </div>
+      <div class="plbl">Pro 한도를 최대한 활용하는 개인화 전략</div>
+      <div class="ptxt"><span class="ph">내 업무에서 Claude Pro 사용량을 
+가장 효율적으로 쓰는 방법을 알려줘.</span>
+
+<span class="pc">내 주요 업무: </span><span class="py">[예: 마케팅 기획 + 콘텐츠 제작 + 데이터 분석]</span>
+
+<span class="pb">알려줄 내용:
+1. 이 업무 유형에서 토큰을 가장 많이 소모하는 패턴
+2. 같은 결과를 얻으면서 토큰을 아끼는 프롬프트 방법
+3. Projects 기능을 활용해서 매번 컨텍스트 재입력을 없애는 방법
+4. 어떤 작업은 Opus, 어떤 작업은 Sonnet을 쓰면 좋은지 기준
+5. Pro 한도 리셋(5시간) 사이클에 맞춰 업무를 배치하는 팁</span>
+
+<span class="pc">그리고 내가 지금 Pro에서 Max로 업그레이드해야 하는 
+명확한 신호 3가지도 알려줘.</span></div>
+    </div>
+
+  </section>
+
+  <hr class="div">
+
+  <!-- ════════════════════════════ -->
+  <!-- LEVEL 2: PRO → MAX -->
+  <!-- ════════════════════════════ -->
+  <section class="level lv2" id="lv2">
+    <div class="lvhd">
+      <div class="lnum">L2</div>
+      <div class="lttl">
+        <h2>Pro → Max 업그레이드 — 언제, 얼마나, 어떤 Max?</h2>
+        <p>⏱ 예상 시간 20분 &nbsp;|&nbsp; Pro 사용자 중 헤비유저</p>
+      </div>
+    </div>
+
+    <p style="margin-bottom:18px; font-size:15.5px; color:#334155; line-height:1.9;">
+      Max 플랜은 "<strong>더 많이 쓰고 싶은 개인 파워유저</strong>"를 위한 플랜입니다.
+      팀 기능이나 보안 강화보다는 순전히 <strong>사용량과 우선 접속</strong>이 핵심입니다.
+      Max 5×($100)와 Max 20×($200) 중 어느 것이 나에게 맞는지, 
+      아니면 Max보다 Team이 더 유리한지를 계산해봅니다.
+    </p>
+
+    <!-- COST COMPARISON TABLE -->
+    <p style="margin-bottom:12px;"><strong>사용 시나리오별 비용 비교 계산</strong></p>
+    <table class="calc-table">
+      <thead><tr><th>사용 패턴</th><th>Free</th><th>Pro ($20)</th><th>Max 5× ($100)</th><th>Max 20× ($200)</th></tr></thead>
+      <tbody>
+        <tr><td>가끔 사용 (주 2~3회)</td><td>✓ 충분</td><td>과투자</td><td>과투자</td><td>과투자</td></tr>
+        <tr class="best"><td>매일 업무 사용 (하루 20~50회)</td><td>한도 초과</td><td>✓ 최적</td><td>과투자 가능</td><td>과투자</td></tr>
+        <tr><td>하루 100회+ 헤비 사용</td><td>불가</td><td>한도 초과</td><td>✓ 적합</td><td>고려 가능</td></tr>
+        <tr class="best"><td>Claude Code 집중 개발 (종일)</td><td>불가</td><td>한도 초과</td><td>✓ 최적</td><td>✓ 대규모 코드베이스</td></tr>
+        <tr><td>팀 5명이 각자 헤비 사용</td><td>불가</td><td>Pro 5개 = $100</td><td>Max 5× 5개 = $500</td><td><strong>Team이 훨씬 저렴</strong></td></tr>
+      </tbody>
+    </table>
+
+    <!-- METHOD -->
+    <div class="mblock">
+      <div class="mttl"><span class="mbar"></span>적용 방법 | Max 5× vs Max 20× 선택 기준</div>
+      <ol class="slist">
+        <li class="si">
+          <div class="snum">1</div>
+          <div class="sbody">
+            <strong>Max 5×($100)로 시작하고 1개월 후 평가</strong>
+            <span>처음 Max를 사용한다면 5×로 시작하세요. 5×에서도 한도에 걸린다면 그때 20×를 고려합니다. 대부분의 파워유저는 5×로 충분합니다. 직접 코딩 세션을 종일 돌리는 경우에만 20×가 필요합니다.</span>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">2</div>
+          <div class="sbody">
+            <strong>혼자 4명 이하라면 Max, 5명 이상이라면 Team이 유리</strong>
+            <span>팀원 5명이 각자 Pro를 쓰면 $100. 5명이 Team Standard를 쓰면 $125(연간 기준 $100). 게다가 Team은 데이터 학습 기본 OFF + 공유 프로젝트 + 관리 기능이 추가됩니다. 숫자만 봐도 Team이 유리합니다.</span>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">3</div>
+          <div class="sbody">
+            <strong>Max의 "1M 컨텍스트 창"은 개발자에게 특히 가치 있다</strong>
+            <span>2026년 3월 이후 Max 사용자는 Claude Code에서 1M 토큰 컨텍스트 창을 무제한으로 사용할 수 있습니다. 큰 코드베이스를 분할 없이 한 번에 분석하고 싶다면 Max의 가장 큰 가치입니다.</span>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <!-- SCENARIO 2 -->
+    <div class="scene">
+      <div class="slbl">🎬 실습 시나리오 02</div>
+      <div class="sttl">Pro vs Max 5× 손익분기점 계산하기</div>
+      <div class="sdesc">
+        한 달에 Pro 한도에 몇 번 걸리는지, 그 시간 동안 실제로 얼마나 생산성 손실이 생기는지 계산해서, Max로 업그레이드하는 것이 경제적인지 판단합니다.
+      </div>
+      <ul class="ssteps">
+        <li>지난 한 달 동안 Claude 한도에 걸린 횟수와 기다린 시간 추정</li>
+        <li>프롬프트 #3으로 ROI 계산 요청</li>
+        <li>계산 결과에 따라 업그레이드 여부 결정</li>
+        <li>업그레이드 결정 시 연간 결제 할인 검토 ($17/월 vs $20/월)</li>
+      </ul>
+    </div>
+
+    <!-- PROMPT #3 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #3</h3>
+        <span class="ptag to">Pro → Max 업그레이드 ROI 계산</span>
+      </div>
+      <div class="plbl">업그레이드 가치를 숫자로 계산하기</div>
+      <div class="ptxt"><span class="ph">Claude Pro에서 Max로 업그레이드하는 것이 
+나에게 경제적으로 합리적인지 계산해줘.</span>
+
+<span class="pc">내 상황:</span>
+월 클로드 사용 빈도: <span class="py">[예: 하루 2~3시간]</span>
+Pro 한도에 걸리는 횟수: <span class="py">[예: 주 3~4회]</span>
+한도에 걸렸을 때 기다리는 시간: <span class="py">[예: 평균 2시간]</span>
+내 시간의 가치 (시급 환산): <span class="py">[예: 30,000원/시간]</span>
+주요 용도: <span class="py">[코딩 / 글쓰기 / 분석 / 기타]</span>
+
+<span class="pb">계산해줄 내용:
+
+1. 한도 대기로 인한 월간 생산성 손실
+   = 대기 횟수 × 대기 시간 × 시급
+
+2. Max 업그레이드 추가 비용
+   = Max 5× ($100) - Pro ($20) = $80/월
+
+3. 업그레이드 ROI
+   = (생산성 손실 절약액) / (추가 비용) × 100%
+
+4. 손익분기점
+   = 월 몇 시간의 대기 감소면 경제적으로 정당화되는가?
+
+5. 최종 추천
+   - 업그레이드 안 해도 되는 경우
+   - Max 5×가 적합한 경우
+   - Max 20×가 적합한 경우</span>
+
+<span class="pc">숫자로 명확하게 계산해줘.
+단위는 원화로 환산해줘 (1달러 = 1,350원 기준).</span></div>
+    </div>
+
+  </section>
+
+  <hr class="div">
+
+  <!-- ════════════════════════════ -->
+  <!-- LEVEL 3: TEAM PLAN -->
+  <!-- ════════════════════════════ -->
+  <section class="level lv3" id="lv3">
+    <div class="lvhd">
+      <div class="lnum">L3</div>
+      <div class="lttl">
+        <h2>팀 플랜 도입 — 언제, 어떻게, 얼마나</h2>
+        <p>⏱ 예상 시간 25분 &nbsp;|&nbsp; 팀 리더·관리자</p>
+      </div>
+    </div>
+
+    <p style="margin-bottom:18px; font-size:15.5px; color:#334155; line-height:1.9;">
+      팀 플랜의 가장 큰 가치는 단순히 많이 쓸 수 있는 것이 아닙니다.
+      <strong>데이터 학습 기본 OFF, 공유 워크스페이스, 중앙 관리</strong>가 핵심입니다.
+      5명 이상의 팀이 AI를 업무에 쓴다면, 각자 Pro를 쓰는 것보다 Team이 더 합리적인 선택입니다.
+    </p>
+
+    <!-- TEAM vs INDIVIDUAL ANALYSIS -->
+    <p style="margin-bottom:12px;"><strong>팀원 5명 기준 — 개별 Pro vs Team 플랜 비교</strong></p>
+    <table class="calc-table">
+      <thead><tr><th>구분</th><th>개별 Pro × 5명</th><th>Team Standard × 5명</th><th>Team (Pro 3 + Premium 2)</th></tr></thead>
+      <tbody>
+        <tr><td>월 비용 (월간 결제)</td><td>$20 × 5 = $100</td><td>$30 × 5 = $150</td><td>$90 + $300 = $390</td></tr>
+        <tr class="best"><td>월 비용 (연간 결제)</td><td>$17 × 5 = $85</td><td>$25 × 5 = $125</td><td>$120 × 5 = $200 (혼합)</td></tr>
+        <tr><td>데이터 학습 기본값</td><td>ON (개인 설정 필요)</td><td>OFF 자동 보장</td><td>OFF 자동 보장</td></tr>
+        <tr><td>공유 프로젝트</td><td>없음 (각자 분리)</td><td>✓ 있음</td><td>✓ 있음</td></tr>
+        <tr><td>Claude Code</td><td>✓ 개인별</td><td>✗ Standard 미포함</td><td>✓ Premium 석만</td></tr>
+        <tr><td>중앙 관리</td><td>없음</td><td>✓ 있음</td><td>✓ 있음</td></tr>
+        <tr><td>SSO</td><td>없음</td><td>✓ 있음</td><td>✓ 있음</td></tr>
+        <tr><td>비용 대비 가치</td><td>기능 최소</td><td>보안+협업 추가 $40</td><td>개발팀에 최적</td></tr>
+      </tbody>
+    </table>
+
+    <div class="ok">
+      <strong>✅ Team 플랜 도입을 강하게 권장하는 3가지 신호</strong>
+      ① 5명 이상이 각자 Pro를 쓰고 있음 → 비용 효율 + 보안 개선 가능<br>
+      ② 팀원들이 AI 결과물을 서로 공유·협력하는 경우가 많음 → 공유 프로젝트 필수<br>
+      ③ 고객 데이터, 계약서 등 민감 정보를 다루는 팀 → 학습 기본 OFF 중요
+    </div>
+
+    <!-- METHOD -->
+    <div class="mblock">
+      <div class="mttl"><span class="mbar"></span>적용 방법 | Team 플랜 도입 단계별 전략</div>
+      <ol class="slist">
+        <li class="si">
+          <div class="snum">1</div>
+          <div class="sbody">
+            <strong>Standard vs Premium 석 혼합 전략</strong>
+            <span>Team 플랜은 Standard($25/월)와 Premium($100-150/월) 석을 혼합해서 구성할 수 있습니다. 개발자에게는 Claude Code가 포함된 Premium 석을, 기획·마케팅 등에는 Standard 석을 배정하면 비용을 최적화할 수 있습니다.</span>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">2</div>
+          <div class="sbody">
+            <strong>공유 Projects 설계가 핵심</strong>
+            <span>Team 플랜의 가장 큰 가치는 공유 Project입니다. 팀의 공통 컨텍스트(제품 소개, 브랜드 가이드, 코딩 컨벤션)를 Project에 한 번만 설정하면, 모든 팀원이 매번 설명 없이 바로 업무를 시작할 수 있습니다.</span>
+          </div>
+        </li>
+        <li class="si">
+          <div class="snum">3</div>
+          <div class="sbody">
+            <strong>도입 전 파일럿 테스트 (1개월)</strong>
+            <span>바로 전체 팀에 도입하지 말고, 2~3명의 핵심 사용자가 먼저 1개월 테스트합니다. 실제 활용도와 ROI를 측정한 후 전체 팀 롤아웃 결정합니다. Anthropic은 5명 최소 요건이 있으므로, 파일럿은 Free/Pro로 진행합니다.</span>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <!-- SCENARIO 3 -->
+    <div class="scene">
+      <div class="slbl">🎬 실습 시나리오 03</div>
+      <div class="sttl">팀 플랜 도입 비용·편익 분석서 작성하기</div>
+      <div class="sdesc">
+        경영진이나 팀장에게 Team 플랜 도입을 설득하기 위한 비용·편익 분석서를 클로드로 자동 생성합니다. 실제 수치와 설득력 있는 근거가 포함된 문서를 만듭니다.
+      </div>
+      <ul class="ssteps">
+        <li>팀 규모, 현재 비용, 주요 용도를 정리</li>
+        <li>프롬프트 #4로 도입 분석서 자동 생성</li>
+        <li>생성된 문서를 검토하고 실제 수치로 업데이트</li>
+        <li>팀장·경영진 보고용으로 활용</li>
+      </ul>
+    </div>
+
+    <!-- PROMPT #4 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #4</h3>
+        <span class="ptag ts">Team 플랜 도입 분석서 생성</span>
+      </div>
+      <div class="plbl">경영진 보고용 Claude Team 도입 분석서</div>
+      <div class="ptxt"><span class="ph">Claude Team 플랜 도입을 위한 
+비용·편익 분석 보고서를 작성해줘.</span>
+
+<span class="pc">== 팀 현황 ==</span>
+팀 규모: <span class="py">[예: 8명]</span>
+현재 AI 도구 사용: <span class="py">[예: 개인별 Claude Pro 5명, 미사용 3명]</span>
+현재 월 AI 비용: <span class="py">[예: $100/월]</span>
+주요 업무: <span class="py">[예: 마케팅 콘텐츠 제작, 고객 분석, 보고서 작성]</span>
+민감 데이터: <span class="py">[고객 개인정보 다룸 / 일반 업무만]</span>
+
+<span class="pc">== 작성할 내용 ==</span>
+
+<span class="pg">1. 현재 상황 분석</span>
+- 현재 AI 사용 현황 및 비용
+- 비효율 포인트 (각자 Pro 사용 시 문제점)
+
+<span class="pg">2. Claude Team 도입 시나리오</span>
+- 추천 구성: Standard X석 + Premium Y석
+- 예상 월 비용
+- 현재 대비 비용 변화
+
+<span class="pg">3. 기대 효과 (정량적)</span>
+- 업무 자동화로 절약되는 시간 (주당 X시간)
+- 시간 비용 환산 (시급 기준)
+- 1년 ROI 계산
+
+<span class="pg">4. 기대 효과 (정성적)</span>
+- 데이터 보안 강화
+- 팀 협업 개선
+- 지식 자산 축적
+
+<span class="pg">5. 도입 리스크 및 대응</span>
+- 예상되는 우려 사항
+- 리스크 완화 방법
+
+<span class="pg">6. 도입 로드맵 (3개월)</span>
+- 1개월차: 파일럿
+- 2개월차: 전체 전환
+- 3개월차: 고도화
+
+<span class="pc">형식: A4 2~3페이지 분량, 임원 보고용 톤
+마크다운으로 작성 (노션에 바로 붙여넣기 가능)</span></div>
+    </div>
+
+    <!-- PROMPT #5 -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #5</h3>
+        <span class="ptag ts">Team 공유 프로젝트 설계</span>
+      </div>
+      <div class="plbl">Team 도입 후 — 공유 프로젝트 최적 설계</div>
+      <div class="ptxt"><span class="ph">우리 팀을 위한 Claude Team 공유 프로젝트 구조를 설계해줘.</span>
+
+<span class="pc">팀 정보:</span>
+팀명: <span class="py">[팀명]</span>
+팀 업무: <span class="py">[주요 업무 3가지]</span>
+팀 구성: <span class="py">[직책/역할 목록]</span>
+
+<span class="pb">설계해줄 내용:
+
+1. 추천 프로젝트 구성
+   어떤 Project를 만들어야 하는지, 
+   각 Project의 목적과 시스템 프롬프트 방향
+
+예시 프로젝트:
+- 📊 데이터분석 프로젝트
+  시스템 프롬프트에 포함할 것: 분석 기준, 보고서 형식
+- ✍️ 콘텐츠 제작 프로젝트
+  시스템 프롬프트: 브랜드 보이스, 금지 표현, 타겟 독자
+- 🔧 개발팀 프로젝트
+  시스템 프롬프트: 기술 스택, 코딩 컨벤션, 배포 환경
+
+2. 각 프로젝트별 시스템 프롬프트 초안
+   (우리 팀 정보를 반영해서 실제로 쓸 수 있게)
+
+3. 팀원 권한 설정 제안
+   누가 어떤 프로젝트에 접근할 수 있게 할지
+
+4. 공유 Knowledge 문서 목록
+   각 프로젝트에 업로드할 참고 문서 종류</span></div>
+    </div>
+
+    <!-- PROMPT #6: API vs Subscription -->
+    <div class="pblock">
+      <div class="phd">
+        <h3>📋 복사해서 바로 쓰는 프롬프트 #6</h3>
+        <span class="ptag tv">API vs 구독 선택 가이드</span>
+      </div>
+      <div class="plbl">개발자·자동화팀: API와 구독 플랜 비용 비교</div>
+      <div class="ptxt"><span class="ph">우리 사용 패턴에서 Anthropic API와 
+Claude 구독 플랜 중 어느 것이 더 경제적인지 계산해줘.</span>
+
+<span class="pc">우리 사용 현황:</span>
+월간 예상 사용량:
+- 입력 토큰: <span class="py">[예: 100만 토큰/월]</span>
+- 출력 토큰: <span class="py">[예: 50만 토큰/월]</span>
+주 사용 모델: <span class="py">[Sonnet 4.6 / Opus 4.6 / Haiku 4.5]</span>
+사용 유형: <span class="py">[대화형 / 배치 처리 / 혼합]</span>
+사용자 수: <span class="py">[명]</span>
+
+<span class="pb">계산해줄 내용:
+
+1. API 비용 계산 (현재 가격 기준)
+   - Sonnet 4.6: 입력 $3/MTok, 출력 $15/MTok
+   - Opus 4.6: 입력 $5/MTok, 출력 $25/MTok
+   - Haiku 4.5: 입력 $0.8/MTok, 출력 $4/MTok
+   - 배치 API 50% 할인 적용 가능 여부
+
+2. 구독 플랜 비용 계산
+   - 사용자 수 × 플랜 가격
+
+3. 손익분기점
+   - 월간 토큰 사용량이 얼마 이상이면 API가 유리한가
+
+4. 최적 조합 추천
+   - 예: "개발팀은 API, 일반 팀원은 Pro 구독"</span>
+
+<span class="pc">단위는 원화로도 환산해줘 ($1 = 1,350원).</span></div>
+    </div>
+
+  </section>
+
+  <!-- ─── SUMMARY ─── -->
+  <div class="summary">
+    <h2>📌 28일차 핵심 정리</h2>
+    <div class="sgrid">
+      <div class="sitem">
+        <h4>플랜 선택 원칙</h4>
+        <p>Free: 가끔 사용. Pro: 매일 업무. Max 5×: Pro 한도 자주 초과. Max 20×: 종일 Claude Code. Team: 5명 이상 팀.</p>
+      </div>
+      <div class="sitem">
+        <h4>Pro 효율화 핵심</h4>
+        <p>/clear, /compact로 컨텍스트 관리. Projects로 반복 설명 제거. 작업 유형별 모델 선택(Sonnet/Opus). 5시간 리셋 활용.</p>
+      </div>
+      <div class="sitem">
+        <h4>Max 업그레이드 신호</h4>
+        <p>매일 Pro 한도 초과 → Max 5×. 대규모 코드베이스 작업 일상적 → Max(1M 컨텍스트). 5명 이상이면 Team이 더 유리.</p>
+      </div>
+      <div class="sitem">
+        <h4>Team 플랜 가치</h4>
+        <p>데이터 학습 기본 OFF + 공유 프로젝트 + 관리 콘솔. 5명 기준 개별 Pro와 비슷한 비용에 훨씬 많은 기능.</p>
+      </div>
+      <div class="sitem">
+        <h4>API vs 구독</h4>
+        <p>낮은 사용량은 구독이 예측 가능. 높은 자동화/배치 처리는 API가 저렴. 배치 API는 50% 할인 + 비시간 민감 작업에 적합.</p>
+      </div>
+      <div class="sitem">
+        <h4>내일 예고</h4>
+        <p>29일차: 적응형 사고(Adaptive Thinking) — 작업 복잡도에 따라 사고 시간을 조절하여 효율 높이기.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── CHECKLIST ─── -->
+  <div class="ckbox">
+    <h3>✅ 오늘 실습 체크리스트</h3>
+    <ol class="slist">
+      <li class="si">
+        <div class="snum" style="background:#d1fae5;color:var(--a3);">1</div>
+        <div class="sbody">
+          <strong>내 사용 패턴 자가 진단 완료</strong>
+          <p>프롬프트 #1로 현재 플랜이 최적인지 진단했나요? 현재 플랜에 만족하는지 아니면 변경이 필요한지 결론을 내렸나요?</p>
+        </div>
+      </li>
+      <li class="si">
+        <div class="snum" style="background:#d1fae5;color:var(--a3);">2</div>
+        <div class="sbody">
+          <strong>사용량 효율화 전략 적용</strong>
+          <p>Projects 기능을 설정해서 반복 컨텍스트를 제거했나요? 작업 유형별 모델 선택 기준을 정했나요?</p>
+        </div>
+      </li>
+      <li class="si">
+        <div class="snum" style="background:#d1fae5;color:var(--a3);">3</div>
+        <div class="sbody">
+          <strong>업그레이드 ROI 계산 완료</strong>
+          <p>프롬프트 #3으로 Max 업그레이드가 경제적으로 합리적인지 계산해봤나요? 숫자로 결론을 내렸나요?</p>
+        </div>
+      </li>
+      <li class="si">
+        <div class="snum" style="background:#d1fae5;color:var(--a3);">4</div>
+        <div class="sbody">
+          <strong>(팀 리더) Team 플랜 검토 완료</strong>
+          <p>팀이 5명 이상이라면 프롬프트 #4로 도입 분석서를 생성하고, 팀장/경영진과 공유 계획을 세웠나요?</p>
+        </div>
+      </li>
+    </ol>
+  </div>
+
+</div><!-- /wrap -->
+
+<footer>
+  <p>클로드(Claude) 활용 및 교육 통합 가이드 · 4주차 28일차 · 플랜 최적화</p>
+  <p style="margin-top:8px;">
+    <a href="https://claude.ai/upgrade">Claude 플랜 업그레이드</a> &nbsp;·&nbsp;
+    <a href="https://www.anthropic.com/pricing">Anthropic 공식 가격표</a>
+  </p>
+</footer>
+
+</body>
+</html>

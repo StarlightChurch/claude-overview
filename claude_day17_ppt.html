@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>17일차: 클로드 for 파워포인트(PPT) — 강의안·보고서 장표 자동 생성</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap');
+
+:root {
+  --ink:#0b0c1a; --ink2:#1c1e38; --ink3:#525470;
+  --paper:#f6f7f3; --paper2:#edeae6; --paper3:#dedad0;
+  --white:#fff;
+  --ppt:#c83820;   --ppt-l:#fde8e4;   --ppt-d:#8a2010;
+  --blue:#1258a8;  --blue-l:#e2ecfb;  --blue-d:#0b3570;
+  --amber:#b87820; --amber-l:#fdf4e0; --amber-d:#7a5008;
+  --teal:#0a7a60;  --teal-l:#e0f5ee;  --teal-d:#065040;
+  --plum:#6030b8;  --plum-l:#f2ebff;  --plum-d:#3c1890;
+  --slate:#2850a0; --slate-l:#eaeefc; --slate-d:#183078;
+  --rose:#b83060;  --rose-l:#fde8ef;  --rose-d:#7a1840;
+  --green:#387018; --green-l:#eaf4de; --green-d:#224408;
+  --border:rgba(11,12,26,.09); --shadow:0 2px 22px rgba(11,12,26,.07);
+  --r:14px; --r2:20px; --mono:'JetBrains Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--paper);color:var(--ink);line-height:1.8;font-size:15px;}
+.wrap{max-width:920px;margin:0 auto;padding:2rem 1.5rem 6rem;}
+
+/* Cover */
+.cover{border-radius:22px;padding:3.5rem 3rem 3rem;margin-bottom:2.5rem;position:relative;overflow:hidden;
+  background:linear-gradient(135deg,#1a0808 0%,#320c0c 45%,#100808 100%);}
+.cv1{position:absolute;right:-80px;top:-80px;width:320px;height:320px;border-radius:50%;
+  background:radial-gradient(circle,rgba(200,56,32,.24) 0%,transparent 70%);}
+.cv2{position:absolute;left:-60px;bottom:-60px;width:270px;height:270px;border-radius:50%;
+  background:radial-gradient(circle,rgba(18,88,168,.16) 0%,transparent 70%);}
+.cv3{position:absolute;right:170px;bottom:-40px;width:200px;height:200px;border-radius:50%;
+  background:radial-gradient(circle,rgba(184,120,32,.14) 0%,transparent 70%);}
+.cover-eyebrow{display:inline-flex;align-items:center;gap:8px;background:rgba(200,56,32,.3);
+  color:#f8a080;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  padding:5px 16px;border-radius:30px;margin-bottom:1.25rem;position:relative;}
+.cover h1{font-size:2.1rem;font-weight:900;line-height:1.25;color:#fff;margin-bottom:.7rem;position:relative;}
+.cover h1 em{color:#f8d068;font-style:normal;}
+.cover p{font-size:14px;color:rgba(255,255,255,.62);max-width:540px;line-height:1.75;position:relative;}
+.cover-chips{margin-top:2rem;display:flex;gap:10px;flex-wrap:wrap;position:relative;}
+.chip{background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);font-size:12px;font-weight:500;
+  padding:4px 14px;border-radius:30px;border:1px solid rgba(255,255,255,.1);}
+
+/* TOC */
+.toc{background:var(--white);border:.5px solid var(--border);border-radius:var(--r);
+  padding:1.5rem 2rem;margin-bottom:2.5rem;box-shadow:var(--shadow);}
+.toc-label{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:1rem;}
+.toc-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
+@media(max-width:540px){.toc-grid{grid-template-columns:1fr;}}
+.toc-item{display:flex;align-items:center;gap:10px;padding:.45rem .75rem;border-radius:8px;
+  text-decoration:none;color:var(--ink2);font-size:13.5px;transition:background .15s;}
+.toc-item:hover{background:var(--ppt-l);color:var(--ppt-d);}
+.toc-num{min-width:24px;height:24px;border-radius:50%;background:var(--ppt);color:#fff;
+  font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+
+/* Section */
+.sec{background:var(--white);border:.5px solid var(--border);border-radius:var(--r2);
+  padding:2.2rem 2.4rem;margin-bottom:2rem;box-shadow:var(--shadow);}
+.sec-eyebrow{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);margin-bottom:.35rem;}
+.sec h2{font-size:1.5rem;font-weight:900;color:var(--ink);margin-bottom:.3rem;line-height:1.3;}
+.sec .sub{font-size:13.5px;color:var(--ink3);margin-bottom:1.75rem;line-height:1.7;}
+.sec h3{font-size:1rem;font-weight:700;color:var(--ink);margin:1.75rem 0 .7rem;
+  padding-left:.9rem;border-left:3px solid var(--ppt);}
+.acc-blue  h3{border-left-color:var(--blue);}
+.acc-amber h3{border-left-color:var(--amber);}
+.acc-teal  h3{border-left-color:var(--teal);}
+.acc-plum  h3{border-left-color:var(--plum);}
+.acc-adv   h3{border-left-color:var(--slate);}
+.sec p{margin-bottom:.9rem;font-size:14.5px;}
+.sec ul,.sec ol{padding-left:1.5rem;margin-bottom:1rem;}
+.sec li{margin:.35rem 0;font-size:14.5px;}
+hr{border:none;border-top:.5px solid var(--border);margin:1.8rem 0;}
+
+/* Slide mockup */
+.slide-mockup{border-radius:12px;overflow:hidden;border:.5px solid var(--border);
+  margin:1.25rem 0;box-shadow:var(--shadow);aspect-ratio:16/9;position:relative;
+  display:flex;flex-direction:column;}
+.slide-body{flex:1;padding:1.25rem 1.5rem;display:flex;flex-direction:column;justify-content:center;}
+.slide-title{font-size:1rem;font-weight:900;margin-bottom:.5rem;line-height:1.3;}
+.slide-bullets{font-size:12.5px;line-height:1.75;list-style:none;padding:0;}
+.slide-bullets li{padding-left:1.2rem;position:relative;margin:.2rem 0;}
+.slide-bullets li::before{content:"▶";position:absolute;left:0;font-size:9px;top:4px;}
+.slide-footer{padding:.4rem 1.2rem;font-size:10.5px;display:flex;justify-content:space-between;
+  align-items:center;border-top:.5px solid rgba(255,255,255,.15);}
+
+.slide-title-page{background:linear-gradient(135deg,#c83820 0%,#8a2010 100%);}
+.slide-title-page .slide-body{align-items:center;text-align:center;}
+.slide-title-page .slide-title{color:#fff;font-size:1.3rem;font-weight:900;}
+.slide-title-page .slide-sub{color:rgba(255,255,255,.75);font-size:12px;margin-top:.3rem;}
+.slide-title-page .slide-footer{color:rgba(255,255,255,.5);border-color:rgba(255,255,255,.2);}
+
+.slide-content{background:#fff;}
+.slide-content .slide-title{color:#1a1e38;}
+.slide-content .slide-bullets li{color:var(--ink2);}
+.slide-content .slide-bullets li::before{color:var(--ppt);}
+.slide-content .slide-footer{color:var(--ink3);background:#f8f7f3;}
+
+.slide-dark{background:#1a1e38;}
+.slide-dark .slide-title{color:#fff;}
+.slide-dark .slide-bullets li{color:rgba(255,255,255,.85);}
+.slide-dark .slide-bullets li::before{color:#f8d068;}
+.slide-dark .slide-footer{color:rgba(255,255,255,.4);border-color:rgba(255,255,255,.15);}
+
+/* Slide grid */
+.slide-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:1.25rem 0;}
+@media(max-width:560px){.slide-grid{grid-template-columns:1fr;}}
+
+/* Structure preview */
+.deck-structure{background:var(--paper2);border-radius:var(--r);border:.5px solid var(--paper3);
+  padding:1.25rem 1.5rem;margin:1.25rem 0;}
+.ds-title{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ppt-d);margin-bottom:.9rem;}
+.ds-item{display:flex;align-items:center;gap:10px;padding:.4rem 0;border-bottom:.5px solid var(--paper3);}
+.ds-item:last-child{border-bottom:none;}
+.ds-num{width:24px;height:24px;border-radius:6px;background:var(--ppt);color:#fff;
+  font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ds-type{display:inline-block;font-size:10px;font-weight:700;padding:1px 7px;border-radius:20px;
+  margin-right:6px;}
+.dt-title{background:var(--ppt-l);color:var(--ppt-d);}
+.dt-toc{background:var(--blue-l);color:var(--blue-d);}
+.dt-content{background:var(--slate-l);color:var(--slate-d);}
+.dt-chart{background:var(--amber-l);color:var(--amber-d);}
+.dt-summary{background:var(--teal-l);color:var(--teal-d);}
+.ds-name{font-size:13.5px;color:var(--ink2);}
+.ds-desc{font-size:12px;color:var(--ink3);margin-top:.1rem;}
+
+/* Ba */
+.ba{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:1.2rem 0;}
+@media(max-width:540px){.ba{grid-template-columns:1fr;}}
+.ba-card{border-radius:10px;padding:1rem 1.1rem;font-size:13.5px;line-height:1.7;}
+.ba-before{background:#fdf0ee;border:1px solid #f0b0a8;}
+.ba-after{background:var(--teal-l);border:1px solid #80c8b4;}
+.ba-lbl{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.5rem;}
+.ba-before .ba-lbl{color:var(--ppt-d);}
+.ba-after  .ba-lbl{color:var(--teal-d);}
+
+/* Steps */
+.steps{counter-reset:s;margin:1.25rem 0;}
+.step{display:flex;gap:1rem;align-items:flex-start;padding:1rem 0;border-bottom:.5px solid var(--border);}
+.step:last-child{border-bottom:none;}
+.sn{counter-increment:s;min-width:30px;height:30px;border-radius:50%;background:var(--ppt);color:#fff;
+  font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
+.sn::before{content:counter(s);}
+.sb{flex:1;}
+.st{font-weight:700;font-size:14.5px;margin-bottom:.3rem;}
+.sd{font-size:13.5px;color:var(--ink3);line-height:1.65;}
+
+/* Callout */
+.box{border-radius:10px;padding:1rem 1.25rem;margin:1.2rem 0;font-size:14px;}
+.box-lbl{font-size:10.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;margin-bottom:.5rem;}
+.box.apply{background:var(--teal-l);border-left:3px solid var(--teal);}
+.box.apply .box-lbl{color:var(--teal-d);}
+.box.scenario{background:var(--blue-l);border-left:3px solid var(--blue);}
+.box.scenario .box-lbl{color:var(--blue-d);}
+.box.tip{background:var(--amber-l);border-left:3px solid var(--amber);}
+.box.tip .box-lbl{color:var(--amber-d);}
+.box.warn{background:var(--ppt-l);border-left:3px solid var(--ppt);}
+.box.warn .box-lbl{color:var(--ppt-d);}
+.box.insight{background:var(--plum-l);border-left:3px solid var(--plum);}
+.box.insight .box-lbl{color:var(--plum-d);}
+.box.ok{background:var(--green-l);border-left:3px solid var(--green);}
+.box.ok .box-lbl{color:var(--green-d);}
+
+/* Prompt block */
+.pb{background:#1a0a06;border-radius:12px;padding:1.1rem 1.5rem;margin:1rem 0;position:relative;}
+.pb-lbl{font-size:10.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;
+  color:#f8a080;margin-bottom:.8rem;display:flex;align-items:center;gap:6px;}
+.pb-lbl::before{content:"📋";font-size:13px;}
+.pb-num{border-radius:5px;font-size:10px;font-weight:800;padding:1px 8px;margin-right:4px;display:inline-block;}
+.pn-0{background:#381808;color:#f0a080;}
+.pn-p{background:var(--ppt);color:#fff;}
+.pn-b{background:var(--blue);color:#fff;}
+.pn-a{background:var(--amber);color:#fff;}
+.pn-t{background:var(--teal);color:#fff;}
+.pn-l{background:var(--plum);color:#fff;}
+.pn-s{background:var(--slate);color:#fff;}
+.pn-x{background:var(--ink2);color:#fff;}
+.pt{font-family:var(--mono);font-size:12.5px;line-height:1.95;color:#e0c8c0;
+  white-space:pre-wrap;word-break:break-word;}
+.pt em{color:#f8d068;font-style:normal;}
+.pt strong{color:#a0e8b8;}
+.pt .cm{color:#604040;font-style:italic;}
+.pt .ht{color:#f8a080;font-weight:600;}
+.copy-btn{position:absolute;top:.8rem;right:.8rem;background:rgba(255,255,255,.08);border:none;
+  border-radius:6px;color:#8a7070;font-size:11px;padding:4px 10px;cursor:pointer;transition:all .18s;}
+.copy-btn:hover{background:rgba(255,255,255,.16);color:#fff;}
+
+/* Table */
+.tbl{width:100%;border-collapse:collapse;margin:1.2rem 0;font-size:13.5px;}
+.tbl th{background:var(--ink2);color:#fff;padding:10px 14px;text-align:left;font-weight:700;}
+.tbl th:first-child{border-radius:8px 0 0 0;}
+.tbl th:last-child{border-radius:0 8px 0 0;}
+.tbl td{padding:9px 14px;border-bottom:.5px solid var(--border);}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl tr:nth-child(even) td{background:rgba(200,56,32,.04);}
+.tbl code{background:var(--ppt-l);color:var(--ppt-d);border-radius:4px;padding:1px 6px;font-size:12px;font-family:var(--mono);}
+.good{color:var(--teal-d);font-weight:600;}
+.bad{color:var(--ppt-d);}
+
+/* Tag */
+.tag{display:inline-block;border-radius:6px;font-size:11px;font-weight:800;padding:2px 9px;margin:0 2px;vertical-align:middle;}
+.tg-p{background:var(--ppt-l);color:var(--ppt-d);}
+.tg-b{background:var(--blue-l);color:var(--blue-d);}
+.tg-a{background:var(--amber-l);color:var(--amber-d);}
+.tg-t{background:var(--teal-l);color:var(--teal-d);}
+.tg-l{background:var(--plum-l);color:var(--plum-d);}
+.tg-s{background:var(--slate-l);color:var(--slate-d);}
+
+/* Use case grid */
+.uc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:1.25rem 0;}
+@media(max-width:580px){.uc-grid{grid-template-columns:1fr 1fr;}}
+.uc-card{background:var(--paper2);border-radius:10px;border:.5px solid var(--paper3);padding:.9rem 1rem;}
+.uc-icon{font-size:1.4rem;margin-bottom:.3rem;}
+.uc-title{font-size:13px;font-weight:700;color:var(--ink2);margin-bottom:.2rem;}
+.uc-desc{font-size:12px;color:var(--ink3);line-height:1.5;}
+
+/* Summary */
+.summary{background:linear-gradient(135deg,var(--ppt-l),var(--amber-l));
+  border:1px solid #f0c0a8;border-radius:var(--r2);padding:1.5rem 2rem;margin-top:2rem;}
+.summary-title{font-size:13px;font-weight:800;color:var(--ppt-d);letter-spacing:.06em;text-transform:uppercase;margin-bottom:1rem;}
+.summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+@media(max-width:600px){.summary-grid{grid-template-columns:1fr 1fr;}}
+.summary-card{background:rgba(255,255,255,.72);border-radius:10px;padding:.9rem 1rem;font-size:13px;}
+.summary-card strong{display:block;font-size:11px;color:var(--ppt-d);font-weight:800;letter-spacing:.05em;text-transform:uppercase;margin-bottom:.4rem;}
+
+code{background:var(--ppt-l);color:var(--ppt-d);border-radius:4px;padding:1px 6px;font-size:12.5px;font-family:var(--mono);}
+.footer{text-align:center;font-size:12px;color:var(--ink3);margin-top:4rem;padding-top:1.5rem;border-top:.5px solid var(--border);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ══ COVER ══ -->
+<div class="cover">
+  <div class="cv1"></div><div class="cv2"></div><div class="cv3"></div>
+  <div class="cover-eyebrow">📅 Day 17 · 클로드 AI 30일 마스터 코스</div>
+  <h1>클로드 for 파워포인트<br><em>강의안 · 보고서 장표</em><br>자동 생성 완전 마스터</h1>
+  <p>텍스트 하나, 주제 하나만 주면 됩니다 — 클로드가 스토리 구조부터 슬라이드 내용, 디자인 방향까지 완성형 PPT를 설계해줍니다</p>
+  <div class="cover-chips">
+    <span class="chip">🖥️ 3가지 활용 방법</span>
+    <span class="chip">📐 슬라이드 구조 설계</span>
+    <span class="chip">📋 14개 복붙 프롬프트</span>
+    <span class="chip">🎨 디자인 지침 최적화</span>
+    <span class="chip">🤖 Claude for PPT 애드인</span>
+  </div>
+</div>
+
+<!-- ══ TOC ══ -->
+<div class="toc">
+  <div class="toc-label">목차</div>
+  <div class="toc-grid">
+    <a class="toc-item" href="#s0"><span class="toc-num">0</span>클로드 × PPT — 3가지 활용 방법 & 전략</a>
+    <a class="toc-item" href="#s1"><span class="toc-num">1</span>슬라이드 구조 설계 — 스토리라인 완성</a>
+    <a class="toc-item" href="#s2"><span class="toc-num">2</span>장표 내용 생성 — 슬라이드별 텍스트 자동화</a>
+    <a class="toc-item" href="#s3"><span class="toc-num">3</span>강의안 & 교육 자료 특화 제작</a>
+    <a class="toc-item" href="#s4"><span class="toc-num">4</span>보고서 & 임원 발표 장표 특화 제작</a>
+    <a class="toc-item" href="#s5"><span class="toc-num">5</span>Claude for PPT 애드인 심화 활용</a>
+    <a class="toc-item" href="#s6"><span class="toc-num">6</span>고급 통합 — 엑셀 → PPT 원스텝 자동화</a>
+  </div>
+</div>
+
+
+<!-- ══ S0: 개념 ══ -->
+<div class="sec" id="s0">
+  <div class="sec-eyebrow">기초 개념 · 3가지 활용 방법</div>
+  <h2>클로드 × PPT — 무엇을 어떻게 할 수 있나?</h2>
+  <p class="sub">파워포인트 작업에서 클로드를 활용하는 방법은 3가지입니다. 상황과 목적에 따라 가장 적합한 방법을 선택하세요.</p>
+
+  <h3>왜 PPT 작업에 클로드가 필요한가?</h3>
+
+  <div class="ba">
+    <div class="ba-card ba-before">
+      <div class="ba-lbl">❌ 기존 방식의 고통</div>
+      • 빈 화면에서 "무슨 내용부터 시작하지?" 막막함<br>
+      • 불릿 포인트 채우는 데 1~2시간 소비<br>
+      • 논리 흐름이 연결되지 않아 반복 수정<br>
+      • 동일 내용 다른 청중용으로 재작업<br>
+      → 20장 보고서에 반나절 소비
+    </div>
+    <div class="ba-card ba-after">
+      <div class="ba-lbl">✅ 클로드 활용 방식</div>
+      • 주제·청중·목적만 말하면 전체 구조 제안<br>
+      • 슬라이드별 핵심 메시지+불릿 자동 생성<br>
+      • 스피커 노트(발표 대본)까지 동시 생성<br>
+      • 같은 내용을 "임원용·팀원용·고객용"으로 변환<br>
+      → 20장 보고서 초안 30~45분 완성
+    </div>
+  </div>
+
+  <h3>방법 1: 채팅으로 내용 설계 → 직접 PPT에 입력</h3>
+  <p>claude.ai에서 슬라이드 구조와 내용을 텍스트로 받아서 직접 파워포인트에 입력하는 방법입니다. 무료 플랜에서도 사용 가능하며, 내용 설계에 특화되어 있습니다.</p>
+
+  <h3>방법 2: 아티팩트로 HTML/MARP 슬라이드 직접 생성</h3>
+  <p>클로드 아티팩트 기능으로 브라우저에서 바로 볼 수 있는 HTML 슬라이드를 생성합니다. 다운로드해서 프레젠테이션에 직접 사용하거나, 구글 슬라이드에 붙여넣기도 가능합니다.</p>
+
+  <h3>방법 3: Claude for PowerPoint 애드인 (Pro+)</h3>
+  <p>PPT 파일 안에서 클로드를 직접 호출해서 슬라이드를 자동 생성하거나 수정합니다. 엑셀 애드인과 연동하면 데이터 분석부터 발표 자료까지 원스텝 자동화가 가능합니다.</p>
+
+  <table class="tbl">
+    <thead><tr><th>방법</th><th>설치</th><th>플랜</th><th>출력 형태</th><th>최적 용도</th></tr></thead>
+    <tbody>
+      <tr><td><strong>채팅 내용 설계</strong></td><td>불필요</td><td>무료 포함</td><td>텍스트 구조</td><td>내용 기획·초안 작성</td></tr>
+      <tr><td><strong>아티팩트 HTML</strong></td><td>불필요</td><td>무료 포함</td><td class="good">즉시 실행 슬라이드</td><td>빠른 시각화·공유</td></tr>
+      <tr><td><strong>PPT 애드인</strong></td><td>Office 스토어</td><td>Pro 이상</td><td class="good">실제 .pptx 파일</td><td>완성형 보고서 제작</td></tr>
+    </tbody>
+  </table>
+
+  <div class="box tip">
+    <div class="box-lbl">💡 가장 효율적인 3단계 조합</div>
+    <strong>① 채팅에서 구조 설계</strong> → "이 주제로 10장 슬라이드 구조 잡아줘"<br>
+    <strong>② 아티팩트로 초안 시각화</strong> → HTML 슬라이드로 전체 흐름 확인<br>
+    <strong>③ PPT 애드인으로 완성</strong> → 실제 파일로 변환 + 디자인 적용<br>
+    애드인 없이도 ①②만으로 PPT 제작 시간을 70% 이상 줄일 수 있습니다.
+  </div>
+
+  <!-- Use case grid -->
+  <h3>클로드로 만들 수 있는 PPT 유형</h3>
+  <div class="uc-grid">
+    <div class="uc-card">
+      <div class="uc-icon">📊</div>
+      <div class="uc-title">임원 보고서</div>
+      <div class="uc-desc">경영 현황, 분기 실적, 전략 방향 장표</div>
+    </div>
+    <div class="uc-card">
+      <div class="uc-icon">🎓</div>
+      <div class="uc-title">강의안·교육 자료</div>
+      <div class="uc-desc">교과 개요, 단원별 강의 슬라이드</div>
+    </div>
+    <div class="uc-card">
+      <div class="uc-icon">💼</div>
+      <div class="uc-title">제안서·영업 덱</div>
+      <div class="uc-desc">고객 맞춤 제안, 서비스 소개 자료</div>
+    </div>
+    <div class="uc-card">
+      <div class="uc-icon">🚀</div>
+      <div class="uc-title">투자자 피치덱</div>
+      <div class="uc-desc">문제-해결-시장-팀-요청 구조</div>
+    </div>
+    <div class="uc-card">
+      <div class="uc-icon">📈</div>
+      <div class="uc-title">데이터 시각화 보고</div>
+      <div class="uc-desc">차트·그래프 중심 데이터 스토리</div>
+    </div>
+    <div class="uc-card">
+      <div class="uc-icon">🤝</div>
+      <div class="uc-title">팀 공유 자료</div>
+      <div class="uc-desc">주간 회의, 프로젝트 현황 공유</div>
+    </div>
+  </div>
+
+  <div class="pb">
+    <div class="pb-lbl"><span class="pb-num pn-0">P-00</span>복사해서 바로 쓰는 프롬프트 — PPT 작업 전 전략 설계</div>
+    <button class="copy-btn" onclick="cp(this)">복사</button>
+    <div class="pt"><span class="cm"># 본격 작업 전에 최적 접근법을 먼저 설계하는 프롬프트</span>
+
+PPT 발표 자료를 만들려고 해. 전략을 먼저 세워줘.
+
+<span class="ht">[발표 정보]</span>
+주제/제목: <em>[예: 2026년 2분기 마케팅 전략 보고]</em>
+발표 목적: <em>[예: 임원진 승인 획득 / 팀원 공유 / 고객 설득]</em>
+청중: <em>[예: C-Level 임원 5명, 평균 나이 50대]</em>
+발표 시간: <em>[예: 15분 발표 + 5분 Q&A]</em>
+슬라이드 수: <em>[예: 15장 이내]</em>
+현재 가진 정보: <em>[예: 데이터 있음 / 아이디어만 있음]</em>
+
+전략으로 알려줄 것:
+① 이 상황에 맞는 최적 슬라이드 수와 구성 비율
+② 핵심 메시지 1문장 (이 발표가 끝난 후 청중이 기억해야 할 것)
+③ 가장 먼저 설득해야 할 것 (청중 관심사 분석)
+④ 피해야 할 실수 (이 청중에게 흔한 실수)
+⑤ 사용할 방법 추천 (채팅 설계 / 아티팩트 / 애드인)</div>
+  </div>
+</div>
+
+
+<!-- ══ S1: 구조 설계 ══ -->
+<div class="sec acc-blue" id="s1">
+  <div class="sec-eyebrow">Section 1 · 슬라이드 구조 설계</div>
+  <h2>📐 슬라이드 구조 설계 — 스토리라인이 전부다</h2>
+  <p class="sub">내용보다 구조가 먼저입니다. 좋은 구조 위에 내용을 채우면 발표가 설득력 있게 흘러갑니다. 클로드는 청중과 목적에 맞는 스토리라인을 설계해줍니다.</p>
+
+  <h3>PPT 구조의 5가지 황금 패턴</h3>
+
+  <table class="tbl">
+    <thead><tr><th>패턴명</th><th>구조</th><th>언제 사용?</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>📊 보고·분석형</strong></td>
+        <td>현황 → 문제 → 원인 → 해결책 → 기대 효과 → 요청 사항</td>
+        <td>임원 보고, 경영 현황</td>
+      </tr>
+      <tr>
+        <td><strong>🚀 설득·제안형</strong></td>
+        <td>문제 공감 → 솔루션 제시 → 근거·증거 → 실행 계획 → CTA</td>
+        <td>영업 제안, 투자 피치</td>
+      </tr>
+      <tr>
+        <td><strong>🎓 교육·강의형</strong></td>
+        <td>도입(왜?) → 개념 → 방법론 → 실습·예시 → 정리 → 다음 단계</td>
+        <td>강의안, 워크숍</td>
+      </tr>
+      <tr>
+        <td><strong>📈 데이터 스토리형</strong></td>
+        <td>상황(Context) → 갈등(Complication) → 해결(Resolution)</td>
+        <td>데이터 중심 발표</td>
+      </tr>
+      <tr>
+        <td><strong>🗓 업데이트·공유형</strong></td>
+        <td>지난 기간 요약 → 완료 사항 → 진행 중 → 다음 계획 → 이슈</td>
+        <td>주간 보고, 팀 공유</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Deck structure preview -->
+  <h3>구조 예시 — 10장 임원 보고 덱</h3>
+  <div class="deck-structure">
+    <div class="ds-title">📊 임원 보고서 구조 예시 (10장)</div>
+    <div class="ds-item">
+      <div class="ds-num">1</div>
+      <span class="ds-type dt-title">제목</span>
+      <div>
+        <div class="ds-name">표지 — 보고 제목, 발표자, 날짜</div>
+      </div>
+    </div>
+    <div class="ds-item">
+      <div class="ds-num">2</div>
+      <span class="ds-type dt-summary">요약</span>
+      <div>
+        <div class="ds-name">Executive Summary — 핵심 메시지 3줄</div>
+        <div class="ds-desc">임원은 이 장만 봐도 결론을 알 수 있어야 함</div>
+      </div>
+    </div>
+    <div class="ds-item">
+      <div class="ds-num">3</div>
+      <span class="ds-type dt-content">현황</span>
+      <div><div class="ds-name">현재 상황 — 핵심 지표 현황</div></div>
+    </div>
+    <div class="ds-item">
+      <div class="ds-num">4~5</div>
+      <span class="ds-type dt-chart">분석</span>
+      <div>
+        <div class="ds-name">분석 결과 — 데이터 기반 인사이트</div>
+        <div class="ds-desc">차트·그래프 중심, 텍스트 최소화</div>
+      </div>
+    </div>
+    <div class="ds-item">
+      <div class="ds-num">6~7</div>
+      <span class="ds-type dt-content">과제</span>
+      <div><div class="ds-name">문제점 & 기회 요인</div></div>
+    </div>
+    <div class="ds-item">
+      <div class="ds-num">8~9</div>
+      <span class="ds-type dt-content">전략</span>
+      <div><div class="ds-name">제안 전략 — 실행 계획 + 기대 효과</div></div>
+    </div>
+    <div class="ds-item">
+      <div class="ds-num">10</div>
+      <span class="ds-type dt-toc">요청</span>
+      <div>
+        <div class="ds-name">요청 사항 — 의사결정 필요 항목</div>
+        <div class="ds-desc">가장 중요한 슬라이드 — 명확한 YES/NO 요청</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="box scenario">
+    <div class="box-lbl">🎭 실습 시나리오 1</div>
+    <strong>상황:</strong> 내달 전사 분기 보고회에서 마케팅 팀장이 발표해야 합니다. 20분 발표 시간에 CEO와 CFO가 청중입니다. 어떤 구조로 슬라이드를 짜야 할지 막막합니다.<br>
+    <strong>목표:</strong> 임원 설득에 최적화된 15장 슬라이드 구조 완성
+  </div>
+
+  <div class="pb">
+    <div class="pb-lbl"><span class="pb-num pn-p">P-01</span>복사해서 바로 쓰는 프롬프트 — 슬라이드 구조 & 스토리라인 설계</div>
+    <button class="copy-btn" onclick="cp(this)">복사</button>
+    <div class="pt"><span class="cm"># 청중과 목적에 맞는 완전한 슬라이드 구조 자동 설계</span>
+
+아래 발표를 위한 최적 슬라이드 구조를 설계해줘.
+
+<span class="ht">[발표 정보]</span>
+주제: <em>[예: 2026년 2분기 디지털 마케팅 전략 보고]</em>
+청중: <em>[예: CEO, CFO, 마케팅 VP — 의사결정권 있음]</em>
+목적: <em>[예: 내년 마케팅 예산 20% 증액 승인]</em>
+발표 시간: <em>[예: 20분 (발표 15분 + Q&A 5분)]</em>
+슬라이드 수: <em>[15장 이내]</em>
+
+<span class="ht">[현재 갖고 있는 내용]</span>
+<em>[예: 올해 1분기 성과 데이터, 내년 전략 방향 초안, 경쟁사 분석 자료]</em>
+
+<span class="ht">[설계 요청]</span>
+① 전체 슬라이드 목록 (번호, 제목, 슬라이드 유형)
+② 각 슬라이드의 핵심 메시지 1문장
+③ 각 슬라이드에 들어갈 내용 요소 (텍스트/차트/이미지)
+④ 예상 발표 시간 배분 (슬라이드별)
+⑤ "이 구조의 설득 포인트" — 왜 이 순서가 이 청중에게 효과적인지
+
+마지막에 "이 구조에서 가장 중요한 슬라이드 1개"를 지목해줘.</div>
+  </div>
+
+  <div class="pb">
+    <div class="pb-lbl"><span class="pb-num pn-p">P-02</span>복사해서 바로 쓰는 프롬프트 — 기존 내용 → 최적 구조 재편</div>
+    <button class="copy-btn" onclick="cp(this)">복사</button>
+    <div class="pt"><span class="cm"># 이미 갖고 있는 내용을 최적 순서로 재배열</span>
+
+아래 내용으로 발표 자료를 만들려는데, 최적 슬라이드 순서로 재편해줘.
+
+<span class="ht">[현재 갖고 있는 내용들 (순서 무관)]</span>
+<em>--- 아래에 갖고 있는 내용을 순서 상관없이 나열하세요 ---</em>
+
+예시:
+- Q1 매출이 전년 대비 23% 성장
+- 주요 경쟁사 3사의 전략 변화
+- 신제품 출시 6개월 로드맵
+- 고객 만족도 조사 결과 (NPS 42점)
+- 마케팅 채널별 ROI 분석
+- 팀 확충 계획 (2명 채용)
+- 예산 증액 요청 (15% 증가)
+- 2분기 집중 전략 3가지
+
+<span class="ht">[발표 맥락]</span>
+청중: <em>[누구인지]</em>
+최종 목적: <em>[발표 후 원하는 결과]</em>
+
+재편 후 제공:
+① 추천 슬라이드 순서 (각 슬라이드 제목 + 들어갈 내용)
+② 현재 갖고 있는 내용에서 빠진 것 (추가 필요 슬라이드)
+③ 삭제하거나 부록으로 옮길 내용
+④ 전체 스토리 흐름 요약 (3줄)</div>
+  </div>
+</div>
+
+
+<!-- ══ S2: 장표 내용 생성 ══ -->
+<div class="sec acc-amber" id="s2">
+  <div class="sec-eyebrow">Section 2 · 장표 내용 생성</div>
+  <h2>✍️ 장표 내용 자동 생성 — 슬라이드별 텍스트 완성</h2>
+  <p class="sub">구조가 정해졌다면 이제 각 슬라이드의 텍스트를 채울 차례입니다. 클로드는 불릿 포인트, 헤드라인, 스피커 노트를 동시에 생성해줍니다.</p>
+
+  <h3>좋은 슬라이드 텍스트의 3원칙</h3>
+
+  <div class="ba">
+    <div class="ba-card ba-before">
+      <div class="ba-lbl">❌ 슬라이드에 쓰면 안 되는 것</div>
+      • 긴 문단 텍스트 (발표자가 읽는 용)<br>
+      • 의미 없는 불릿 나열 ("좋은 성과를 거뒀다")<br>
+      • 모든 것을 다 담으려는 욕심<br>
+      • 수식어 남발 ("획기적인", "최고의")<br>
+      → 독자가 슬라이드 읽느라 발표자를 안 봄
+    </div>
+    <div class="ba-card ba-after">
+      <div class="ba-lbl">✅ 슬라이드에 들어가야 할 것</div>
+      • 핵심 메시지 헤드라인 (1문장)<br>
+      • 근거가 되는 수치·데이터 불릿 (3개 이내)<br>
+      • 시각적 요소 여백<br>
+      • 말하지 않아도 이해되는 자명한 구조<br>
+      → 슬라이드 = 키워드, 발표자 = 설명
+    </div>
+  </div>
+
+  <!-- Slide examples -->
+  <h3>슬라이드 타입별 레이아웃 예시</h3>
+  <div class="slide-grid">
+    <div class="slide-mockup slide-title-page">
+      <div class="slide-body">
+        <div class="slide-title">2026년 2분기<br>마케팅 전략 보고</div>
+        <div class="slide-sub">마케팅팀 / 2026년 4월</div>
+      </div>
+      <div class="slide-footer" style="color:rgba(255,255,255,.4);">
+        <span>표지 슬라이드</span><span>1 / 15</span>
+      </div>
+    </div>
+    <div class="slide-mockup slide-content">
+      <div class="slide-body">
+        <div class="slide-title" style="color:var(--ppt);font-size:.95rem;border-bottom:2px solid var(--ppt);padding-bottom:.4rem;">
+          디지털 채널이 오프라인 대비 ROI 3.2배 높음
+        </div>
+        <ul class="slide-bullets">
+          <li>온라인 전환율 4.8% → 업계 평균 2.1% 대비 <strong>+128%</strong></li>
+          <li>CPL(리드 획득 비용) ₩18,500 → 전년 대비 -34%</li>
+          <li>리타겟팅 캠페인 ROAS 680%로 최고치 달성</li>
+        </ul>
+      </div>
+      <div class="slide-footer">
+        <span>콘텐츠 슬라이드</span><span>5 / 15</span>
+      </div>
+    </div>
+    <div class="slide-mockup slide-dark">
+      <div class="slide-body">
+        <div class="slide-title" style="font-size:.9rem;">핵심 인사이트</div>
+        <ul class="slide-bullets">
+          <li>SNS 광고 예산 20% 증액 시 기대 매출 +35억</li>
+          <li>3분기 신제품 출시와 캠페인 타이밍 일치 필요</li>
+          <li>데이터 인프라 투자 없이 개인화 불가</li>
+        </ul>
+      </div>
+      <div class="slide-footer">
+        <span>다크 포인트 슬라이드</span><span>8 / 15</span>
+      </div>
+    </div>
+    <div class="slide-mockup" style="background:linear-gradient(135deg,#1258a8,#0b3570);">
+      <div class="slide-body" style="align-items:center;text-align:center;">
+        <div style="font-size:2rem;font-weight:900;color:#fff;">+23%</div>
+        <div style="font-size:.85rem;color:rgba(255,255,255,.75);margin-top:.3rem;">전년 동기 대비 매출 성장률</div>
+        <div style="font-size:.7rem;color:rgba(255,255,255,.5);margin-top:.2rem;">2026년 1분기 기준</div>
+      </div>
+      <div class="slide-footer" style="color:rgba(255,255,255,.4);border-color:rgba(255,255,255,.2);">
+        <span>임팩트 수치 슬라이드</span><span>3 / 15</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="box scenario">
+    <div class="box-lbl">🎭 실습 시나리오 2</div>
+    <strong>상황:</strong> P-01에서 구조를 잡았습니다. 이제 각 슬라이드의 실제 텍스트 내용을 채워야 합니다. 특히 "현황 분석" 슬라이드 3장이 막막합니다.<br>
+    <strong>목표:</strong> 특정 슬라이드 내용 + 스피커 노트 동시 완성
+  </div>
+
+  <div class="pb">
+    <div class="pb-lbl"><span class="pb-num pn-b">P-03</span>복사해서 바로 쓰는 프롬프트 — 전체 슬라이드 텍스트 일괄 생성</div>
+    <button class="copy-btn" onclick="cp(this)">복사</button>
+    <div class="pt"><span class="cm"># 구조에 맞게 모든 슬라이드 내용을 한 번에 생성</span>
+
+아래 슬라이드 구조에 맞게 각 장표의 내용을 작성해줘.
+
+<span class="ht">[슬라이드 구조 — P-01에서 받은 결과 붙여넣기]</span>
+<em>--- 위에서 받은 슬라이드 목록과 구조를 붙여넣으세요 ---</em>
+
+<span class="ht">[사용할 핵심 데이터·내용]</span>
+<em>--- 보유한 데이터, 통계, 주요 포인트들을 붙여넣으세요 ---</em>
+
+<span class="ht">[각 슬라이드 출력 형식]</span>
+슬라이드 번호와 제목
+---
+📌 헤드라인: [1문장 핵심 메시지]
+• 불릿 1: [구체적 수치·팩트 포함]
+• 불릿 2: [구체적 수치·팩트 포함]
+• 불릿 3: [구체적 수치·팩트 포함]
+🗣 스피커 노트: [발표자가 이 슬라이드에서 말할 내용 3~4문장]
+📊 시각 요소 제안: [차트·이미지·다이어그램 추천]
+---
+
+<span class="ht">[톤 지침]</span>
+청중: <em>[임원 / 팀원 / 고객 중 선택]</em>
+어조: <em>[격식체 / 비즈니스 캐주얼]</em>
+숫자 형식: 만 원 단위, % 소수점 1자리</div>
+  </div>
+
+  <div class="pb">
+    <div class="pb-lbl"><span class="pb-num pn-b">P-04</span>복사해서 바로 쓰는 프롬프트 — 특정 슬라이드 집중 개선</div>
+    <button class="copy-btn" onclick="cp(this)">복사</button>
+    <div class="pt"><span class="cm"># 마음에 안 드는 특정 슬라이드만 집중적으로 개선</span>
+
+이 슬라이드 내용을 더 강력하게 개선해줘.
+
+<span class="ht">[현재 슬라이드 내용]</span>
+제목: <em>[현재 슬라이드 제목]</em>
+내용:
+<em>--- 현재 텍스트 붙여넣기 ---</em>
+
+<span class="ht">[문제점]</span>
+<em>[예: 너무 텍스트가 많다 / 핵심이 뭔지 모르겠다 / 임팩트가 없다]</em>
+
+<span class="ht">[개선 요청]</span>
+① 헤드라인을 더 임팩트 있게 (결론을 먼저 말하는 형식)
+② 불릿을 3개 이내로 줄이되 핵심 수치는 모두 유지
+③ 이 슬라이드에서 청중이 기억해야 할 것 딱 1가지
+④ 스피커 노트 (발표자가 이 슬라이드에서 해야 할 말 3문장)
+⑤ 이 내용에 어울리는 시각화 제안 (차트 유형 or 아이콘 배치)
+
+개선 전/후를 나란히 보여줘서 비교할 수 있게 해줘.</div>
+  </div>
+</div>
+
+
+<!-- ══ S3: 강의안 ══ -->
+<div class="sec acc-teal" id="s3">
+  <div class="sec-eyebrow">Section 3 · 강의안 & 교육 자료</div>
+  <h2>🎓 강의안 & 교육 자료 — 학습 목표부터 실습까지</h2>
+  <p class="sub">교육·강의 PPT는 일반 보고서와 다릅니다. 학습 목표, 개념 설명, 실습, 정리가 유기적으로 연결되어야 합니다. 클로드가 교육학적 구조까지 고려해서 설계합니다.</p>
+
+  <h3>강의 PPT가 일반 보고서와 다른 점</h3>
+
+  <table class="tbl">
+    <thead><tr><th>요소</th><th>일반 보고서</th><th>강의안</th></tr></thead>
+    <tbody>
+      <tr><td><strong>목적</strong></td><td>정보 전달·의사결정</td><td>이해·학습·행동 변화</td></tr>
+      <tr><td><strong>핵심 슬라이드</strong></td><td>요약·인사이트</td><td>학습 목표·실습 과제</td></tr>
+      <tr><td><strong>텍스트 밀도</strong></td><td>최소화</td><td>중간 (학습자 메모용)</td></tr>
+      <tr><td><strong>상호작용</strong></td><td>없음</td><td>Q&A·퀴즈·활동 슬라이드</td></tr>
+      <tr><td><strong>시간 구분</strong></td><td>불필요</td><td>각 섹션별 분 배분</td></tr>
+      <tr><td><strong>추가 자료</strong></td><td>참고문헌</td><td>참고 자료·실습 파일</td></tr>
+    </tbody>
+  </table>
+
+  <div class="box scenario">
+    <div class="box-lbl">🎭 실습 시나리오 3</div>
+    <strong>상황:</strong> 신입사원 교육에서 "효과적인 이메일 작성법"을 90분 강의해야 합니다. 참석자 20명, PPT 기반 강의입니다. 처음 만드는 강의라 어디서 시작해야 할지 막막합니다.<br>
+    <strong>목표:</strong> 90분 강의 전체 슬라이드 + 강의 스크립트 초안 동시 완성
+  </div>
+
+  <div class="pb">
+    <div class="pb-lbl"><span class="pb-num pn-t">P-05</span>복사해서 바로 쓰는 프롬프트 — 강의안 전체 구조 & 내용 생성</div>
+    <button class="copy-btn" onclick="cp(this)">복사</button>
+    <div class="pt"><span class="cm"># 강의 주제만 주면 완전한 강의 PPT 구조가 완성</span>
+
+아래 강의를 위한 슬라이드와 강의 계획서를 만들어줘.
+
+<span class="ht">[강의 정보]</span>
+강의 주제: <em>[예: 효과적인 비즈니스 이메일 작성법]</em>
+수강자: <em>[예: 신입사원 20명, 업무 경력 0~1년]</em>
+강의 시간: <em>[예: 90분]</em>
+강의 형태: <em>[예: PPT 강의 + 실습 포함]</em>
+학습 목표: <em>[예: 수강 후 바로 쓸 수 있는 이메일 3가지 유형 마스터]</em>
+
+<span class="ht">[슬라이드 구성 요청]</span>
+① 강의 전체 목차 (섹션별 시간 배분 포함)
+② 각 슬라이드 제목 + 핵심 포인트 + 강의자 발화 예시
+③ 각 섹션 끝에 "체크 질문" 슬라이드 포함
+④ 실습 과제 슬라이드 (수강자가 직접 해볼 것)
+⑤ 최종 요약 슬라이드
+
+<span class="ht">[강의 계획서]</span>
+강의 전체 흐름을 아래 형식으로 정리해줘:
+시간 | 섹션명 | 활동 유형 | 핵심 내용 | 필요 준비물
+
+<span class="ht">[특별 요청]</span>
+"이것만은 꼭 이해하고 가야 한다"는 핵심 1가지를 강조하는 슬라이드 1장을 특별히 디자인해줘 (색상·레이아웃 제안 포함)</div>
+  </div>
+
+  <div class="pb">
+    <div class="pb-lbl"><span class="pb-num pn-t">P-06</span>복사해서 바로 쓰는 프롬프트 — 교육 자료 수준별 버전 생성</div>
+    <button class="copy-btn" onclick="cp(this)">복사</button>
+    <div class="pt"><span class="cm"># 같은 내용을 수준별(입문/중급/심화)로 다르게 만들기</span>
+
+같은 주제를 수강자 수준에 따라 3가지 버전으로 만들어줘.
+
+<span class="ht">[강의 주제]</span>
+<em>[예: 데이터 기반 의사결정 방법론]</em>
+
+<span class="ht">[버전 1 — 입문 (비전공자/경영진용, 45분)]</span>
+- 수식·기술 용어 없이 개념 중심
+- 실제 사례와 스토리 위주
+- "이것만 알면 된다" 핵심 3가지
+- 슬라이드 15장 이내
+
+<span class="ht">[버전 2 — 중급 (실무자용, 90분)]</span>
+- 기본 방법론 + 도구 소개
+- 실습 예제 포함
+- "지금 당장 써먹을 수 있는" 체크리스트
+- 슬라이드 25장
+
+<span class="ht">[버전 3 — 심화 (전문가용, 120분)]</span>
+- 고급 기법 + 케이스 스터디
+- 워크샵 형태 (그룹 활동 포함)
+- 심화 참고 자료 포함
+- 슬라이드 35장
+
+각 버전의 차이점 요약표도 함께 만들어줘.</div>
+  </div>
+</div>
+
+
+<!-- ══ S4: 임원 보고 ══ -->
+<div class="sec acc-plum" id="s4">
+  <div class="sec-eyebrow">Section 4 · 보고서 & 임원 발표</div>
+  <h2>💼 보고서 & 임원 발표 장표 — 설득의 기술</h2>
+  <p class="sub">임원 발표는 강의와 완전히 다릅니다. 더 짧고, 더 직접적이며, 숫자가 중심이 되어야 합니다. 클로드가 임원의 시간을 존중하는 구조를 만들어줍니다.</p>
+
+  <h3>임원이 PPT를 보는 방식 — 알아야 할 3가지</h3>
+
+  <div class="steps">
+    <div class="step">
+      <div class="sn"></div>
+      <div class="sb">
+        <div class="st">슬라이드를 읽지 않는다 — 스캔한다</div>
+        <div class="sd">임원은 각 슬라이드에 3~5초를 씁니다. 헤드라인만 봐도 핵심을 알 수 있어야 합니다. "Q1 매출 현황" ❌ → "Q1 매출 23% 성장, 목표 초과 달성" ✅</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="sn"></div>
+      <div class="sb">
+        <div class="st">결론을 먼저 원한다 — 두괄식 필수</div>
+        <div class="sd">과정·배경을 먼저 설명하고 결론을 나중에 말하는 방식은 임원 청중에게 역효과입니다. 첫 슬라이드에 결론을, 나머지 슬라이드에 근거를 담으세요.</sd>
+      </div>
+    </div>
+    <div class="step">
+      <div class="sn"></div>
+      <div class="sb">
+        <div class="st">무엇을 결정해줘야 하는지 명확해야 한다</div>
+        <div class="sd">발표의 목적이 "정보 공유"인지 "승인 요청"인지 "예산 결정"인지를 마지막 슬라이드에서 명확히 해야 합니다. "무엇을 결정해주셔야 합니다"를 직접 말하세요.</sd>
+      </div>
+    </div>
+  </div>
+
+  <div class="box scenario">
+    <div class="box-lbl">🎭 실습 시나리오 4</div>
+    <strong>상황:</strong> 신규 서비스 론칭을 위한 예산 2억원 승인을 CEO에게 받아야 합니다. 10분 발표 기회가 주어졌습니다. 설득력 있는 장표가 필요합니다.<br>
+    <strong>목표:</strong> CEO 설득용 예산 승인 발표 장표 10장 완성
+  </div>
+
+  <div class="pb">
+    <div class="pb-lbl"><span class="pb-num pn-l">P-07</span>복사해서 바로 쓰는 프롬프트 — 임원 승인 요청 발표 장표</div>
+    <button class="copy-btn" onclick="cp(this)">복사</button>
+    <div class="pt"><span class="cm"># 임원의 YES를 이끌어내는 설득 구조 PPT</span>
+
+임원 승인을 받기 위한 발표 장표를 만들어줘.
+
+<span class="ht">[발표 정보]</span>
+요청 사항: <em>[예: 신규 AI 도구 도입 예산 5천만원 승인]</em>
+발표 대상: <em>[예: CEO, 재무담당 부사장]</em>
+발표 시간: <em>[예: 10분]</em>
+현재 보유 근거: <em>[예: 파일럿 테스트 결과, 비용 절감 계산, 경쟁사 도입 현황]</em>
+
+<span class="ht">[10장 구조로 만들어줘]</span>
+
+슬라이드 1 — 제안 요약 (Executive Summary)
+: 요청 사항 + 핵심 근거 3가지 + 기대 효과를 딱 1장으로
+
+슬라이드 2~3 — 문제·기회 정의
+: "지금 행동하지 않으면 어떤 비용이 발생하는가"
+
+슬라이드 4~5 — 솔루션 및 근거
+: 수치·데이터 기반 설득
+
+슬라이드 6~7 — 실행 계획
+: 타임라인, 담당자, 마일스톤
+
+슬라이드 8 — 리스크 & 대응 방안
+: 임원이 물어볼 반론을 선제 차단
+
+슬라이드 9 — ROI & 기대 효과
+: 투자 대비 수익 수치화
+
+슬라이드 10 — 요청 사항 (Ask Slide)
+: "이 자리에서 결정해주셔야 할 것"을 명확히
+
+<span class="ht">[각 슬라이드]</span>
+헤드라인(1문장) + 불릿(3개 이내) + 스피커 노트(2문장)</div>
+  </div>
+
+  <div class="pb">
+    <div class="pb-lbl"><span class="pb-num pn-l">P-08</span>복사해서 바로 쓰는 프롬프트 — 같은 내용 청중별 3버전 변환</div>
+    <button class="copy-btn" onclick="cp(this)">복사</button>
+    <div class="pt"><span class="cm"># 하나의 내용을 임원/팀원/고객용으로 각각 최적화</span>
+
+아래 내용을 3가지 청중별 버전으로 각각 변환해줘.
+
+<span class="ht">[원본 내용]</span>
+<em>--- 기존 슬라이드 내용 또는 핵심 데이터를 붙여넣으세요 ---</em>
+
+<span class="ht">[버전 A — 임원/경영진용 (5분 발표)]</span>
+포커스: 의사결정에 필요한 것만 (WHY & WHAT)
+강조: 비용·수익·전략적 의미
+길이: 5장 이내
+어조: 결론 먼저, 직접적
+
+<span class="ht">[버전 B — 실무팀원용 (15분 발표)]</span>
+포커스: 어떻게 실행하는지 (HOW)
+강조: 역할 분담, 프로세스, 일정
+길이: 15장
+어조: 협력적, 액션 중심
+
+<span class="ht">[버전 C — 외부 고객/파트너용 (10분 발표)]</span>
+포커스: 그들에게 어떤 가치가 있는지 (WHAT'S IN IT FOR ME)
+강조: 고객 혜택, 신뢰성, 사용 사례
+길이: 10장
+어조: 설득적, 신뢰 구축
+
+각 버전의 표지 제목과 핵심 헤드라인 3개도 각각 만들어줘.</div>
+  </div>
+</div>
+
+
+<!-- ══ S5: 애드인 ══ -->
+<div class="sec acc-adv" id="s5">
+  <div class="sec-eyebrow">Section 5 · Claude for PPT 애드인</div>
+  <h2>🤖 Claude for PPT 애드인 — 파일 안에서 직접 생성</h2>
+  <p class="sub">Pro 이상 플랜에서는 파워포인트 파일 안에서 Claude를 호출해 슬라이드를 직접 생성·수정할 수 있습니다. 엑셀 애드인과 연동하면 데이터 → 시각화 → 발표 자료가 원스텝으로 완성됩니다.</p>
+
+  <h3>애드인 설치 & 시작 방법</h3>
+
+  <div class="steps">
+    <div class="step">
+      <div class="sn"></div>
+      <div class="sb">
+        <div class="st">파워포인트 → 홈 탭 → 추가 기능 → "Claude" 검색</div>
+        <div class="sd">Office 스토어에서 "Claude by Anthropic"을 설치합니다. Pro 이상 계정으로 로그인하면 전체 기능이 활성화됩니다.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="sn"></div>
+      <div class="sb">
+        <div class="st">Claude 패널 열기 → 파일 컨텍스트 공유</div>
+        <div class="sd">"Share presentation context" 버튼을 클릭하면 현재 PPT의 전체 내용을 Claude가 파악합니다. 이후 "이 슬라이드를 개선해줘" 같은 자연어 명령이 가능해집니다.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="sn"></div>
+      <div class="sb">
+        <div class="st">슬라이드 생성 또는 편집 명령</div>
+        <div class="sd">텍스트를 선택하고 "이것을 슬라이드로 변환", 또는 "3~5번 슬라이드 내용을 요약해줘" 같은 명령을 직접 입력합니다.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="sn"></div>
+      <div class="sb">
+        <div class="st">엑셀 애드인과 연동 (고급)</div>
+        <div class="sd">엑셀에서 분석한 데이터를 PPT에 자동으로 가져와 시각화 슬라이드를 만들 수 있습니다. "Excel의 매출 분석 데이터로 3장 슬라이드 만들어줘"라고 요청하면 됩니다.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="box scenario">
+    <div class="box-lbl">🎭 실습 시나리오 5</div>
+    <strong>상황:</strong> 엑셀에서 완성한 분기 매출 분석을 임원 보고용 PPT로 만들어야 합니다. 애드인으로 엑셀 데이터를 PPT 슬라이드로 자동 변환하고 싶습니다.<br>
+    <strong>목표:</strong> 엑셀 데이터 → PPT 발표 자료 원스텝 자동화 완성
+  </div>
+
+  <div class="pb">
+    <div class="pb-lbl"><span class="pb-num pn-s">P-09</span>복사해서 바로 쓰는 프롬프트 — 애드인: 기존 PPT 전체 분석 & 개선</div>
+    <button class="copy-btn" onclick="cp(this)">복사</button>
+    <div class="pt"><span class="cm"># Claude for PPT 애드인에서 기존 파일 분석 요청</span>
+
+이 발표 자료 전체를 분석하고 개선안을 줘.
+
+<span class="ht">[분석 요청]</span>
+① 전체 스토리 흐름이 논리적으로 연결되어 있는가?
+   - 각 슬라이드 제목을 읽었을 때 하나의 이야기가 되는가?
+   - 빠진 연결 고리가 있는가?
+
+② 각 슬라이드 진단:
+   - 텍스트가 너무 많은 슬라이드 (3개 이상 문단)
+   - 메시지가 불명확한 슬라이드
+   - 제거해도 되는 슬라이드
+
+③ 임팩트가 가장 약한 슬라이드 2개와 강화 방법
+
+④ 전체 발표 시간 예상 (슬라이드 수 기준)
+
+⑤ 종합 개선 우선순위 3가지
+
+<span class="ht">[개선 실행 요청]</span>
+분석 결과를 보고 내가 "OK" 하면,
+가장 중요한 개선 사항 1~2개를 직접 수정해줘.</div>
+  </div>
+
+  <div class="pb">
+    <div class="pb-lbl"><span class="pb-num pn-s">P-10</span>복사해서 바로 쓰는 프롬프트 — 아티팩트 HTML 슬라이드 직접 생성</div>
+    <button class="copy-btn" onclick="cp(this)">복사</button>
+    <div class="pt"><span class="cm"># 애드인 없이도 브라우저에서 바로 볼 수 있는 HTML 슬라이드 생성</span>
+
+아래 내용으로 HTML 형식의 프레젠테이션 슬라이드를 만들어줘.
+아티팩트로 출력해줘서 브라우저에서 바로 볼 수 있게 해줘.
+
+<span class="ht">[발표 내용]</span>
+제목: <em>[발표 제목]</em>
+슬라이드 수: <em>[5~10장]</em>
+
+슬라이드 1 (표지): <em>[제목, 부제목, 발표자]</em>
+슬라이드 2: <em>[내용]</em>
+슬라이드 3: <em>[내용]</em>
+... (계속)
+
+<span class="ht">[디자인 요청]</span>
+색상 테마: <em>[예: 다크 테마(navy/white), 화이트 클린, 컬러풀]</em>
+폰트: 모던 산세리프
+애니메이션: 슬라이드 전환 시 페이드 효과
+키보드 네비게이션: 화살표 키 또는 클릭으로 다음 슬라이드
+
+<span class="ht">[기술 요구사항]</span>
+- 전체 화면 모드 버튼
+- 슬라이드 번호/전체 표시 (하단)
+- 화면 비율: 16:9
+- 폰트: Google Fonts에서 Noto Sans KR 사용</div>
+  </div>
+</div>
+
+
+<!-- ══ S6: 통합 ══ -->
+<div class="sec" id="s6">
+  <div class="sec-eyebrow">Section 6 · 고급 통합 전략</div>
+  <h2>⚡ 엑셀 → PPT 원스텝 자동화 & 마스터 전략</h2>
+  <p class="sub">Day 16 엑셀과 Day 17 PPT를 연결합니다. 데이터 분석부터 완성 발표 자료까지 클로드가 한 흐름으로 만들어줍니다.</p>
+
+  <h3>데이터 → 슬라이드 자동화 파이프라인</h3>
+
+  <div class="steps">
+    <div class="step">
+      <div class="sn"></div>
+      <div class="sb">
+        <div class="st">엑셀 데이터를 텍스트로 요약 (클로드 채팅)</div>
+        <div class="sd">"이 데이터의 핵심 인사이트 5가지를 불릿으로 정리해줘" → 발표에 쓸 핵심 메시지 추출</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="sn"></div>
+      <div class="sb">
+        <div class="st">인사이트 기반 슬라이드 구조 설계</div>
+        <div class="sd">P-01으로 청중에 맞는 슬라이드 구조 자동 생성 → 몇 장, 어떤 순서</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="sn"></div>
+      <div class="sb">
+        <div class="st">각 슬라이드 내용 완성</div>
+        <div class="sd">P-03으로 전체 슬라이드 텍스트 + 스피커 노트 한 번에 생성</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="sn"></div>
+      <div class="sb">
+        <div class="st">아티팩트로 시각화 확인 → PPT로 최종 완성</div>
+        <div class="sd">P-10으로 HTML 슬라이드 먼저 확인 → 만족하면 PPT 애드인으로 최종 파일 생성</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="box scenario">
+    <div class="box-lbl">🎭 실습 시나리오 6 (종합 마스터)</div>
+    <strong>상황:</strong> 월요일 오전에 분기 실적 보고 PPT를 완성해야 합니다. 엑셀 데이터는 있지만 PPT는 백지 상태입니다. 금요일에 엑셀 데이터가 업데이트됐고, 오늘 오전 내에 완성이 목표입니다.<br>
+    <strong>목표:</strong> 엑셀 데이터 → 임원 보고용 15장 PPT를 2시간 내에 완성
+  </div>
+
+  <div class="pb">
+    <div class="pb-lbl"><span class="pb-num pn-a">P-11</span>복사해서 바로 쓰는 프롬프트 — 엑셀 데이터 → PPT 내용 원스텝 변환</div>
+    <button class="copy-btn" onclick="cp(this)">복사</button>
+    <div class="pt"><span class="cm"># 엑셀에서 복사한 데이터를 PPT 장표로 직접 변환</span>
+
+아래 엑셀 데이터를 분석해서 임원 보고용 PPT 내용으로 바꿔줘.
+
+<span class="ht">[엑셀 데이터 — 여기에 붙여넣기]</span>
+<em>--- 엑셀에서 Ctrl+C 하고 여기에 Ctrl+V ---</em>
+
+<span class="ht">[발표 맥락]</span>
+청중: <em>[예: CEO, CFO]</em>
+발표 목적: <em>[예: Q1 실적 보고 + Q2 전략 승인]</em>
+시간: <em>[예: 15분]</em>
+
+<span class="ht">[요청 1 — 인사이트 추출]</span>
+이 데이터에서:
+① 가장 중요한 인사이트 5가지 (각 1문장, 수치 포함)
+② 좋은 뉴스 3가지 (임원이 기뻐할 것)
+③ 나쁜 뉴스 or 위험 신호 2가지 (선제 대응 필요)
+④ 즉시 행동이 필요한 것 1가지
+
+<span class="ht">[요청 2 — 슬라이드 변환]</span>
+위 인사이트를 활용해서 15장 PPT 내용을 만들어줘.
+(각 슬라이드: 제목 + 헤드라인 + 불릿 3개 + 스피커 노트 2문장)
+
+<span class="ht">[요청 3 — 핵심 수치 슬라이드]</span>
+임팩트 있는 Big Number 슬라이드 3개도 만들어줘.
+(각각: 핵심 수치 1개 + 그 의미 1문장 + 맥락 1문장)</div>
+  </div>
+
+  <div class="pb">
+    <div class="pb-lbl"><span class="pb-num pn-a">P-12</span>복사해서 바로 쓰는 프롬프트 — 발표 대본 & Q&A 준비</div>
+    <button class="copy-btn" onclick="cp(this)">복사</button>
+    <div class="pt"><span class="cm"># PPT 완성 후 발표 대본과 예상 Q&A 준비</span>
+
+완성된 PPT를 바탕으로 발표 준비를 도와줘.
+
+<span class="ht">[슬라이드 내용]</span>
+<em>--- 완성된 슬라이드 내용 붙여넣기 (텍스트 버전) ---</em>
+
+<span class="ht">[요청 1 — 발표 대본]</span>
+각 슬라이드별 발표 대본을 작성해줘:
+- 이 슬라이드에서 말해야 할 핵심 (30~60초 분량)
+- 슬라이드 넘기는 자연스러운 전환 문장
+- 강조 포인트 (이 슬라이드에서 한 가지를 강조한다면)
+
+전체 대본 맨 앞에 "오프닝 멘트 (30초)"와 
+맨 끝에 "클로징 멘트 (30초)"도 추가해줘.
+
+<span class="ht">[요청 2 — 예상 Q&A]</span>
+이 발표를 들은 <em>[청중]</em>이 할 것 같은 질문 10개와 모범 답변:
+- 날카로운 질문 5개 (데이터·논리 공격)
+- 실행 관련 질문 3개 (어떻게 할 것인가)
+- 리스크 관련 질문 2개
+
+각 질문에: 답변 핵심 (2~3문장) + "절대 이렇게 답하지 말 것"</div>
+  </div>
+
+  <div class="pb">
+    <div class="pb-lbl"><span class="pb-num pn-a">P-13</span>복사해서 바로 쓰는 프롬프트 — 피드백 받은 PPT 빠른 수정</div>
+    <button class="copy-btn" onclick="cp(this)">복사</button>
+    <div class="pt"><span class="cm"># 팀장/동료 피드백을 PPT에 반영하는 프롬프트</span>
+
+PPT에 대한 피드백을 받았어. 반영해줘.
+
+<span class="ht">[현재 PPT 내용]</span>
+<em>--- 현재 슬라이드 내용 붙여넣기 ---</em>
+
+<span class="ht">[받은 피드백]</span>
+<em>--- 팀장/동료가 준 피드백을 그대로 붙여넣거나 요약 ---</em>
+
+예시 피드백:
+- "3번 슬라이드가 너무 복잡해. 두 장으로 나눠"
+- "ROI 수치가 없어. 추가해줘"
+- "결론이 약해. 더 강하게 끝내야 해"
+- "6번 슬라이드 순서를 7번 뒤로 옮겨"
+
+<span class="ht">[수정 요청]</span>
+① 각 피드백을 반영한 수정 내용
+② 피드백 구현이 어렵거나 상충되는 경우 대안 제안
+③ 수정 전/후 해당 슬라이드 내용 비교
+④ 수정 후 전체 흐름이 여전히 자연스러운지 점검</div>
+  </div>
+
+  <div class="pb">
+    <div class="pb-lbl"><span class="pb-num pn-x">P-14</span>복사해서 바로 쓰는 프롬프트 — 마스터: 30분 안에 PPT 초안 완성</div>
+    <button class="copy-btn" onclick="cp(this)">복사</button>
+    <div class="pt"><span class="cm"># 이 프롬프트 하나로 30분 내 PPT 초안을 완성하는 마스터 프롬프트</span>
+
+30분 안에 발표용 PPT 초안을 완성하고 싶어. 모든 것을 한 번에 해줘.
+
+<span class="ht">[발표 정보]</span>
+주제: <em>[한 문장으로]</em>
+청중: <em>[누구인지 + 규모]</em>
+발표 시간: <em>[X분]</em>
+목적: <em>[정보 공유 / 설득·승인 / 교육 중 하나]</em>
+핵심 메시지: <em>[이 발표로 전달할 가장 중요한 것 1가지]</em>
+보유 자료: <em>[있는 것: 데이터, 사례, 아이디어 등]</em>
+
+<span class="ht">[한 번에 만들어줄 것]</span>
+
+Phase 1 — 구조 (2분):
+□ 슬라이드 목록 (번호 + 제목 + 유형)
+□ 전체 스토리 흐름 요약 (3줄)
+
+Phase 2 — 내용 (20분):
+□ 각 슬라이드 헤드라인 + 불릿 3개
+□ 각 슬라이드 스피커 노트 (2문장)
+
+Phase 3 — 완성도 (8분):
+□ 가장 약한 슬라이드 강화안
+□ 예상 질문 3가지 & 답변
+□ 오프닝 & 클로징 멘트
+
+모든 내용은 <em>[청중]</em>의 언어로, 결론 먼저 쓰는 두괄식으로 작성해줘.</div>
+  </div>
+
+  <hr>
+
+  <h3>오늘 배운 내용 최종 정리</h3>
+  <div class="summary">
+    <div class="summary-title">📌 Day 17 — 클로드 for PPT 핵심 요약</div>
+    <div class="summary-grid">
+      <div class="summary-card">
+        <strong>🖥️ 3가지 방법</strong>
+        채팅 설계 / 아티팩트 HTML / PPT 애드인<br>
+        무료도 충분히 활용 가능
+      </div>
+      <div class="summary-card">
+        <strong>📐 구조가 먼저</strong>
+        5가지 황금 패턴 활용<br>
+        스토리라인이 설득력을 결정
+      </div>
+      <div class="summary-card">
+        <strong>✍️ 내용 생성</strong>
+        헤드라인 + 불릿 3개 + 스피커 노트<br>
+        청중별 3버전 동시 생성 가능
+      </div>
+      <div class="summary-card">
+        <strong>🎓 강의 vs 보고</strong>
+        강의: 학습목표+실습 중심<br>
+        보고: 두괄식+수치+의사결정
+      </div>
+      <div class="summary-card">
+        <strong>⚡ 엑셀 연동</strong>
+        데이터 → 인사이트 → 슬라이드<br>
+        P-11으로 원스텝 변환
+      </div>
+      <div class="summary-card">
+        <strong>🎓 다음 학습</strong>
+        Day 18 — 클로드 스킬 기초<br>
+        반복 업무 자동화 Skills 구축
+      </div>
+    </div>
+    <div style="margin-top:1rem;padding:1rem;background:rgba(255,255,255,.65);border-radius:8px;font-size:13px;">
+      <strong>💡 오늘 바로 실천:</strong> P-14 마스터 프롬프트로 내일 당장 쓸 발표 자료 1개를 30분 안에 초안까지 완성해보세요. 완벽하지 않아도 됩니다. 초안이 있으면 수정하기 훨씬 쉽고, 클로드는 수정도 잘해줍니다.<br><br>
+      <strong>📌 핵심 기억:</strong> 클로드는 "내용"을 만드는 것은 잘하지만 "디자인"을 직접 적용하지는 않습니다. 내용을 클로드로 채우고, 파워포인트의 테마와 레이아웃을 적용하는 것은 여전히 사람이 합니다. 이 역할 분담이 가장 효율적입니다.
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <p>이 교재는 2026년 4월 기준 Claude for PowerPoint 애드인 및 claude.ai 아티팩트 기능을 바탕으로 작성되었습니다.</p>
+  <p>공식 Claude for PPT 가이드: <strong>support.claude.com</strong> · 애드인 설치: <strong>Microsoft AppSource</strong></p>
+</div>
+
+</div>
+
+<script>
+function cp(btn){
+  const b=btn.closest('.pb').querySelector('.pt');
+  const txt=b.innerText||b.textContent;
+  navigator.clipboard.writeText(txt).then(()=>{
+    const o=btn.textContent;
+    btn.textContent='✓ 복사됨'; btn.style.color='#4ade80';
+    setTimeout(()=>{ btn.textContent=o; btn.style.color=''; },1800);
+  }).catch(()=>{ btn.textContent='실패'; setTimeout(()=>{ btn.textContent='복사'; },1800); });
+}
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    e.preventDefault();
+    const t=document.querySelector(a.getAttribute('href'));
+    if(t) t.scrollIntoView({behavior:'smooth',block:'start'});
+  });
+});
+</script>
+</body>
+</html>

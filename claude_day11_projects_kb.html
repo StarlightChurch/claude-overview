@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>11일차: 클로드 프로젝트(Projects) — 지식 기반 구축 및 문서 업로드</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap');
+
+:root {
+  --ink:#0b0d1a; --ink2:#1c2038; --ink3:#505470;
+  --paper:#f6f7f2; --paper2:#edece8; --paper3:#dfdbd2;
+  --white:#fff;
+  --proj:#0e6fb8;  --proj-l:#e2eefb;  --proj-d:#093d80;
+  --kb:#0a7a60;    --kb-l:#e0f5ee;    --kb-d:#065040;
+  --doc:#8830c0;   --doc-l:#f5ebff;   --doc-d:#5818a0;
+  --inst:#b87010;  --inst-l:#fdf3de;  --inst-d:#7a4808;
+  --rose:#b82848;  --rose-l:#fde8ed;  --rose-d:#7a1830;
+  --green:#387018; --green-l:#eaf4de; --green-d:#224408;
+  --teal:#0a7a60;  --teal-l:#e0f5ee;  --teal-d:#065040;
+  --sky:#0870a8;   --sky-l:#e2f2fb;   --sky-d:#044870;
+  --amber:#b87010; --amber-l:#fdf3de; --amber-d:#7a4808;
+  --border:rgba(11,13,26,0.09); --shadow:0 2px 22px rgba(11,13,26,0.07);
+  --r:14px; --r2:20px; --mono:'JetBrains Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--paper);color:var(--ink);line-height:1.8;font-size:15px;}
+.wrap{max-width:920px;margin:0 auto;padding:2rem 1.5rem 6rem;}
+
+/* Cover */
+.cover{border-radius:22px;padding:3.5rem 3rem 3rem;margin-bottom:2.5rem;position:relative;overflow:hidden;
+  background:linear-gradient(135deg,#060a20 0%,#0c1840 45%,#060e20 100%);}
+.cv1{position:absolute;right:-80px;top:-80px;width:320px;height:320px;border-radius:50%;
+  background:radial-gradient(circle,rgba(14,111,184,.22) 0%,transparent 70%);}
+.cv2{position:absolute;left:-60px;bottom:-60px;width:260px;height:260px;border-radius:50%;
+  background:radial-gradient(circle,rgba(10,122,96,.16) 0%,transparent 70%);}
+.cv3{position:absolute;right:180px;bottom:-40px;width:200px;height:200px;border-radius:50%;
+  background:radial-gradient(circle,rgba(136,48,192,.12) 0%,transparent 70%);}
+.cover-eyebrow{display:inline-flex;align-items:center;gap:8px;background:rgba(14,111,184,.28);color:#88c8f8;
+  font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:5px 16px;
+  border-radius:30px;margin-bottom:1.25rem;position:relative;}
+.cover h1{font-size:2.1rem;font-weight:900;line-height:1.25;color:#fff;margin-bottom:.7rem;position:relative;}
+.cover h1 em{color:#68d8b0;font-style:normal;}
+.cover p{font-size:14px;color:rgba(255,255,255,.62);max-width:530px;line-height:1.75;position:relative;}
+.cover-chips{margin-top:2rem;display:flex;gap:10px;flex-wrap:wrap;position:relative;}
+.chip{background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);font-size:12px;font-weight:500;
+  padding:4px 14px;border-radius:30px;border:1px solid rgba(255,255,255,.1);}
+
+/* TOC */
+.toc{background:var(--white);border:.5px solid var(--border);border-radius:var(--r);
+  padding:1.5rem 2rem;margin-bottom:2.5rem;box-shadow:var(--shadow);}
+.toc-label{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:1rem;}
+.toc-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
+@media(max-width:540px){.toc-grid{grid-template-columns:1fr;}}
+.toc-item{display:flex;align-items:center;gap:10px;padding:.45rem .75rem;border-radius:8px;
+  text-decoration:none;color:var(--ink2);font-size:13.5px;transition:background .15s;}
+.toc-item:hover{background:var(--proj-l);color:var(--proj-d);}
+.toc-num{min-width:24px;height:24px;border-radius:50%;background:var(--proj);color:#fff;
+  font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+
+/* Section */
+.sec{background:var(--white);border:.5px solid var(--border);border-radius:var(--r2);
+  padding:2.2rem 2.4rem;margin-bottom:2rem;box-shadow:var(--shadow);}
+.sec-eyebrow{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);margin-bottom:.35rem;}
+.sec h2{font-size:1.5rem;font-weight:900;color:var(--ink);margin-bottom:.3rem;line-height:1.3;}
+.sec .sub{font-size:13.5px;color:var(--ink3);margin-bottom:1.75rem;line-height:1.7;}
+.sec h3{font-size:1rem;font-weight:700;color:var(--ink);margin:1.75rem 0 .7rem;
+  padding-left:.9rem;border-left:3px solid var(--proj);}
+.acc-kb   h3{border-left-color:var(--kb);}
+.acc-doc  h3{border-left-color:var(--doc);}
+.acc-inst h3{border-left-color:var(--inst);}
+.acc-adv  h3{border-left-color:var(--sky);}
+.sec p{margin-bottom:.9rem;font-size:14.5px;}
+.sec ul,.sec ol{padding-left:1.5rem;margin-bottom:1rem;}
+.sec li{margin:.35rem 0;font-size:14.5px;}
+hr{border:none;border-top:.5px solid var(--border);margin:1.8rem 0;}
+
+/* anatomy diagram */
+.anatomy{background:var(--proj-l);border:1px solid #a0c8e8;border-radius:var(--r2);
+  padding:1.75rem 2rem;margin:1.5rem 0;position:relative;}
+.anatomy-title{font-size:12px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--proj-d);margin-bottom:1rem;}
+.anatomy-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+@media(max-width:580px){.anatomy-grid{grid-template-columns:1fr;}}
+.anat-box{background:rgba(255,255,255,.75);border-radius:10px;padding:.9rem 1rem;border:.5px solid rgba(14,111,184,.2);}
+.anat-icon{font-size:1.4rem;margin-bottom:.3rem;}
+.anat-name{font-size:13px;font-weight:800;color:var(--proj-d);margin-bottom:.25rem;}
+.anat-desc{font-size:12px;color:var(--ink3);line-height:1.5;}
+
+/* project type cards */
+.proj-types{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:1.5rem 0;}
+@media(max-width:580px){.proj-types{grid-template-columns:1fr 1fr;}}
+.pt-card{border-radius:var(--r);padding:1.1rem 1rem;border:.5px solid var(--border);
+  background:var(--white);box-shadow:var(--shadow);}
+.pt-icon{font-size:1.6rem;margin-bottom:.4rem;}
+.pt-name{font-size:13px;font-weight:800;margin-bottom:.25rem;}
+.pt-desc{font-size:12px;color:var(--ink3);line-height:1.5;}
+
+/* steps */
+.steps{counter-reset:s;margin:1.25rem 0;}
+.step{display:flex;gap:1rem;align-items:flex-start;padding:1rem 0;border-bottom:.5px solid var(--border);}
+.step:last-child{border-bottom:none;}
+.sn{counter-increment:s;min-width:30px;height:30px;border-radius:50%;background:var(--proj);color:#fff;
+  font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
+.sn::before{content:counter(s);}
+.sb{flex:1;}
+.st{font-weight:700;font-size:14.5px;margin-bottom:.3rem;}
+.sd{font-size:13.5px;color:var(--ink3);line-height:1.65;}
+
+/* ba */
+.ba{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:1.2rem 0;}
+@media(max-width:540px){.ba{grid-template-columns:1fr;}}
+.ba-card{border-radius:10px;padding:1rem 1.1rem;font-size:13.5px;line-height:1.7;}
+.ba-before{background:#fdf0f3;border:1px solid #f0b0bc;}
+.ba-after{background:var(--kb-l);border:1px solid #80c8b4;}
+.ba-lbl{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.5rem;}
+.ba-before .ba-lbl{color:var(--rose-d);}
+.ba-after .ba-lbl{color:var(--kb-d);}
+
+/* callouts */
+.box{border-radius:10px;padding:1rem 1.25rem;margin:1.2rem 0;font-size:14px;}
+.box-lbl{font-size:10.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;margin-bottom:.5rem;}
+.box.apply{background:var(--kb-l);border-left:3px solid var(--kb);}
+.box.apply .box-lbl{color:var(--kb-d);}
+.box.scenario{background:var(--proj-l);border-left:3px solid var(--proj);}
+.box.scenario .box-lbl{color:var(--proj-d);}
+.box.tip{background:var(--inst-l);border-left:3px solid var(--inst);}
+.box.tip .box-lbl{color:var(--inst-d);}
+.box.warn{background:var(--rose-l);border-left:3px solid var(--rose);}
+.box.warn .box-lbl{color:var(--rose-d);}
+.box.insight{background:var(--doc-l);border-left:3px solid var(--doc);}
+.box.insight .box-lbl{color:var(--doc-d);}
+.box.ok{background:var(--green-l);border-left:3px solid var(--green);}
+.box.ok .box-lbl{color:var(--green-d);}
+
+/* prompt block */
+.pb{background:#0c0d1e;border-radius:12px;padding:1.1rem 1.5rem;margin:1rem 0;position:relative;}
+.pb-lbl{font-size:10.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;
+  color:#78b8f8;margin-bottom:.8rem;display:flex;align-items:center;gap:6px;}
+.pb-lbl::before{content:"📋";font-size:13px;}
+.pb-num{border-radius:5px;font-size:10px;font-weight:800;padding:1px 8px;margin-right:4px;display:inline-block;}
+.pn-0{background:#252850;color:#a0b0e0;}
+.pn-p{background:var(--proj);color:#fff;}
+.pn-k{background:var(--kb);color:#fff;}
+.pn-d{background:var(--doc);color:#fff;}
+.pn-i{background:var(--inst);color:#fff;}
+.pn-a{background:var(--sky);color:#fff;}
+.pn-x{background:var(--ink2);color:#fff;}
+.pt{font-family:var(--mono);font-size:12.5px;line-height:1.95;color:#c8d2e4;
+  white-space:pre-wrap;word-break:break-word;}
+.pt em{color:#68d8c0;font-style:normal;}
+.pt strong{color:#fde68a;}
+.pt .cm{color:#404860;font-style:italic;}
+.pt .ht{color:#f0a060;font-weight:600;}
+.copy-btn{position:absolute;top:.8rem;right:.8rem;background:rgba(255,255,255,.08);border:none;
+  border-radius:6px;color:#7a8099;font-size:11px;padding:4px 10px;cursor:pointer;transition:all .18s;}
+.copy-btn:hover{background:rgba(255,255,255,.16);color:#fff;}
+
+/* doc format grid */
+.doc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:1.2rem 0;}
+@media(max-width:580px){.doc-grid{grid-template-columns:1fr 1fr;}}
+.doc-card{border-radius:10px;padding:.85rem .9rem;text-align:center;border:.5px solid var(--border);}
+.doc-ext{font-size:1.3rem;font-weight:900;margin-bottom:.25rem;font-family:var(--mono);}
+.doc-name{font-size:11.5px;font-weight:700;margin-bottom:.2rem;}
+.doc-note{font-size:10.5px;color:var(--ink3);line-height:1.4;}
+
+/* knowledge card */
+.kb-card{background:var(--kb-l);border:1px solid #80c8b4;border-radius:var(--r);
+  padding:1.25rem 1.5rem;margin:.75rem 0;}
+.kb-head{font-size:12px;font-weight:800;color:var(--kb-d);letter-spacing:.05em;
+  text-transform:uppercase;margin-bottom:.5rem;display:flex;align-items:center;gap:8px;}
+.kb-body{font-size:13.5px;color:var(--ink2);line-height:1.7;}
+
+/* instruction box */
+.inst-box{background:var(--inst-l);border:1px solid #e0c070;border-radius:var(--r);
+  padding:1.25rem 1.5rem;margin:.75rem 0;}
+.inst-head{font-size:12px;font-weight:800;color:var(--inst-d);letter-spacing:.05em;
+  text-transform:uppercase;margin-bottom:.5rem;}
+.inst-body{font-family:var(--mono);font-size:12.5px;color:var(--ink2);line-height:1.8;}
+
+/* table */
+.tbl{width:100%;border-collapse:collapse;margin:1.2rem 0;font-size:13.5px;}
+.tbl th{background:var(--ink2);color:#fff;padding:10px 14px;text-align:left;font-weight:700;}
+.tbl th:first-child{border-radius:8px 0 0 0;}
+.tbl th:last-child{border-radius:0 8px 0 0;}
+.tbl td{padding:9px 14px;border-bottom:.5px solid var(--border);}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl tr:nth-child(even) td{background:rgba(14,111,184,.04);}
+.tbl code{background:var(--proj-l);color:var(--proj-d);border-radius:4px;padding:1px 6px;font-size:12px;font-family:var(--mono);}
+.good{color:var(--kb-d);font-weight:600;}
+.bad{color:var(--rose-d);}
+
+/* tag */
+.tag{display:inline-block;border-radius:6px;font-size:11px;font-weight:800;padding:2px 9px;margin:0 2px;vertical-align:middle;}
+.tg-p{background:var(--proj-l);color:var(--proj-d);}
+.tg-k{background:var(--kb-l);color:var(--kb-d);}
+.tg-d{background:var(--doc-l);color:var(--doc-d);}
+.tg-i{background:var(--inst-l);color:var(--inst-d);}
+.tg-g{background:var(--green-l);color:var(--green-d);}
+.tg-r{background:var(--rose-l);color:var(--rose-d);}
+
+/* use case grid */
+.uc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:1.2rem 0;}
+@media(max-width:580px){.uc-grid{grid-template-columns:1fr 1fr;}}
+.uc-card{background:var(--paper2);border-radius:10px;border:.5px solid var(--paper3);padding:.9rem 1rem;}
+.uc-icon{font-size:1.4rem;margin-bottom:.3rem;}
+.uc-title{font-size:13px;font-weight:700;color:var(--ink2);margin-bottom:.2rem;}
+.uc-desc{font-size:12px;color:var(--ink3);line-height:1.5;}
+
+/* before/after comparison for projects */
+.proj-compare{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:1.5rem 0;}
+@media(max-width:540px){.proj-compare{grid-template-columns:1fr;}}
+.pc-card{border-radius:var(--r);padding:1.1rem 1.25rem;border:.5px solid var(--border);}
+.pc-head{font-size:11px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;margin-bottom:.75rem;}
+.pc-item{display:flex;align-items:flex-start;gap:8px;margin:.4rem 0;font-size:13.5px;line-height:1.6;}
+.pc-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:7px;}
+
+/* summary */
+.summary{background:linear-gradient(135deg,var(--proj-l),var(--kb-l));
+  border:1px solid #a0c0e0;border-radius:var(--r2);padding:1.5rem 2rem;margin-top:2rem;}
+.summary-title{font-size:13px;font-weight:800;color:var(--proj-d);letter-spacing:.06em;text-transform:uppercase;margin-bottom:1rem;}
+.summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+@media(max-width:600px){.summary-grid{grid-template-columns:1fr 1fr;}}
+.summary-card{background:rgba(255,255,255,.72);border-radius:10px;padding:.9rem 1rem;font-size:13px;}
+.summary-card strong{display:block;font-size:11px;color:var(--proj-d);font-weight:800;
+  letter-spacing:.05em;text-transform:uppercase;margin-bottom:.4rem;}
+
+code{background:var(--proj-l);color:var(--proj-d);border-radius:4px;padding:1px 6px;font-size:12.5px;font-family:var(--mono);}
+.footer{text-align:center;font-size:12px;color:var(--ink3);margin-top:4rem;
+  padding-top:1.5rem;border-top:.5px solid var(--border);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ══ COVER ══ -->
+<div class="cover">
+  <div class="cv1"></div><div class="cv2"></div><div class="cv3"></div>
+  <div class="cover-eyebrow">📅 Day 11 · 클로드 AI 30일 마스터 코스</div>
+  <h1>클로드 프로젝트(Projects)<br><em>지식 기반 구축</em>과 문서 업로드</h1>
+  <p>매번 같은 맥락을 반복하는 시대는 끝났습니다 — Projects로 클로드에게 나만의 전문 지식 베이스를 만들어주면, 클로드는 영구적인 전문가 파트너가 됩니다</p>
+  <div class="cover-chips">
+    <span class="chip">📁 Projects 완전 가이드</span>
+    <span class="chip">📚 지식 기반(KB) 구축</span>
+    <span class="chip">📄 문서 업로드 전략</span>
+    <span class="chip">📋 14개 복붙 프롬프트</span>
+    <span class="chip">💼 직업별 KB 템플릿 6종</span>
+  </div>
+</div>
+
+<!-- ══ TOC ══ -->
+<div class="toc">
+  <div class="toc-label">목차</div>
+  <div class="toc-grid">
+    <a class="toc-item" href="#s0"><span class="toc-num">0</span>Projects란? — 일반 대화와 무엇이 다른가</a>
+    <a class="toc-item" href="#s1"><span class="toc-num">1</span>프로젝트 만들기 — 단계별 설정 가이드</a>
+    <a class="toc-item" href="#s2"><span class="toc-num">2</span>지식 기반(KB) 구축 — 문서 업로드 전략</a>
+    <a class="toc-item" href="#s3"><span class="toc-num">3</span>Instructions 작성법 — 클로드를 전문가로 만들기</a>
+    <a class="toc-item" href="#s4"><span class="toc-num">4</span>직업별 Projects 완성형 템플릿 6종</a>
+    <a class="toc-item" href="#s5"><span class="toc-num">5</span>문서 활용 심화 — 분석·요약·Q&A</a>
+    <a class="toc-item" href="#s6"><span class="toc-num">6</span>고급 전략 — KB 최적화 &amp; 유지 관리</a>
+  </div>
+</div>
+
+
+<!-- ══ S0: 개념 ══ -->
+<div class="sec" id="s0">
+  <div class="sec-eyebrow">기초 개념 · What are Projects?</div>
+  <h2>Projects란? — 일반 대화와 무엇이 다른가</h2>
+  <p class="sub">클로드를 매번 "새로운 직원"처럼 대하는 것에서 벗어나, 나의 업무와 전문 지식을 완전히 파악한 "숙련된 파트너"로 만드는 기능입니다.</p>
+
+  <h3>일반 대화 vs Projects — 핵심 차이</h3>
+
+  <div class="ba">
+    <div class="ba-card ba-before">
+      <div class="ba-lbl">❌ 일반 대화 (대화별 리셋)</div>
+      매번 새 대화 → 클로드가 나를 모름<br>
+      "나는 마케터야, 우리 제품은..." 반복 입력<br>
+      파일 업로드해도 다음 대화에서 사라짐<br>
+      지시사항을 매번 처음부터 설명<br>
+      → 시간 낭비 + 일관성 없는 답변
+    </div>
+    <div class="ba-card ba-after">
+      <div class="ba-lbl">✅ Projects (영구 컨텍스트)</div>
+      프로젝트 안에서는 클로드가 항상 맥락 파악<br>
+      문서·데이터가 프로젝트에 영구 저장됨<br>
+      지시사항(Instructions)이 모든 대화에 자동 적용<br>
+      이전 대화 내용을 기반으로 쌓이는 지식<br>
+      → 진짜 전문가 파트너처럼 작동
+    </div>
+  </div>
+
+  <h3>Projects의 3요소 해부</h3>
+
+  <div class="anatomy">
+    <div class="anatomy-title">📁 클로드 프로젝트의 구조</div>
+    <div class="anatomy-grid">
+      <div class="anat-box">
+        <div class="anat-icon">📋</div>
+        <div class="anat-name">Instructions (지시사항)</div>
+        <div class="anat-desc">클로드에게 역할·규칙·행동 방침을 영구적으로 설정. 모든 대화에 자동 적용되는 시스템 프롬프트.</div>
+      </div>
+      <div class="anat-box">
+        <div class="anat-icon">📚</div>
+        <div class="anat-name">Knowledge (지식 기반)</div>
+        <div class="anat-desc">PDF, 문서, 데이터, 코드 등 업로드한 파일들의 집합. 클로드가 언제든 참조하는 전문 지식 저장소.</div>
+      </div>
+      <div class="anat-box">
+        <div class="anat-icon">💬</div>
+        <div class="anat-name">Conversations (대화)</div>
+        <div class="anat-desc">프로젝트 안에서 나누는 모든 대화. 컨텍스트가 이어지며 대화가 쌓일수록 클로드가 더 정확해짐.</div>
+      </div>
+    </div>
+  </div>
+
+  <h3>어떤 프로젝트가 가능한가?</h3>
+
+  <div class="proj-types">
+    <div class="pt-card">
+      <div class="pt-icon">💼</div>
+      <div class="pt-name" style="color:var(--proj-d);">업무 전문가</div>
+      <div class="pt-desc">내 직무 매뉴얼·프로세스 문서를 업로드 → 업무 질문에 항상 우리 회사 기준으로 답변</div>
+    </div>
+    <div class="pt-card">
+      <div class="pt-icon">📖</div>
+      <div class="pt-name" style="color:var(--kb-d);">연구 어시스턴트</div>
+      <div class="pt-desc">논문·보고서 집합 → "이 연구들을 기반으로 분석해줘"가 가능한 학술 파트너</div>
+    </div>
+    <div class="pt-card">
+      <div class="pt-icon">🛒</div>
+      <div class="pt-name" style="color:var(--doc-d);">제품 전문가</div>
+      <div class="pt-desc">제품 스펙·FAQ·정책 업로드 → 고객 문의에 정확한 제품 정보로 답변 생성</div>
+    </div>
+    <div class="pt-card">
+      <div class="pt-icon">✍️</div>
+      <div class="pt-name" style="color:var(--inst-d);">글쓰기 파트너</div>
+      <div class="pt-desc">내 기존 글·브랜드 가이드라인 → 항상 내 목소리와 스타일을 유지하는 글쓰기 보조</div>
+    </div>
+    <div class="pt-card">
+      <div class="pt-icon">💻</div>
+      <div class="pt-name" style="color:var(--sky-d);">코딩 어시스턴트</div>
+      <div class="pt-desc">코드베이스·아키텍처 문서 → 프로젝트 전체를 이해한 상태에서 코딩 지원</div>
+    </div>
+    <div class="pt-card">
+      <div class="pt-icon">🎓</div>
+      <div class="pt-name" style="color:var(--green-d);">학습 튜터</div>
+      <div class="pt-desc">교재·강의 노트 → 내가 공부하는 내용을 완전히 파악한 개인 맞춤 튜터</div>
+    </div>
+  </div>
+
+  <div class="box tip">
+    <div class="box-lbl">💡 무료 플랜에서도 Projects 사용 가능</div>
+    Projects는 무료 플랜에서도 최대 5개까지 만들 수 있습니다. Pro 이상 플랜에서는 더 많은 프로젝트와 대용량 파일 업로드가 가능합니다. 가장 먼저 만들 프로젝트 하나를 지금 바로 시작해보세요.
+  </div>
+
+  <hr>
+
+  <div class="box apply">
+    <div class="box-lbl">✅ 적용방법 — Projects 체험하기 전 준비</div>
+    프로젝트를 만들기 전에, 아래 프롬프트로 내 상황에 맞는 프로젝트 전략을 먼저 설계합니다.
+  </div>
+
+  <div class="pb">
+    <div class="pb-lbl"><span class="pb-num pn-0">P-00</span>복사해서 바로 쓰는 프롬프트 — 내 상황에 맞는 Projects 전략 설계</div>
+    <button class="copy-btn" onclick="cp(this)">복사</button>
+    <div class="pt"><span class="cm"># 클로드 Projects를 처음 시작하기 전 전략 수립</span>
+
+내 상황에 맞는 클로드 Projects 활용 전략을 설계해줘.
+
+[내 정보]
+직업/역할: <em>[예: 스타트업 PM, 프리랜서 작가, 대학원생]</em>
+주요 반복 업무: <em>[예: 주간 보고서 작성, 고객 이메일 응대, 논문 리뷰]</em>
+자주 쓰는 문서 유형: <em>[예: 내부 정책 문서, 고객 계약서, 연구 논문]</em>
+현재 가장 불편한 점: <em>[예: 매번 배경 설명을 반복해야 함]</em>
+
+제안해줄 것:
+① 당장 만들어야 할 Projects Top 3 (우선순위 포함)
+② 각 프로젝트에 넣어야 할 핵심 문서 목록
+③ Instructions에 반드시 포함할 내용
+④ 가장 먼저 업로드할 "핵심 문서 1개" 추천과 이유
+⑤ 이 Projects로 매주 절약할 수 있는 시간 추정</div>
+  </div>
+</div>
+
+
+<!-- ══ S1: 프로젝트 만들기 ══ -->
+<div class="sec" id="s1">
+  <div class="sec-eyebrow">Section 1 · 프로젝트 생성</div>
+  <h2>📁 프로젝트 만들기 — 단계별 설정 가이드</h2>
+  <p class="sub">처음 프로젝트를 만드는 과정을 화면 단위로 따라합니다. 5분이면 첫 프로젝트가 완성됩니다.</p>
+
+  <h3>1-1. 프로젝트 생성 단계</h3>
+
+  <div class="steps">
+    <div class="step">
+      <div class="sn"></div>
+      <div class="sb">
+        <div class="st">사이드바에서 "Projects" 또는 "+" 버튼 찾기</div>
+        <div class="sd">claude.ai 왼쪽 사이드바에서 <strong>Projects</strong> 섹션을 찾습니다. "New Project" 또는 "+" 버튼을 클릭합니다. 모바일 앱에서는 ≡ 메뉴 → Projects 순으로 접근합니다.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="sn"></div>
+      <div class="sb">
+        <div class="st">프로젝트 이름 입력</div>
+        <div class="sd">명확하고 구체적인 이름을 사용하세요. <strong>"마케팅 전략 2026"</strong>, <strong>"고객 응대 매뉴얼"</strong>, <strong>"논문 리서치"</strong>처럼 나중에 봐도 무슨 프로젝트인지 알 수 있게.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="sn"></div>
+      <div class="sb">
+        <div class="st">Instructions 작성 (핵심!)</div>
+        <div class="sd">이 프로젝트에서 클로드가 어떻게 행동할지 지정합니다. 역할, 어조, 금지 사항, 출력 형식 등을 포함합니다. (자세한 작성법은 Section 3에서 배웁니다)</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="sn"></div>
+      <div class="sb">
+        <div class="st">문서 업로드 (Knowledge 구축)</div>
+        <div class="sd">프로젝트와 관련된 PDF, Word, 텍스트 파일을 업로드합니다. 파일은 영구 저장되어 이후 모든 대화에서 클로드가 참조합니다. (업로드 전략은 Section 2에서)</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="sn"></div>
+      <div class="sb">
+        <div class="st">첫 번째 대화 시작</div>
+        <div class="sd">프로젝트 안에서 "New Conversation"을 클릭해서 첫 대화를 시작합니다. Instructions와 업로드한 문서가 이미 적용된 상태로 대화가 시작됩니다.</div>
+      </div>
+    </div>
+  </div>
+
+  <h3>1-2. 프로젝트 설정 화면 구조</h3>
+
+  <div class="ba">
+    <div class="ba-card" style="background:var(--paper2);border:1px solid var(--paper3);">
+      <div class="ba-lbl" style="color:var(--ink2);">📁 프로젝트 설정 화면</div>
+      <strong>프로젝트 이름</strong> [입력창]<br><br>
+      <strong>Instructions</strong><br>
+      [멀티라인 텍스트 입력창]<br>
+      "You are a… 역할과 지시사항"<br><br>
+      <strong>Knowledge (문서)</strong><br>
+      [파일 업로드 영역]<br>
+      📄 document1.pdf<br>
+      📄 policy.docx<br>
+      [+ 파일 추가 버튼]
+    </div>
+    <div class="ba-card ba-after">
+      <div class="ba-lbl">✅ 각 요소의 역할</div>
+      <strong>이름:</strong> 사이드바에서 구분하는 라벨<br>
+      <br>
+      <strong>Instructions:</strong> 클로드의 역할과 규칙을<br>
+      모든 대화에 자동 적용하는<br>
+      영구 시스템 프롬프트<br>
+      <br>
+      <strong>Knowledge:</strong> 클로드가 언제든<br>
+      참조할 수 있는 전문 지식 저장소<br>
+      (파일은 영구 보존됨)
+    </div>
+  </div>
+
+  <div class="box warn">
+    <div class="box-lbl">⚠️ 주의: 프로젝트 대화 vs 일반 대화</div>
+    <strong>프로젝트 안에서:</strong> Instructions + Knowledge + 이전 대화 맥락이 모두 적용됨<br>
+    <strong>일반 대화에서:</strong> 프로젝트 설정이 전혀 적용되지 않음<br><br>
+    → 프로젝트 관련 작업은 반드시 해당 프로젝트 안에서 시작하세요. 일반 대화창에서 시작하면 모든 설정이 무시됩니다.
+  </div>
+
+  <div class="box scenario">
+    <div class="box-lbl">🎭 실습 시나리오 1</div>
+    <strong>상황:</strong> 매주 경쟁사 분석 보고서를 작성해야 합니다. 매번 "나는 마케터야, 우리 산업은..." 을 반복 입력하는 게 지칩니다.<br>
+    <strong>목표:</strong> "경쟁사 분석" 프로젝트를 만들고 첫 대화 시작하기
+  </div>
+
+  <div class="pb">
+    <div class="pb-lbl"><span class="pb-num pn-p">P-01</span>복사해서 바로 쓰는 프롬프트 — 프로젝트 첫 대화: 설정 확인 및 테스트</div>
+    <button class="copy-btn" onclick="cp(this)">복사</button>
+    <div class="pt"><span class="cm"># 프로젝트를 만든 직후, 설정이 잘 됐는지 확인하는 첫 대화</span>
+
+안녕! 이 프로젝트의 설정을 확인하고 싶어.
+
+① 지금 이 프로젝트에서 네가 맡은 역할과 지켜야 할 규칙을 요약해줘
+② 업로드된 문서 목록과 각 문서의 핵심 내용을 1~2줄씩 알려줘
+③ 이 프로젝트에서 내가 자주 할 것 같은 요청 3가지를 예상해줘
+④ 지금 설정에서 개선하면 좋을 것이 있으면 솔직히 말해줘
+
+설정 확인 후, 짧은 테스트 질문도 같이 답해줘:
+<em>"[이 프로젝트의 핵심 업무와 관련된 실제 질문 하나]"</em></div>
+  </div>
+</div>
+
+
+<!-- ══ S2: 지식 기반 구축 ══ -->
+<div class="sec acc-kb" id="s2">
+  <div class="sec-eyebrow">Section 2 · 지식 기반(KB) 구축</div>
+  <h2>📚 지식 기반 구축 — 문서 업로드 전략</h2>
+  <p class="sub">어떤 문서를 어떻게 업로드하느냐에 따라 클로드가 얼마나 정확하게 답변하는지가 결정됩니다.</p>
+
+  <h3>2-1. 업로드 가능한 파일 형식</h3>
+
+  <div class="doc-grid">
+    <div class="doc-card" style="background:var(--rose-l);border-color:#f0b0b8;">
+      <div class="doc-ext" style="color:var(--rose-d);">PDF</div>
+      <div class="doc-name">PDF 문서</div>
+      <div class="doc-note">보고서, 논문, 매뉴얼, 계약서 — 가장 범용적</div>
+    </div>
+    <div class="doc-card" style="background:var(--proj-l);border-color:#a0c8e8;">
+      <div class="doc-ext" style="color:var(--proj-d);">DOCX</div>
+      <div class="doc-name">Word 문서</div>
+      <div class="doc-note">내부 정책, 기획서, 회의록, 절차서</div>
+    </div>
+    <div class="doc-card" style="background:var(--green-l);border-color:#a0c870;">
+      <div class="doc-ext" style="color:var(--green-d);">TXT</div>
+      <div class="doc-name">텍스트 파일</div>
+      <div class="doc-note">로그, 메모, 코드 스니펫, 설정 파일</div>
+    </div>
+    <div class="doc-card" style="background:var(--kb-l);border-color:#80c8b4;">
+      <div class="doc-ext" style="color:var(--kb-d);">MD</div>
+      <div class="doc-name">Markdown</div>
+      <div class="doc-note">README, 기술 문서, 위키 내용</div>
+    </div>
+    <div class="doc-card" style="background:var(--inst-l);border-color:#e0c070;">
+      <div class="doc-ext" style="color:var(--inst-d);">CSV</div>
+      <div class="doc-name">데이터 파일</div>
+      <div class="doc-note">통계 데이터, 고객 목록, 제품 카탈로그</div>
+    </div>
+    <div class="doc-card" style="background:var(--doc-l);border-color:#c0a0e0;">
+      <div class="doc-ext" style="color:var(--doc-d);">기타</div>
+      <div class="doc-name">이미지·코드</div>
+      <div class="doc-note">PNG/JPG 이미지, .py .js .html 코드 파일</div>
+    </div>
+    <div class="doc-card" style="background:var(--sky-l);border-color:#90b8e0;">
+      <div class="doc-ext" style="color:var(--sky-d);">XLSX</div>
+      <div class="doc-name">Excel 파일</div>
+      <div class="doc-note">스프레드시트, 예산표, 데이터 분석</div>
+    </div>
+    <div class="doc-card" style="background:var(--paper2);border-color:var(--paper3);">
+      <div class="doc-ext" style="color:var(--ink3);">기타</div>
+      <div class="doc-name">PPTX 등</div>
+      <div class="doc-note">발표 자료, 슬라이드 내용 분석</div>
+    </div>
+  </div>
+
+  <h3>2-2. 효과적인 문서 업로드 전략</h3>
+
+  <div class="steps">
+    <div class="step">
+      <div class="sn"></div>
+      <div class="sb">
+        <div class="st">전략 1: 핵심 문서 우선 — "80/20 원칙"</div>
+        <div class="sd">모든 문서를 다 올리는 것보다, 클로드가 가장 자주 참조할 핵심 문서 2~5개를 엄선하세요. 너무 많은 문서는 오히려 클로드의 답변 정확도를 낮출 수 있습니다.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="sn"></div>
+      <div class="sb">
+        <div class="st">전략 2: 문서 품질 높이기 — 업로드 전 정제</div>
+        <div class="sd">스캔된 PDF(이미지 기반)보다 텍스트 기반 PDF가 훨씬 잘 인식됩니다. 업로드 전에 텍스트 복사가 되는지 확인하세요. OCR이 적용된 스캔 문서는 품질이 떨어질 수 있습니다.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="sn"></div>
+      <div class="sb">
+        <div class="st">전략 3: 문서 구조 명확히 — 제목·목차·섹션</div>
+        <div class="sd">클로드는 문서의 구조를 파악해서 관련 부분을 찾아냅니다. 헤더, 섹션 제목, 목차가 명확한 문서일수록 참조 정확도가 높아집니다.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="sn"></div>
+      <div class="sb">
+        <div class="st">전략 4: 문서 설명 제공 — Instructions에 명시</div>
+        <div class="sd">Instructions에 "doc1.pdf는 2026년 제품 로드맵입니다. doc2.pdf는 경쟁사 분석 보고서입니다"처럼 각 문서가 무엇인지 설명하면 클로드가 상황에 맞는 문서를 먼저 참조합니다.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="sn"></div>
+      <div class="sb">
+        <div class="st">전략 5: 정기 업데이트 — 지식 기반 최신화</div>
+        <div class="sd">업로드한 문서는 자동으로 업데이트되지 않습니다. 새 버전 문서가 나오면 기존 파일을 삭제하고 새 파일을 업로드하세요. 날짜를 파일명에 포함하면 관리가 편합니다.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="box scenario">
+    <div class="box-lbl">🎭 실습 시나리오 2</div>
+    <strong>상황:</strong> 고객 지원팀의 Projects를 만들려고 합니다. 제품 FAQ, 정책 문서, 응대 가이드라인을 업로드하고 클로드가 이를 기반으로 고객 응대 초안을 작성해줬으면 합니다.<br>
+    <strong>목표:</strong> 문서 업로드 후 클로드가 문서를 잘 이해했는지 확인하기
+  </div>
+
+  <div class="pb">
+    <div class="pb-lbl"><span class="pb-num pn-k">P-02</span>복사해서 바로 쓰는 프롬프트 — 문서 업로드 후 이해도 확인 테스트</div>
+    <button class="copy-btn" onclick="cp(this)">복사</button>
+    <div class="pt"><span class="cm"># 업로드한 문서들을 클로드가 잘 파악했는지 테스트</span>
+
+방금 업로드한 문서들을 검토하고 아래 질문들에 답해줘.
+
+① 각 문서의 핵심 내용 3줄 요약 (문서별로)
+② 문서들 사이에 내용이 겹치거나 충돌하는 부분이 있으면 알려줘
+③ 문서에서 불명확하거나 더 정보가 필요한 부분은?
+④ 이 문서들을 바탕으로 내가 자주 요청할 것 같은 질문 3가지와 예상 답변을 짧게
+
+그리고 테스트 질문:
+<em>"[업로드한 문서와 관련된 실제 질문 하나]"</em>
+이 질문에 답할 때, 어떤 문서의 몇 번째 섹션을 참조했는지도 알려줘.</div>
+  </div>
+
+  <div class="pb">
+    <div class="pb-lbl"><span class="pb-num pn-k">P-03</span>복사해서 바로 쓰는 프롬프트 — 문서에서 특정 정보 추출하기</div>
+    <button class="copy-btn" onclick="cp(this)">복사</button>
+    <div class="pt"><span class="cm"># 업로드된 문서에서 필요한 정보만 골라내기</span>
+
+업로드된 문서들에서 아래 정보를 찾아서 정리해줘.
+
+[찾을 정보]
+① <em>[예: 환불 정책의 세부 조건과 기한]</em>
+② <em>[예: 제품 보증 기간 및 적용 범위]</em>
+③ <em>[예: 고객 응대 시 사용해야 할 공식 표현들]</em>
+
+[정리 형식]
+각 정보마다:
+- 핵심 내용 (2~3문장)
+- 출처 (문서명 + 해당 섹션)
+- 주의사항 또는 예외 조건
+
+[추가 요청]
+위 정보들을 바탕으로 고객이 "환불 요청"을 해왔을 때
+우리 정책에 맞는 응대 시나리오 1개를 예시로 작성해줘.</div>
+  </div>
+</div>
+
+
+<!-- ══ S3: Instructions ══ -->
+<div class="sec acc-inst" id="s3">
+  <div class="sec-eyebrow">Section 3 · Instructions 작성법</div>
+  <h2>📋 Instructions — 클로드를 내 전문가 파트너로 만들기</h2>
+  <p class="sub">Instructions는 프로젝트의 두뇌입니다. 잘 작성된 Instructions 하나가 수십 번의 프롬프트를 대체합니다.</p>
+
+  <h3>좋은 Instructions의 6가지 구성 요소</h3>
+  <table class="tbl">
+    <thead><tr><th>요소</th><th>내용</th><th>예시</th></tr></thead>
+    <tbody>
+      <tr><td><strong>① 역할 정의</strong></td><td>클로드의 페르소나와 전문성</td><td>"너는 [회사명]의 B2B 마케팅 전략 어시스턴트야"</td></tr>
+      <tr><td><strong>② 목적·용도</strong></td><td>이 프로젝트의 목적</td><td>"이 프로젝트의 목적은 주간 마케팅 보고서 작성 지원"</td></tr>
+      <tr><td><strong>③ 지식 베이스 안내</strong></td><td>업로드한 문서 설명</td><td>"[문서명]은 2026 제품 로드맵, [문서명]은 경쟁사 분석"</td></tr>
+      <tr><td><strong>④ 응답 규칙</strong></td><td>언어·형식·길이·어조</td><td>"항상 한국어로, 비즈니스 어조, 500자 이내"</td></tr>
+      <tr><td><strong>⑤ 금지 사항</strong></td><td>하면 안 되는 것</td><td>"문서에 없는 내용 추측 금지, 확실하지 않으면 명시"</td></tr>
+      <tr><td><strong>⑥ 출력 형식</strong></td><td>결과물 구조 지정</td><td>"항상 [요약] [근거] [다음 단계] 형식으로"</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Instructions 작성 전 피해야 할 것들</h3>
+
+  <div class="ba">
+    <div class="ba-card ba-before">
+      <div class="ba-lbl">❌ 나쁜 Instructions 패턴</div>
+      너무 짧음: "마케팅 도와줘" — 방향이 없음<br>
+      너무 모호: "전문적으로 답해줘" — 기준 없음<br>
+      너무 길고 복잡: 500줄의 규칙 목록 — 따르기 어려움<br>
+      중복 규칙: 같은 말을 다른 표현으로 반복<br>
+      모순 규칙: "간결하게" + "상세하게" 동시 요구
+    </div>
+    <div class="ba-card ba-after">
+      <div class="ba-lbl">✅ 좋은 Instructions 패턴</div>
+      명확한 역할: 구체적 페르소나 1가지<br>
+      실행 가능한 규칙: "최대 300자" 처럼 구체적<br>
+      적절한 길이: 5~10개 핵심 규칙<br>
+      우선순위 명시: "가장 중요한 것은..."<br>
+      업로드 문서 참조: 각 파일의 역할 명시
+    </div>
+  </div>
+
+  <div class="box scenario">
+    <div class="box-lbl">🎭 실습 시나리오 3</div>
+    <strong>상황:</strong> 클로드에게 내 회사 고객 응대 방식을 완전히 익혀줬으면 합니다. 정책 문서와 FAQ를 업로드했고, Instructions를 작성해야 합니다.<br>
+    <strong>목표:</strong> 고객 지원 전문 Instructions 완성
+  </div>
+
+  <div class="pb">
+    <div class="pb-lbl"><span class="pb-num pn-i">P-04</span>복사해서 바로 쓰는 프롬프트 — 내 상황에 맞는 Instructions 자동 생성</div>
+    <button class="copy-btn" onclick="cp(this)">복사</button>
+    <div class="pt"><span class="cm"># 클로드가 내 답변을 바탕으로 최적화된 Instructions를 작성해줌</span>
+
+내 Projects에 넣을 Instructions를 작성해줘.
+아래 질문들에 내가 답할게, 그걸 바탕으로 작성해줘.
+
+질문 1: 이 프로젝트에서 클로드가 맡을 역할은? (직업·전문 분야)
+답변: <em>[예: 우리 회사 SaaS 제품의 고객 지원 전문가]</em>
+
+질문 2: 주로 어떤 요청을 할 건가? (상위 3가지)
+답변: <em>[예: 고객 이메일 초안 작성, FAQ 응대 작성, 정책 해석]</em>
+
+질문 3: 업로드할 문서 종류와 각 문서의 역할은?
+답변: <em>[예: product_policy.pdf = 환불·교환 정책, faq.pdf = 자주 묻는 질문]</em>
+
+질문 4: 클로드가 반드시 지켜야 할 규칙 2~3가지는?
+답변: <em>[예: 항상 한국어, 문서에 없는 내용 추측 금지, 공식적 어조]</em>
+
+질문 5: 원하는 출력 형식이나 특별한 요구사항은?
+답변: <em>[예: 이메일은 항상 제목 + 본문 + 서명 형식]</em>
+
+위 답변을 바탕으로 바로 프로젝트 Instructions 창에 붙여넣을 수 있는 텍스트를 작성해줘.</div>
+  </div>
+
+  <h3>직종별 Instructions 템플릿 — 바로 복사해서 수정하세요</h3>
+
+  <div class="inst-box">
+    <div class="inst-head">📊 마케터 / 브랜드 매니저용 Instructions 템플릿</div>
+    <div class="inst-body">너는 [회사명]의 디지털 마케팅 전략 어시스턴트야.
+주요 역할: 캠페인 기획, 카피라이팅, 콘텐츠 전략, 성과 분석 지원.
+
+[업로드 문서 안내]
+- brand_guide.pdf: 브랜드 톤앤보이스, 금지 표현, 색상 가이드
+- campaign_history.pdf: 2024-25년 캠페인 결과 및 인사이트
+- competitor_analysis.pdf: 주요 경쟁사 포지셔닝 분석
+
+[응답 규칙]
+1. 항상 한국어로, 브랜드 가이드의 톤앤보이스 유지
+2. 카피는 항상 3가지 버전(보수적/중간/과감한) 제시
+3. 성과 데이터 인용 시 반드시 출처 문서 명시
+4. 불확실한 내용은 "(확인 필요)"로 표시
+
+[출력 형식]
+이메일 카피: 제목줄 3개 + 본문 초안
+SNS 콘텐츠: 캡션 + 해시태그 5개 + 이미지 방향 제안</div>
+  </div>
+
+  <div class="pb">
+    <div class="pb-lbl"><span class="pb-num pn-i">P-05</span>복사해서 바로 쓰는 프롬프트 — Instructions 품질 검증</div>
+    <button class="copy-btn" onclick="cp(this)">복사</button>
+    <div class="pt"><span class="cm"># 작성한 Instructions가 잘 작동하는지 검증하는 방법</span>
+
+내가 작성한 Instructions를 검토해줘.
+
+[내가 작성한 Instructions]
+<em>--- 여기에 작성한 Instructions 텍스트를 붙여넣으세요 ---</em>
+
+검토 기준:
+① 역할이 명확하고 구체적인가? (애매한 부분 지적)
+② 규칙들이 실제로 실행 가능한가? (모호한 규칙 지적)
+③ 서로 모순되는 규칙이 있는가?
+④ 중요한데 빠진 요소가 있는가?
+⑤ 너무 길거나 불필요한 부분은?
+
+개선된 버전도 함께 작성해줘.
+원본의 의도는 유지하면서, 더 명확하고 실행 가능하게.</div>
+  </div>
+</div>
+
+
+<!-- ══ S4: 직업별 템플릿 ══ -->
+<div class="sec" id="s4">
+  <div class="sec-eyebrow">Section 4 · 직업별 완성형 Projects 템플릿</div>
+  <h2>💼 직업별 Projects 완성형 템플릿 6종</h2>
+  <p class="sub">아래 템플릿을 복사해서 기울임꼴 부분만 내 상황으로 바꾸면 바로 사용 가능합니다.</p>
+
+  <h3>템플릿 1: 연구자 · 대학원생 — 논문 리서치 프로젝트</h3>
+
+  <div class="kb-card">
+    <div class="kb-head">📚 논문 리서치 프로젝트 설정</div>
+    <div class="kb-body">
+      <strong>프로젝트 이름:</strong> [연구 주제] 리서치 2026<br>
+      <strong>업로드할 문서:</strong> 핵심 논문 PDF 5~10편, 리뷰 논문 2~3편, 내 연구 노트<br>
+      <strong>Instructions 핵심:</strong> 학술 어조, 출처 필수 인용, 방법론 중심 분석
+    </div>
+  </div>
+
+  <div class="pb">
+    <div class="pb-lbl"><span class="pb-num pn-k">P-06</span>복사해서 바로 쓰는 프롬프트 — 연구자: 논문 비교 분석</div>
+    <button class="copy-btn" onclick="cp(this)">복사</button>
+    <div class="pt"><span class="cm"># 업로드된 논문들을 체계적으로 비교 분석</span>
+
+업로드된 논문들을 비교 분석해줘.
+
+[분석 기준]
+① 연구 질문/가설: 각 논문이 무엇을 주장하는가
+② 연구 방법론: 정량/정성, 샘플 크기, 분석 방법
+③ 핵심 발견: 주요 결과 2~3가지
+④ 한계점: 각 논문이 인정하는 한계
+⑤ 상호 관계: 논문들 사이 일치/불일치 지점
+
+[출력 형식]
+비교 표 (논문 제목 vs 분석 기준) + 종합 인사이트 단락
+
+[추가 질문]
+내 연구 주제 "<em>[연구 주제]</em>"와 가장 직접적으로 관련된 논문 2편을 선택해서 그 이유를 설명해줘.
+그리고 이 논문들에서 내가 인용해야 할 핵심 문장 3개를 추천해줘.</div>
+  </div>
+
+  <h3>템플릿 2: 영업 · 비즈니스 개발 — 제안서 작성 프로젝트</h3>
+
+  <div class="pb">
+    <div class="pb-lbl"><span class="pb-num pn-k">P-07</span>복사해서 바로 쓰는 프롬프트 — 영업: 고객 맞춤 제안서 초안</div>
+    <button class="copy-btn" onclick="cp(this)">복사</button>
+    <div class="pt"><span class="cm"># 업로드된 제품 문서 + 고객 정보 = 맞춤 제안서</span>
+
+아래 고객 정보와 업로드된 제품/서비스 문서를 바탕으로 제안서 초안을 작성해줘.
+
+[고객 정보]
+회사명: <em>[고객사명]</em>
+업종: <em>[예: 제조업, 물류, 이커머스]</em>
+규모: <em>[직원 수, 매출 규모 등]</em>
+현재 문제/니즈: <em>[고객이 말한 핵심 문제]</em>
+예산 범위: <em>[알고 있으면]</em>
+의사결정자: <em>[직급·역할]</em>
+
+[제안서 구성]
+① 핵심 요약 (Executive Summary): 1페이지 분량
+② 문제 공감: 고객 상황을 우리가 이해함을 보여줌
+③ 우리 솔루션: 문서 기반으로 고객 문제에 맞게 조정
+④ 기대 효과: 수치 포함 (문서의 사례 데이터 활용)
+⑤ 다음 단계: 명확한 행동 촉구
+
+문서에 없는 내용은 "(확인 필요)"로 표시해줘.</div>
+  </div>
+
+  <h3>템플릿 3: 교사 · 교육자 — 수업 자료 프로젝트</h3>
+
+  <div class="pb">
+    <div class="pb-lbl"><span class="pb-num pn-k">P-08</span>복사해서 바로 쓰는 프롬프트 — 교사: 문서 기반 수업 자료 생성</div>
+    <button class="copy-btn" onclick="cp(this)">복사</button>
+    <div class="pt"><span class="cm"># 업로드된 교재/커리큘럼을 바탕으로 수업 자료 제작</span>
+
+업로드된 교재와 커리큘럼을 바탕으로 이번 주 수업 자료를 만들어줘.
+
+[이번 주 수업 정보]
+단원/주제: <em>[예: 3-2단원 이차방정식]</em>
+학습 목표: <em>[예: 근의 공식 이해 및 적용]</em>
+수업 시간: <em>[예: 50분 × 3차시]</em>
+학생 수준: <em>[예: 수학 중간 수준, 산만한 학생 5명]</em>
+
+[만들 자료]
+① 수업 지도안: 차시별 시간 배분 + 교사 발화 예시
+② 개념 설명 자료: 단계별 예시 + 비유 2가지
+③ 연습 문제 8개: 수준별(쉬움 3/보통 3/심화 2)
+④ 형성평가 5문항: OX 2개 + 단답 2개 + 서술 1개
+
+교재 내용을 벗어나지 말고, 교재의 예시와 설명 방식을 따라줘.</div>
+  </div>
+
+  <h3>템플릿 4: 스타트업 창업자 · PM — 제품 전략 프로젝트</h3>
+
+  <div class="pb">
+    <div class="pb-lbl"><span class="pb-num pn-k">P-09</span>복사해서 바로 쓰는 프롬프트 — PM: 문서 기반 PRD 작성</div>
+    <button class="copy-btn" onclick="cp(this)">복사</button>
+    <div class="pt"><span class="cm"># 업로드된 시장 조사·사용자 리서치로 PRD 초안 작성</span>
+
+업로드된 문서들(시장 조사, 사용자 인터뷰, 경쟁사 분석)을 바탕으로
+아래 기능의 PRD(제품 요구사항 문서) 초안을 작성해줘.
+
+[기능 정보]
+기능명: <em>[예: 알림 센터 리뉴얼]</em>
+배경: <em>[왜 이 기능이 필요한지]</em>
+담당 팀: <em>[예: 프론트엔드 + 백엔드 각 2명]</em>
+
+[PRD 구조]
+① 개요 (한 단락)
+② 문제 정의 — 문서의 사용자 리서치 근거 포함
+③ 목표 및 성공 지표 (KPI 3가지)
+④ 사용자 스토리 (최소 5개)
+⑤ 범위 내 / 범위 외
+⑥ 기술적 고려사항 — 문서의 아키텍처 내용 참조
+⑦ 리스크 및 의존성
+⑧ 타임라인 제안
+
+문서에서 근거를 인용할 때 "(출처: [문서명])"을 붙여줘.</div>
+  </div>
+</div>
+
+
+<!-- ══ S5: 문서 활용 심화 ══ -->
+<div class="sec acc-doc" id="s5">
+  <div class="sec-eyebrow">Section 5 · 문서 활용 심화</div>
+  <h2>🔍 문서 활용 심화 — 분석 · 요약 · Q&amp;A</h2>
+  <p class="sub">업로드한 문서를 단순히 "참조"하는 수준을 넘어, 문서에서 인사이트를 추출하고 지식을 재구성하는 고급 활용법을 배웁니다.</p>
+
+  <h3>문서 기반 고급 작업 5가지</h3>
+
+  <div class="uc-grid">
+    <div class="uc-card">
+      <div class="uc-icon">🔎</div>
+      <div class="uc-title">교차 참조</div>
+      <div class="uc-desc">여러 문서에서 동일 주제를 찾아 비교·대조하기</div>
+    </div>
+    <div class="uc-card">
+      <div class="uc-icon">📊</div>
+      <div class="uc-title">갭 분석</div>
+      <div class="uc-desc">문서들에서 빠진 정보나 모순 찾아내기</div>
+    </div>
+    <div class="uc-card">
+      <div class="uc-icon">✂️</div>
+      <div class="uc-title">요약·증류</div>
+      <div class="uc-desc">긴 문서를 핵심만 남긴 간결한 버전으로 압축</div>
+    </div>
+    <div class="uc-card">
+      <div class="uc-icon">❓</div>
+      <div class="uc-title">Q&amp;A 생성</div>
+      <div class="uc-desc">문서 내용으로 FAQ·퀴즈·인터뷰 문항 자동 생성</div>
+    </div>
+    <div class="uc-card">
+      <div class="uc-icon">🔄</div>
+      <div class="uc-title">형식 변환</div>
+      <div class="uc-desc">정책 문서 → 체크리스트, 보고서 → 슬라이드 노트</div>
+    </div>
+    <div class="uc-card">
+      <div class="uc-icon">💡</div>
+      <div class="uc-title">인사이트 추출</div>
+      <div class="uc-desc">데이터·보고서에서 행동 가능한 인사이트 도출</div>
+    </div>
+  </div>
+
+  <div class="box scenario">
+    <div class="box-lbl">🎭 실습 시나리오 4</div>
+    <strong>상황:</strong> 회사 내부 정책 문서 3개(인사 정책, 복리후생 가이드, 휴가 규정)를 업로드했습니다. 신입 직원 온보딩 자료로 재가공해야 합니다.<br>
+    <strong>목표:</strong> 복잡한 정책 문서 → 신입 직원이 이해하기 쉬운 FAQ 및 체크리스트로 변환
+  </div>
+
+  <div class="pb">
+    <div class="pb-lbl"><span class="pb-num pn-d">P-10</span>복사해서 바로 쓰는 프롬프트 — 문서 → FAQ 자동 생성</div>
+    <button class="copy-btn" onclick="cp(this)">복사</button>
+    <div class="pt"><span class="cm"># 업로드된 정책 문서에서 FAQ 자동 생성</span>
+
+업로드된 문서들을 바탕으로 신입 직원 FAQ를 만들어줘.
+
+[FAQ 생성 기준]
+① 신입 직원이 첫 달에 가장 자주 물어볼 것 같은 질문 10개 추출
+② 각 질문에 대한 답변: 문서 내용 기반, 이해하기 쉬운 언어로
+③ 관련 문서와 섹션 표시: "(인사 정책 3.2절 참조)"
+
+[형식]
+Q: [질문]
+A: [답변 — 2~3문장]
+📄 출처: [문서명, 섹션]
+
+[추가 요청]
+① FAQ 외에, 신입 직원이 입사 첫 주에 완료해야 할 체크리스트도 만들어줘
+   (문서에 언급된 필수 절차들을 체크리스트 형식으로)
+② 문서에 명확히 명시되지 않아서 HR에 직접 확인해야 할 사항이 있으면 알려줘</div>
+  </div>
+
+  <div class="pb">
+    <div class="pb-lbl"><span class="pb-num pn-d">P-11</span>복사해서 바로 쓰는 프롬프트 — 대용량 보고서 핵심 추출</div>
+    <button class="copy-btn" onclick="cp(this)">복사</button>
+    <div class="pt"><span class="cm"># 긴 보고서에서 실행 가능한 인사이트만 추출</span>
+
+업로드된 보고서에서 의사결정에 필요한 핵심만 추출해줘.
+
+[보고서 정보]
+보고서 유형: <em>[예: 시장 조사 보고서, 경쟁사 분석, 연간 업계 트렌드 보고서]</em>
+내 관심 분야: <em>[예: 우리가 진출할 동남아 시장, 20~30대 여성 고객층]</em>
+의사결정 맥락: <em>[예: 내년 마케팅 예산 배분, 신규 기능 우선순위 결정]</em>
+
+[추출 항목]
+① 핵심 통계 및 수치 (Top 5) — 인용 가능한 형태로
+② 내 관심 분야 관련 내용 요약 (3~5문단)
+③ 경쟁 환경 변화에서 우리에게 기회/위협이 되는 것
+④ 즉시 행동 가능한 인사이트 3가지
+⑤ 이 보고서의 한계점 또는 주의할 편향
+
+[형식]
+임원 보고용 1페이지 요약본 형태로 작성해줘.</div>
+  </div>
+</div>
+
+
+<!-- ══ S6: 고급 전략 ══ -->
+<div class="sec acc-adv" id="s6">
+  <div class="sec-eyebrow">Section 6 · 고급 전략</div>
+  <h2>⚡ 고급 전략 — KB 최적화 &amp; 프로젝트 유지 관리</h2>
+  <p class="sub">Projects를 만드는 것에서 끝나지 않고, 지속적으로 더 강력해지는 지식 기반을 만드는 고급 전략을 배웁니다.</p>
+
+  <h3>KB 최적화 — 더 잘 작동하는 지식 기반 만들기</h3>
+
+  <div class="steps">
+    <div class="step">
+      <div class="sn"></div>
+      <div class="sb">
+        <div class="st">문서 인덱스 문서 만들기</div>
+        <div class="sd">별도의 "index.txt" 파일을 만들어서 "파일명: 내용 설명 / 최적 활용 상황"을 정리해 업로드합니다. Instructions에서 "index.txt를 먼저 참조해서 어떤 문서를 봐야 할지 결정해라"고 지시하면 정확도가 높아집니다.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="sn"></div>
+      <div class="sb">
+        <div class="st">질문-답변 쌍 문서 추가</div>
+        <div class="sd">과거에 클로드와 나눈 좋은 Q&A를 별도 파일로 저장해서 업로드합니다. "이전에 우리가 합의한 답변 방식"이 지식 기반에 쌓여서 일관성이 높아집니다.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="sn"></div>
+      <div class="sb">
+        <div class="st">날짜 기반 파일 관리</div>
+        <div class="sd">파일명에 날짜를 포함합니다(예: <code>competitor_analysis_202604.pdf</code>). Instructions에서 "최신 파일을 우선 참조해라"고 지시하면 오래된 정보가 혼재되는 것을 방지합니다.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="sn"></div>
+      <div class="sb">
+        <div class="st">분기별 KB 점검 루틴</div>
+        <div class="sd">3개월마다 프로젝트 문서를 점검합니다. 구버전 파일 삭제, 새 문서 추가, Instructions 업데이트. 이를 Projects 안에서 직접 클로드에게 요청하면 됩니다.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="box scenario">
+    <div class="box-lbl">🎭 실습 시나리오 5 (종합 마스터)</div>
+    <strong>상황:</strong> 스타트업의 고객 지원 팀장입니다. 클로드 프로젝트를 만들어 팀 전체의 고객 응대 품질을 일관되게 유지하고 싶습니다. FAQ, 정책 문서, 과거 응대 사례를 모두 활용해야 합니다.<br>
+    <strong>목표:</strong> 팀 전체가 공유할 수 있는 고객 지원 전문 KB 프로젝트 완성
+  </div>
+
+  <div class="pb">
+    <div class="pb-lbl"><span class="pb-num pn-a">P-12</span>복사해서 바로 쓰는 프롬프트 — 팀 공유 고객 지원 KB 구축</div>
+    <button class="copy-btn" onclick="cp(this)">복사</button>
+    <div class="pt"><span class="cm"># 팀 전체를 위한 고객 지원 지식 기반 세팅</span>
+
+팀 전체가 사용할 고객 지원 Claude 프로젝트의 지식 기반 구축을 도와줘.
+
+[팀 상황]
+회사: <em>[업종 + 회사 규모]</em>
+제품/서비스: <em>[간단 설명]</em>
+팀 규모: <em>[고객 지원 팀원 수]</em>
+현재 문제: <em>[예: 담당자마다 응대 품질이 다름, 신입 교육에 시간이 많이 걸림]</em>
+
+[1단계: 문서 구조 설계]
+아래 유형의 문서들을 어떻게 구성하면 좋을지 제안해줘:
+- 환불/교환 정책
+- 자주 묻는 질문 모음
+- 응대 불가 요청 처리 방침
+- 에스컬레이션 기준
+
+[2단계: Instructions 초안]
+위 문서 구조를 전제로 프로젝트 Instructions 초안을 작성해줘.
+팀원 누구나 쓸 수 있도록 명확하고 간결하게.
+
+[3단계: 응대 템플릿]
+업로드될 문서 기반으로 다음 상황의 응대 초안 템플릿을 만들어줘:
+① 환불 거절 (정중하게)
+② 배송 지연 사과
+③ 기술 문제 접수 → 기술팀 에스컬레이션</div>
+  </div>
+
+  <div class="pb">
+    <div class="pb-lbl"><span class="pb-num pn-a">P-13</span>복사해서 바로 쓰는 프롬프트 — 프로젝트 건강 점검 (분기별)</div>
+    <button class="copy-btn" onclick="cp(this)">복사</button>
+    <div class="pt"><span class="cm"># 3개월마다 이 프롬프트를 사용해서 프로젝트를 최신 상태로 유지</span>
+
+이 프로젝트의 분기별 건강 점검을 해줘.
+
+[점검 항목]
+① 현재 업로드된 문서 목록 파악
+   - 각 문서의 내용이 최신 상태인지 판단 가능한 경우 체크
+   - 날짜 기반으로 오래된 문서 (6개월 이상) 식별
+
+② Instructions 검토
+   - 현재 Instructions에서 불명확하거나 모순된 부분
+   - 추가하면 좋을 규칙이나 삭제해야 할 규칙
+
+③ 이 프로젝트의 활용 패턴 분석
+   - 어떤 유형의 질문을 가장 많이 했는지
+   - 자주 발생하는 답변 패턴 (템플릿화할 수 있는 것)
+
+④ 개선 권고사항
+   - 추가해야 할 문서 유형
+   - 프로젝트를 더 효과적으로 만들 3가지 제안
+
+⑤ 다음 분기 활용 계획 제안</div>
+  </div>
+
+  <div class="pb">
+    <div class="pb-lbl"><span class="pb-num pn-x">P-14</span>복사해서 바로 쓰는 프롬프트 — 마스터: 완성형 프로젝트 세팅 원스톱</div>
+    <button class="copy-btn" onclick="cp(this)">복사</button>
+    <div class="pt"><span class="cm"># 처음 프로젝트를 만들 때, 이 프롬프트 하나로 모든 세팅을 원스톱으로</span>
+
+내가 새 클로드 프로젝트를 만들려고 해.
+아래 내 상황을 보고 프로젝트 완성에 필요한 모든 것을 한 번에 만들어줘.
+
+[내 상황]
+직업/역할: <em>[구체적으로]</em>
+이 프로젝트의 목적: <em>[한 문장으로]</em>
+주로 할 작업 Top 3: <em>[구체적인 작업들]</em>
+현재 갖고 있는 문서: <em>[파일 유형과 내용 설명]</em>
+팀 사용 여부: <em>[개인용 / 팀 공유]</em>
+
+만들어줄 것:
+① 프로젝트 이름 제안 3개
+② 프로젝트 Instructions 완성본 (바로 붙여넣기 가능하게)
+③ 업로드해야 할 문서 우선순위 목록
+④ 문서 인덱스 파일 초안 (index.txt)
+⑤ 이 프로젝트에서 가장 먼저 해볼 대화 3가지
+⑥ 30일 활용 계획 (어떤 작업부터 시작할지)</div>
+  </div>
+
+  <hr>
+
+  <h3>오늘 배운 내용 최종 정리</h3>
+  <div class="summary">
+    <div class="summary-title">📌 Day 11 — 클로드 Projects 핵심 요약</div>
+    <div class="summary-grid">
+      <div class="summary-card">
+        <strong>📁 Projects 3요소</strong>
+        Instructions(역할·규칙) + Knowledge(문서) + Conversations(대화)<br>
+        영구 컨텍스트 유지
+      </div>
+      <div class="summary-card">
+        <strong>📚 KB 구축 5전략</strong>
+        핵심 문서 우선 · 품질 정제 · 구조 명확 · 설명 포함 · 정기 업데이트
+      </div>
+      <div class="summary-card">
+        <strong>📋 Instructions 6요소</strong>
+        역할·목적·KB안내·응답규칙·금지사항·출력형식<br>
+        5~10개 핵심 규칙이 최적
+      </div>
+      <div class="summary-card">
+        <strong>🔍 문서 활용 6방법</strong>
+        교차참조·갭분석·요약·Q&A생성·형식변환·인사이트추출
+      </div>
+      <div class="summary-card">
+        <strong>⚡ 고급 최적화</strong>
+        문서 인덱스 · Q&A 쌍 축적 · 날짜 기반 관리 · 분기별 점검
+      </div>
+      <div class="summary-card">
+        <strong>🎓 다음 학습</strong>
+        Day 12 — Projects 심화<br>
+        커스텀 지침으로 일관된 답변 유지
+      </div>
+    </div>
+    <div style="margin-top:1rem;padding:1rem;background:rgba(255,255,255,.65);border-radius:8px;font-size:13px;">
+      <strong>💡 오늘 바로 실천:</strong> P-14 마스터 프롬프트를 사용해서 지금 당장 프로젝트를 하나 만들어보세요. 완벽한 문서가 없어도 괜찮습니다. 빈 Knowledge로 시작해서 Instructions만 잘 설정해도 즉시 효과를 느낄 수 있습니다.<br><br>
+      <strong>📌 핵심 원칙:</strong> Projects는 처음부터 완벽하게 만들 필요가 없습니다. 매주 조금씩 더 좋은 문서를 추가하고 Instructions를 다듬는 것이 더 강력한 지식 기반을 만드는 방법입니다.
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <p>이 교재는 2026년 4월 기준 claude.ai Projects 기능을 바탕으로 작성되었습니다.</p>
+  <p>공식 Projects 가이드: <strong>support.claude.com</strong> · 최신 업데이트: <strong>claude.com/news</strong></p>
+</div>
+
+</div>
+
+<script>
+function cp(btn){
+  const b=btn.closest('.pb').querySelector('.pt');
+  const txt=b.innerText||b.textContent;
+  navigator.clipboard.writeText(txt).then(()=>{
+    const o=btn.textContent;
+    btn.textContent='✓ 복사됨'; btn.style.color='#4ade80';
+    setTimeout(()=>{ btn.textContent=o; btn.style.color=''; },1800);
+  }).catch(()=>{ btn.textContent='실패'; setTimeout(()=>{ btn.textContent='복사'; },1800); });
+}
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    e.preventDefault();
+    const t=document.querySelector(a.getAttribute('href'));
+    if(t) t.scrollIntoView({behavior:'smooth',block:'start'});
+  });
+});
+</script>
+</body>
+</html>
